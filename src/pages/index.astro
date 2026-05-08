@@ -76,15 +76,49 @@ const categories = [
     <!-- Featured Burger -->
     <section class="featured">
       <div class="section-inner featured-inner">
-        <div class="featured-img-placeholder" aria-hidden="true"></div>
+        <img
+          src="/images/meaty-faced-sauce-burger.webp"
+          alt="The Meaty Faced Sauce Burger"
+          class="featured-img"
+        />
         <div class="featured-text">
           <p class="featured-eyebrow">Our Signature</p>
           <h2 class="featured-title">The Meaty Faced Sauce Burger</h2>
           <p class="featured-desc">
-            Placeholder description — a legendary stack of flavor that'll be described right here
-            once the full menu copy arrives.
+            Two smashed patties, melted cheddar, house meaty sauce dripping down every layer.
+            This is what we do. This is why we exist.
           </p>
           <a href="/menu" class="btn btn-primary">Order Now</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- More from the Menu -->
+    <section class="signatures">
+      <div class="section-inner">
+        <h2 class="section-heading">More from the Menu</h2>
+        <div class="sig-grid">
+          <a href="/menu" class="sig-card">
+            <img src="/images/ranchero-chicken.webp" alt="Ranchero Chicken Sandwich" class="sig-img" />
+            <div class="sig-body">
+              <h3 class="sig-name">Ranchero Chicken Sandwich</h3>
+              <p class="sig-desc">Crispy chicken, curly onion straws, ranch drizzle. Placeholder copy coming soon.</p>
+            </div>
+          </a>
+          <a href="/menu" class="sig-card">
+            <img src="/images/bacon-swiss.webp" alt="Bacon Swiss Burger" class="sig-img" />
+            <div class="sig-body">
+              <h3 class="sig-name">Bacon Swiss Burger</h3>
+              <p class="sig-desc">Swiss melt, crispy bacon, onion rings stacked high. Placeholder copy coming soon.</p>
+            </div>
+          </a>
+          <a href="/menu" class="sig-card">
+            <img src="/images/patty-melt.webp" alt="Patty Melt" class="sig-img" />
+            <div class="sig-body">
+              <h3 class="sig-name">Patty Melt</h3>
+              <p class="sig-desc">Griddled sourdough, caramelized onions, Swiss. A classic done right. Placeholder copy coming soon.</p>
+            </div>
+          </a>
         </div>
       </div>
     </section>
@@ -235,17 +269,12 @@ const categories = [
     align-items: center;
   }
 
-  .featured-img-placeholder {
+  .featured-img {
+    width: 100%;
     aspect-ratio: 4 / 3;
+    object-fit: cover;
     border-radius: 8px;
-    background-color: #e8e2dc;
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 12px,
-      rgba(218, 41, 28, 0.06) 12px,
-      rgba(218, 41, 28, 0.06) 24px
-    );
+    display: block;
   }
 
   .featured-eyebrow {
@@ -272,6 +301,67 @@ const categories = [
     color: var(--color-muted);
     line-height: 1.7;
     margin: 0 0 2rem;
+  }
+
+  /* ── Signatures ──────────────────────────── */
+  .signatures {
+    background-color: var(--color-bg);
+    padding: 5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .section-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 2.5rem;
+  }
+
+  .sig-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .sig-card {
+    text-decoration: none;
+    background-color: var(--color-surface);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .sig-card:hover {
+    box-shadow: 0 8px 24px rgba(218, 41, 28, 0.12);
+    transform: translateY(-3px);
+  }
+
+  .sig-img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    display: block;
+  }
+
+  .sig-body {
+    padding: 1.25rem;
+  }
+
+  .sig-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+  }
+
+  .sig-desc {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    margin: 0;
+    line-height: 1.6;
   }
 
   /* ── Locations Teaser ─────────────────────── */
@@ -350,6 +440,10 @@ const categories = [
       grid-template-columns: repeat(2, 1fr);
       gap: 2rem;
       justify-items: center;
+    }
+
+    .sig-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
