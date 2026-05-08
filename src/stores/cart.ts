@@ -35,6 +35,18 @@ export function removeFromCart(index: number) {
   cartItems.set(cartItems.get().filter((_, i) => i !== index));
 }
 
+export function updateQuantity(index: number, delta: number) {
+  const current = cartItems.get();
+  const item = current[index];
+  if (!item) return;
+  const newQty = item.quantity + delta;
+  if (newQty <= 0) {
+    removeFromCart(index);
+  } else {
+    cartItems.set(current.map((i, idx) => idx === index ? { ...i, quantity: newQty } : i));
+  }
+}
+
 export function clearCart() {
   cartItems.set([]);
 }

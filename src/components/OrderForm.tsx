@@ -313,13 +313,23 @@ export default function OrderForm({ locations }: Props) {
               padding: '1.25rem',
               marginBottom: '1.5rem',
             }}>
-              <h3 style={{
-                fontFamily: "'Bricolage Grotesque', sans-serif",
-                fontSize: '1rem',
-                fontWeight: 700,
-                color: '#1a1a1a',
-                margin: '0 0 1rem',
-              }}>Your Order</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{
+                  fontFamily: "'Bricolage Grotesque', sans-serif",
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  color: '#1a1a1a',
+                  margin: 0,
+                }}>Your Order</h3>
+                <a href="/menu" style={{
+                  fontSize: '0.775rem',
+                  fontWeight: 700,
+                  color: '#DA291C',
+                  textDecoration: 'none',
+                  letterSpacing: '0.05em',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}>← Edit Cart</a>
+              </div>
               {items.length === 0 ? (
                 <p style={{ fontSize: '0.875rem', color: '#767676', fontStyle: 'italic' }}>
                   Your cart is empty.{' '}

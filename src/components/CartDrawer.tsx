@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { cartItems, removeFromCart, cartTotal } from '../stores/cart';
+import { cartItems, removeFromCart, updateQuantity, cartTotal } from '../stores/cart';
 
 export default function CartDrawer() {
   const [open, setOpen] = useState(false);
@@ -132,39 +132,71 @@ export default function CartDrawer() {
                   borderRadius: '6px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0.4rem',
+                  gap: '0.5rem',
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#1a1a1a' }}>{item.title}</span>
-                      <span style={{ fontSize: '0.85rem', color: '#767676', marginLeft: '0.5rem' }}>× {item.quantity}</span>
-                    </div>
-                    <span style={{ fontWeight: 700, color: '#DA291C', fontSize: '0.9rem', whiteSpace: 'nowrap', marginLeft: '1rem' }}>
+                  {/* Title + price row */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#1a1a1a', lineHeight: 1.3 }}>{item.title}</span>
+                    <span style={{ fontWeight: 700, color: '#DA291C', fontSize: '0.9rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
+
+                  {/* Customizations */}
                   {item.customizations.length > 0 && (
-                    <ul style={{ margin: 0, paddingLeft: '1rem', fontSize: '0.78rem', color: '#767676' }}>
+                    <ul style={{ margin: 0, paddingLeft: '0.875rem', fontSize: '0.775rem', color: '#767676', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                       {item.customizations.map((c) => <li key={c}>{c}</li>)}
                     </ul>
                   )}
-                  <button
-                    onClick={() => removeFromCart(i)}
-                    style={{
-                      alignSelf: 'flex-start',
-                      background: 'none',
-                      border: 'none',
-                      color: '#DA291C',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      padding: 0,
-                      textDecoration: 'underline',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    Remove
-                  </button>
+
+                  {/* Quantity controls + remove */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.15rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+                      <button
+                        onClick={() => updateQuantity(i, -1)}
+                        aria-label="Decrease quantity"
+                        style={{
+                          width: '28px', height: '28px',
+                          background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.15)',
+                          borderRadius: '6px 0 0 6px', cursor: 'pointer',
+                          fontSize: '1rem', fontWeight: 700, color: '#1a1a1a',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >−</button>
+                      <span style={{
+                        width: '32px', height: '28px',
+                        background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.15)',
+                        borderLeft: 'none', borderRight: 'none',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '0.875rem', fontWeight: 700, color: '#1a1a1a',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}>{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(i, 1)}
+                        aria-label="Increase quantity"
+                        style={{
+                          width: '28px', height: '28px',
+                          background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.15)',
+                          borderRadius: '0 6px 6px 0', cursor: 'pointer',
+                          fontSize: '1rem', fontWeight: 700, color: '#DA291C',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >+</button>
+                    </div>
+                    <button
+                      onClick={() => removeFromCart(i)}
+                      style={{
+                        background: 'none', border: 'none',
+                        color: '#767676', fontSize: '0.75rem', fontWeight: 600,
+                        cursor: 'pointer', padding: 0, textDecoration: 'underline',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -201,7 +233,7 @@ export default function CartDrawer() {
                 textTransform: 'uppercase',
               }}
             >
-              Review Order →
+              Choose Location →
             </a>
           </div>
         )}
