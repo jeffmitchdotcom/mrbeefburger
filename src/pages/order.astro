@@ -9,6 +9,9 @@ const locations = allLocations.map(l => ({
   name: l.data.name,
   address: `${l.data.address}, ${l.data.city}, ${l.data.state}`,
   hours: l.data.hours,
+  lat: l.data.lat,
+  lng: l.data.lng,
+  state: l.data.state,
 }));
 ---
 

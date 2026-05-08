@@ -9,6 +9,9 @@ type Location = {
   name: string;
   address: string;
   hours: string;
+  lat: number;
+  lng: number;
+  state: string;
 };
 
 type Props = {
@@ -39,6 +42,18 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "'DM Sans', sans-serif",
 };
 
+function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 3958.8;
+  const toRad = (n: number) => n * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const defaultSort = (locs: Location[]) =>
+  [...locs].sort((a, b) => a.state.localeCompare(b.state) || a.name.localeCompare(b.name));
+
 export default function OrderForm({ locations }: Props) {
   const [step, setStep] = useState(1);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -48,6 +63,10 @@ export default function OrderForm({ locations }: Props) {
   const [specialRequests, setSpecialRequests] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sortedLocations, setSortedLocations] = useState<Location[]>(() => defaultSort(locations));
+  const [distances, setDistances] = useState<Record<string, string>>({});
+  const [geoLabel, setGeoLabel] = useState('Use my location');
+  const [geoDisabled, setGeoDisabled] = useState(false);
 
   const items = useStore(cartItems);
   const total = cartTotal(items);
@@ -105,6 +124,33 @@ export default function OrderForm({ locations }: Props) {
       setError('Something went wrong. The chef is devastated.');
       setLoading(false);
     }
+  };
+
+  const handleGeo = () => {
+    setGeoLabel('Finding you...');
+    setGeoDisabled(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords;
+        const withDist = locations.map(loc => ({
+          loc,
+          dist: haversine(latitude, longitude, loc.lat, loc.lng),
+        }));
+        withDist.sort((a, b) => a.dist - b.dist);
+        setSortedLocations(withDist.map(({ loc }) => loc));
+        const distMap: Record<string, string> = {};
+        withDist.forEach(({ loc, dist }) => { distMap[loc.slug] = `${dist.toFixed(1)} mi`; });
+        setDistances(distMap);
+        const nearest = withDist[0].loc;
+        setSelectedLocation(nearest);
+        setGeoLabel(`📍 ${nearest.name} — nearest`);
+        setGeoDisabled(false);
+      },
+      () => {
+        setGeoLabel('Location unavailable');
+        setGeoDisabled(false);
+      }
+    );
   };
 
   const btnPrimary: React.CSSProperties = {
@@ -195,18 +241,52 @@ export default function OrderForm({ locations }: Props) {
               Select a location, then tell us how you'll be joining us.
             </p>
 
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <button
+                onClick={handleGeo}
+                disabled={geoDisabled}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  color: '#1a1a1a',
+                  background: '#f7f4f0',
+                  border: '1.5px solid rgba(0,0,0,0.15)',
+                  borderRadius: '999px',
+                  padding: '0.7rem 1.4rem',
+                  cursor: geoDisabled ? 'default' : 'pointer',
+                  opacity: geoDisabled ? 0.6 : 1,
+                  transition: 'border-color 0.2s, color 0.2s',
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="7"/>
+                  <line x1="12" y1="2" x2="12" y2="5"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                  <line x1="2" y1="12" x2="5" y2="12"/>
+                  <line x1="19" y1="12" x2="22" y2="12"/>
+                </svg>
+                {geoLabel}
+              </button>
+            </div>
+
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
               gap: '1rem',
               marginBottom: '2.5rem',
             }}>
-              {locations.map((loc) => (
+              {sortedLocations.map((loc) => (
                 <LocationCard
                   key={loc.slug}
                   location={loc}
                   selected={selectedLocation?.slug === loc.slug}
                   onSelect={() => setSelectedLocation(loc)}
+                  distance={distances[loc.slug]}
                 />
               ))}
             </div>

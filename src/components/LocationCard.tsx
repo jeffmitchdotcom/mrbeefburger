@@ -9,9 +9,10 @@ type Props = {
   location: Location;
   selected: boolean;
   onSelect: () => void;
+  distance?: string;
 };
 
-export default function LocationCard({ location, selected, onSelect }: Props) {
+export default function LocationCard({ location, selected, onSelect, distance }: Props) {
   return (
     <div
       onClick={onSelect}
@@ -58,6 +59,11 @@ export default function LocationCard({ location, selected, onSelect }: Props) {
       <p style={{ fontSize: '0.8rem', color: '#767676', margin: 0 }}>
         <strong style={{ color: '#1a1a1a' }}>Hours:</strong> {location.hours}
       </p>
+      {distance && (
+        <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#767676', margin: 0, letterSpacing: '0.05em' }}>
+          {distance}
+        </p>
+      )}
     </div>
   );
 }
