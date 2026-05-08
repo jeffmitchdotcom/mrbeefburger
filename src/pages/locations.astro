@@ -59,6 +59,9 @@ const mapLocations: MapLocation[] = locations.map(l => ({
     <!-- Location Cards -->
     <section class="locs-section">
       <div class="section-inner">
+        <div class="locs-header">
+          <button id="geo-btn" class="btn-geo">Use my location</button>
+        </div>
         <div class="locs-grid">
           {locations.map((loc: Location) => (
             <div
@@ -85,6 +88,7 @@ const mapLocations: MapLocation[] = locations.map(l => ({
                   <dd><a href={`tel:${loc.phone.replace(/\D/g,'')}`}>{loc.phone}</a></dd>
                 </div>
               </dl>
+              <span class="loc-distance" data-slug={loc.slug}></span>
               <div class="loc-card-actions">
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}`)}`}
@@ -173,6 +177,59 @@ const mapLocations: MapLocation[] = locations.map(l => ({
       });
       window.location.href = '/menu';
     });
+  });
+
+  function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 3958.8;
+    const toRad = (n: number) => n * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  const geoBtn = document.getElementById('geo-btn') as HTMLButtonElement | null;
+  geoBtn?.addEventListener('click', () => {
+    geoBtn.textContent = 'Finding you...';
+    geoBtn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords;
+        const grid = document.querySelector('.locs-grid')!;
+        const cards = [...document.querySelectorAll<HTMLElement>('.loc-card')];
+
+        const withDist = cards.map(card => {
+          const lat = parseFloat(card.dataset.lat!);
+          const lng = parseFloat(card.dataset.lng!);
+          const dist = haversine(latitude, longitude, lat, lng);
+          const slug = card.dataset.slug!;
+          const label = document.querySelector<HTMLElement>(`.loc-distance[data-slug="${slug}"]`);
+          if (label) label.textContent = `${dist.toFixed(1)} mi`;
+          return { card, dist };
+        });
+
+        withDist.sort((a, b) => a.dist - b.dist);
+        withDist.forEach(({ card }) => grid.appendChild(card));
+
+        const nearestCard = withDist[0].card;
+        const nearestBtn = nearestCard.querySelector<HTMLButtonElement>('.order-btn');
+        if (nearestBtn) {
+          setOrderLocation({
+            slug: nearestBtn.dataset.slug!,
+            name: nearestBtn.dataset.name!,
+            address: nearestBtn.dataset.address!,
+          });
+          geoBtn.textContent = `📍 ${nearestBtn.dataset.name} — nearest`;
+        }
+
+        nearestCard.click();
+      },
+      () => {
+        geoBtn.textContent = 'Location unavailable';
+        geoBtn.disabled = false;
+      }
+    );
   });
 </script>
 
@@ -371,6 +428,45 @@ const mapLocations: MapLocation[] = locations.map(l => ({
 
   .btn-primary:hover {
     opacity: 0.88;
+  }
+
+  /* ── Geo button + distance label ─────────── */
+  .locs-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-geo {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-geo:hover {
+    border-color: var(--color-red);
+    color: var(--color-red);
+  }
+
+  .btn-geo:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .loc-distance {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    letter-spacing: 0.05em;
+    min-height: 1em;
   }
 
   /* ── Responsive ───────────────────────────── */
