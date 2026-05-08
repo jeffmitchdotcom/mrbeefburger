@@ -1,0 +1,141 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/ContactForm.tsx';
+---
+
+<Layout title="Contact — Mr. Beefburger">
+  <main>
+
+    <section class="page-hero">
+      <div class="page-hero-inner">
+        <h1 class="page-title">Get in Touch</h1>
+        <p class="page-sub">Questions, feedback, sauce theories, life advice — Gerald's team reads it all.</p>
+      </div>
+    </section>
+
+    <section class="contact-body">
+      <div class="contact-inner">
+
+        <div class="contact-info">
+          <h2 class="info-heading">Other ways to reach us</h2>
+          <div class="info-block">
+            <div class="info-label">General</div>
+            <a href="mailto:hello@mrbeefburger.com" class="info-link">hello@mrbeefburger.com</a>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Catering & Events</div>
+            <a href="mailto:events@mrbeefburger.com" class="info-link">events@mrbeefburger.com</a>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Press</div>
+            <a href="mailto:press@mrbeefburger.com" class="info-link">press@mrbeefburger.com</a>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Response time</div>
+            <p class="info-text">1–3 business days. Longer if Gerald is in the sauce lab.</p>
+          </div>
+        </div>
+
+        <div class="contact-form-col">
+          <ContactForm client:load />
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</Layout>
+
+<style>
+  .page-hero {
+    background-color: var(--color-surface);
+    padding: 4rem 1.5rem;
+    border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+  }
+
+  .page-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: var(--color-red);
+    margin: 0 0 0.5rem;
+    line-height: 1;
+  }
+
+  .page-sub {
+    font-size: 1.0625rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .contact-body {
+    padding: 5rem 1.5rem;
+    background-color: var(--color-bg);
+  }
+
+  .contact-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 5rem;
+    align-items: flex-start;
+  }
+
+  /* ── Info column ──────────────────────────── */
+  .info-heading {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0 0 1.75rem;
+  }
+
+  .info-block {
+    margin-bottom: 1.5rem;
+  }
+
+  .info-label {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .info-link {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-red);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .info-link:hover {
+    text-decoration: underline;
+  }
+
+  .info-text {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── Responsive ───────────────────────────── */
+  @media (max-width: 760px) {
+    .contact-inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+</style>
