@@ -24,6 +24,7 @@ const menu = defineCollection({
     description: z.string(),
     category: z.enum(['burgers', 'sides', 'drinks']),
     toppings: z.array(z.string()).optional(),
+    signature: z.boolean().optional(),
     available: z.boolean().default(true),
   }),
 });
