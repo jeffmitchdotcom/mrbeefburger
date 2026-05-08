@@ -51,10 +51,8 @@ const categories = [
     <!-- Hero -->
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">Mr. Beefburger</h1>
-        <div class="hero-accent-bar" aria-hidden="true"></div>
-        <p class="hero-tagline">Home of the Meaty Faced Sauce Burger.</p>
-        <a href="/menu" class="btn btn-primary">See the Menu</a>
+        <h1 class="hero-title">Home of the Meaty Faced Sauce Burger</h1>
+        <a href="/menu" class="btn btn-hero">See the Menu</a>
       </div>
     </section>
 
@@ -138,47 +136,90 @@ const categories = [
 <style>
   /* ── Hero ─────────────────────────────────── */
   .hero {
-    background-color: var(--color-surface);
+    position: relative;
+    background-image: url('/images/mrbeefburger-hero-image.webp');
+    background-size: cover;
+    background-position: center;
+    min-height: 82vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 70vh;
-    text-align: center;
-    padding: 5rem 1.5rem;
-    border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+    align-items: flex-end;
+  }
+
+  /* Dark gradient up from bottom for text legibility */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.35) 35%,
+      transparent 65%
+    );
+    pointer-events: none;
   }
 
   .hero-inner {
-    max-width: 760px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 3rem 3.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    gap: 1.75rem;
   }
 
   .hero-title {
     font-family: var(--font-display);
-    font-size: clamp(3.5rem, 11vw, 7.5rem);
+    font-size: clamp(2rem, 4.5vw, 3.75rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.1;
+    max-width: 600px;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-hero {
+    display: inline-block;
+    padding: 0.9rem 2.25rem;
+    background-color: var(--color-red);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
     font-weight: 700;
-    color: var(--color-red);
-    margin: 0 0 0.5rem;
-    line-height: 1;
-    letter-spacing: -0.01em;
-  }
-
-  .hero-accent-bar {
-    width: 80px;
-    height: 5px;
-    background-color: var(--color-yellow);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
     border-radius: 999px;
-    margin: 0 0 1.25rem;
+    border: 2px solid var(--color-red);
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
   }
 
-  .hero-tagline {
-    font-family: var(--font-display);
-    font-size: clamp(1rem, 2.5vw, 1.375rem);
-    color: var(--color-muted);
-    font-style: italic;
-    margin: 0 0 2.5rem;
+  .btn-hero:hover {
+    background-color: transparent;
+    color: #ffffff;
+    border-color: #ffffff;
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      min-height: 75vh;
+      background-position: center top;
+    }
+
+    .hero-inner {
+      padding: 0 1.5rem 2.5rem;
+      gap: 1.25rem;
+    }
+
+    .hero-title {
+      max-width: 100%;
+    }
   }
 
   /* ── Category Icons ───────────────────────── */
