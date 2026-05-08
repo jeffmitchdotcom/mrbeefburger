@@ -1,11 +1,229 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const signatures = [
+  {
+    name: 'Signature Burger 1',
+    description: 'Placeholder description for the first signature burger.',
+  },
+  {
+    name: 'Signature Burger 2',
+    description: 'Placeholder description for the second signature burger.',
+  },
+  {
+    name: 'Signature Burger 3',
+    description: 'Placeholder description for the third signature burger.',
+  },
+];
 ---
 
 <Layout>
-	<Welcome />
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1 class="hero-title">MrBeefburger</h1>
+        <p class="hero-sub">Placeholder headline — the future tastes like beef.</p>
+        <a href="/menu" class="btn">See the Menu</a>
+      </div>
+    </section>
+
+    <!-- Signature Burgers -->
+    <section class="signatures">
+      <div class="section-inner">
+        <h2 class="section-heading">Our Signatures</h2>
+        <div class="card-grid">
+          {signatures.map(item => (
+            <div class="card">
+              <div class="card-img-placeholder" aria-hidden="true"></div>
+              <div class="card-body">
+                <h3 class="card-title">{item.name}</h3>
+                <p class="card-desc">{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Locations Teaser -->
+    <section class="locations-teaser">
+      <div class="section-inner locations-inner">
+        <p class="locations-copy">Now open in cities near you. Placeholder location copy goes here.</p>
+        <a href="/locations" class="btn btn-outline">Find a Location</a>
+      </div>
+    </section>
+  </main>
 </Layout>
+
+<style>
+  /* Hero */
+  .hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+    padding: 4rem 1.5rem;
+    border-bottom: 1px solid rgba(245, 200, 66, 0.2);
+  }
+
+  .hero-inner {
+    max-width: 800px;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 1rem;
+    line-height: 1;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.375rem);
+    color: var(--color-muted);
+    margin: 0 0 2.5rem;
+    font-style: italic;
+  }
+
+  /* Shared section styles */
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .section-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 2.5rem;
+  }
+
+  /* Signature burgers */
+  .signatures {
+    padding: 5rem 0;
+    border-bottom: 1px solid rgba(245, 200, 66, 0.2);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid rgba(245, 200, 66, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .card-img-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #2a2a2a;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(245, 200, 66, 0.04) 10px,
+      rgba(245, 200, 66, 0.04) 20px
+    );
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .card-desc {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Locations teaser */
+  .locations-teaser {
+    padding: 5rem 0;
+  }
+
+  .locations-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .locations-copy {
+    font-size: 1.125rem;
+    color: var(--color-text);
+    margin: 0;
+    max-width: 560px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    background-color: var(--color-accent);
+    color: #0d0d0d;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid var(--color-accent);
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    background-color: transparent;
+    color: var(--color-accent);
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    color: var(--color-accent);
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-accent);
+    color: #0d0d0d;
+  }
+
+  @media (max-width: 768px) {
+    .card-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .locations-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

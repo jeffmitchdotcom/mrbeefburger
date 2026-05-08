@@ -1,0 +1,118 @@
+---
+const navLinks = [
+  { label: 'Menu', href: '/menu' },
+  { label: 'About', href: '/about' },
+  { label: 'Locations', href: '/locations' },
+  { label: 'Contact', href: '/contact' },
+];
+---
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo">MrBeefburger</a>
+      <p class="footer-tagline">Placeholder tagline goes here.</p>
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <ul>
+        {navLinks.map(link => (
+          <li><a href={link.href}>{link.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 MrBeefburger. All rights reserved.</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-accent);
+    margin-top: auto;
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-tagline {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  .footer-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: right;
+  }
+
+  .footer-nav a {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-nav a:hover {
+    color: var(--color-accent);
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .footer-bottom p {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .footer-inner {
+      flex-direction: column;
+    }
+
+    .footer-nav ul {
+      text-align: left;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+    }
+  }
+</style>

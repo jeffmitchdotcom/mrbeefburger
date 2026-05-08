@@ -1,0 +1,143 @@
+---
+const navLinks = [
+  { label: 'Menu', href: '/menu' },
+  { label: 'About', href: '/about' },
+  { label: 'Locations', href: '/locations' },
+  { label: 'Contact', href: '/contact' },
+];
+---
+
+<header class="nav-header">
+  <nav class="nav-inner">
+    <a href="/" class="nav-logo">MrBeefburger</a>
+
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <ul class="nav-links">
+      {navLinks.map(link => (
+        <li><a href={link.href}>{link.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle') as HTMLButtonElement;
+  const links = document.querySelector('.nav-links') as HTMLElement;
+
+  toggle.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    links.classList.toggle('open');
+  });
+</script>
+
+<style>
+  .nav-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-accent);
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 2rem;
+  }
+
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-accent);
+  }
+
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-text);
+    transition: background-color 0.2s;
+  }
+
+  .nav-toggle:hover span {
+    background-color: var(--color-accent);
+  }
+
+  @media (max-width: 640px) {
+    .nav-toggle {
+      display: flex;
+    }
+
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 64px;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      gap: 0;
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-accent);
+    }
+
+    .nav-links.open {
+      display: flex;
+    }
+
+    .nav-links li {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 1rem 1.5rem;
+    }
+  }
+</style>
