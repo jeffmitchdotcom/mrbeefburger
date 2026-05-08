@@ -47,15 +47,6 @@ export default function PaymentTheater() {
         justifyContent: 'center',
       }}>
         <div style={{ width: '100%', maxWidth: '480px' }}>
-          <p style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '0.8rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: '#DA291C',
-            marginBottom: '0.5rem',
-          }}>Almost There</p>
           <h1 style={{
             fontFamily: "'Bricolage Grotesque', sans-serif",
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
@@ -64,7 +55,7 @@ export default function PaymentTheater() {
             margin: '0 0 0.35rem',
             lineHeight: 1.1,
           }}>
-            {summary?.customerName ? `Hey, ${summary.customerName}.` : 'Review Your Order'}
+            {summary?.customerName ? `Almost there, ${summary.customerName}...` : 'Almost there...'}
           </h1>
           {orderNumber && (
             <p style={{
