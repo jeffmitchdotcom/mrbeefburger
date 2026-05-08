@@ -95,6 +95,7 @@ export default function OrderForm({ locations }: Props) {
         total: cartTotal(items),
         locationName: selectedLocation!.name,
         locationAddress: selectedLocation!.address,
+        customerName: customerName.trim(),
         orderType,
       }));
       clearCart();

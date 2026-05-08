@@ -6,6 +6,7 @@ type OrderSummary = {
   total: number;
   locationName: string;
   locationAddress: string;
+  customerName: string;
   orderType: string;
 };
 
@@ -57,14 +58,22 @@ export default function PaymentTheater() {
           }}>Almost There</p>
           <h1 style={{
             fontFamily: "'Bricolage Grotesque', sans-serif",
-            fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
+            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
             fontWeight: 800,
             color: '#1a1a1a',
-            margin: '0 0 2rem',
-            lineHeight: 1.2,
+            margin: '0 0 0.35rem',
+            lineHeight: 1.1,
           }}>
-            {orderNumber ? `Order #${orderNumber}` : 'Review Your Order'}
+            {summary?.customerName ? `Hey, ${summary.customerName}.` : 'Review Your Order'}
           </h1>
+          {orderNumber && (
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '0.875rem',
+              color: '#767676',
+              margin: '0 0 2rem',
+            }}>Order #{orderNumber}</p>
+          )}
 
           {/* Order summary */}
           {summary && (
@@ -226,6 +235,24 @@ export default function PaymentTheater() {
             >
               See My Order Anyway →
             </a>
+
+            <p style={{
+              marginTop: '2rem',
+              fontSize: '0.775rem',
+              color: 'rgba(0,0,0,0.35)',
+              fontFamily: "'DM Sans', sans-serif",
+              lineHeight: 1.6,
+            }}>
+              A pet project by{' '}
+              <a
+                href="https://jeffmitch.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#DA291C', fontWeight: 700, textDecoration: 'none' }}
+              >
+                jeffmitch.com
+              </a>
+            </p>
           </div>
         </div>
       )}
