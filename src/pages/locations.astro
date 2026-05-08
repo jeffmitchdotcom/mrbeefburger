@@ -25,7 +25,7 @@ interface MapLocation {
 const entries = await getCollection('locations');
 const locations: Location[] = entries
   .map((e: CollectionEntry<'locations'>): Location => ({ slug: e.id.replace(/\.md$/, ''), ...e.data }))
-  .sort((a: Location, b: Location) => a.city.localeCompare(b.city));
+  .sort((a: Location, b: Location) => a.state.localeCompare(b.state) || a.city.localeCompare(b.city));
 
 const mapLocations: MapLocation[] = locations.map(l => ({
   slug: l.slug,
@@ -60,7 +60,16 @@ const mapLocations: MapLocation[] = locations.map(l => ({
     <section class="locs-section">
       <div class="section-inner">
         <div class="locs-header">
-          <button id="geo-btn" class="btn-geo">Use my location</button>
+          <button id="geo-btn" class="btn-geo">
+            <svg class="geo-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="12" cy="12" r="7"/>
+              <line x1="12" y1="2" x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="2" y1="12" x2="5" y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
+            </svg>
+            <span id="geo-label">Use my location</span>
+          </button>
         </div>
         <div class="locs-grid">
           {locations.map((loc: Location) => (
@@ -189,8 +198,9 @@ const mapLocations: MapLocation[] = locations.map(l => ({
   }
 
   const geoBtn = document.getElementById('geo-btn') as HTMLButtonElement | null;
+  const geoLabel = document.getElementById('geo-label');
   geoBtn?.addEventListener('click', () => {
-    geoBtn.textContent = 'Finding you...';
+    if (geoLabel) geoLabel.textContent = 'Finding you...';
     geoBtn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(
@@ -220,13 +230,13 @@ const mapLocations: MapLocation[] = locations.map(l => ({
             name: nearestBtn.dataset.name!,
             address: nearestBtn.dataset.address!,
           });
-          geoBtn.textContent = `📍 ${nearestBtn.dataset.name} — nearest`;
+          if (geoLabel) geoLabel.textContent = `📍 ${nearestBtn.dataset.name} — nearest`;
         }
 
         nearestCard.click();
       },
       () => {
-        geoBtn.textContent = 'Location unavailable';
+        if (geoLabel) geoLabel.textContent = 'Location unavailable';
         geoBtn.disabled = false;
       }
     );
@@ -266,6 +276,7 @@ const mapLocations: MapLocation[] = locations.map(l => ({
   .map-section {
     width: 100%;
     border-bottom: 3px solid var(--color-red);
+    isolation: isolate;
   }
 
   #map {
@@ -433,20 +444,23 @@ const mapLocations: MapLocation[] = locations.map(l => ({
   /* ── Geo button + distance label ─────────── */
   .locs-header {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1.5rem;
+    justify-content: center;
+    margin-bottom: 2rem;
   }
 
   .btn-geo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-family: var(--font-body);
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--color-text);
     background: var(--color-surface);
     border: 1.5px solid rgba(0, 0, 0, 0.15);
     border-radius: 999px;
-    padding: 0.5rem 1rem;
+    padding: 0.7rem 1.4rem;
     cursor: pointer;
     transition: border-color 0.2s, color 0.2s;
   }
@@ -459,6 +473,10 @@ const mapLocations: MapLocation[] = locations.map(l => ({
   .btn-geo:disabled {
     opacity: 0.6;
     cursor: default;
+  }
+
+  .geo-icon {
+    flex-shrink: 0;
   }
 
   .loc-distance {
