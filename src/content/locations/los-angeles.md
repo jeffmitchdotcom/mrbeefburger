@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Downtown LA"
+name: "Downtown LA"
 address: "412 S Spring St"
 city: "Los Angeles"
 state: "CA"

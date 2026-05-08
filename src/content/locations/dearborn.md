@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Dearborn"
+name: "Dearborn"
 address: "22150 Michigan Ave"
 city: "Dearborn"
 state: "MI"

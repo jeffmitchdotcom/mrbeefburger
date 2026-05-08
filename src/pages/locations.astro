@@ -85,14 +85,24 @@ const mapLocations: MapLocation[] = locations.map(l => ({
                   <dd><a href={`tel:${loc.phone.replace(/\D/g,'')}`}>{loc.phone}</a></dd>
                 </div>
               </dl>
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-outline"
-              >
-                Get Directions
-              </a>
+              <div class="loc-card-actions">
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-outline"
+                >
+                  Get Directions
+                </a>
+                <button
+                  class="btn btn-primary order-btn"
+                  data-slug={loc.slug}
+                  data-name={loc.name}
+                  data-address={`${loc.address}, ${loc.city}, ${loc.state}`}
+                >
+                  Order Now
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -146,6 +156,22 @@ const mapLocations: MapLocation[] = locations.map(l => ({
       card.classList.add('active');
       map.setView([lat, lng], 13, { animate: true });
       if (markers[slug]) markers[slug].openPopup();
+    });
+  });
+</script>
+
+<script>
+  import { setOrderLocation } from '../stores/location';
+
+  document.querySelectorAll<HTMLButtonElement>('.order-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // don't trigger loc-card click (map flyover)
+      setOrderLocation({
+        slug: btn.dataset.slug!,
+        name: btn.dataset.name!,
+        address: btn.dataset.address!,
+      });
+      window.location.href = '/menu';
     });
   });
 </script>
@@ -306,6 +332,12 @@ const mapLocations: MapLocation[] = locations.map(l => ({
     text-decoration: underline;
   }
 
+  .loc-card-actions {
+    display: flex;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+  }
+
   .btn {
     display: inline-block;
     padding: 0.625rem 1.25rem;
@@ -317,9 +349,9 @@ const mapLocations: MapLocation[] = locations.map(l => ({
     text-decoration: none;
     border-radius: 999px;
     border: 2px solid var(--color-red);
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s, opacity 0.2s;
     text-align: center;
-    align-self: flex-start;
+    cursor: pointer;
   }
 
   .btn-outline {
@@ -330,6 +362,15 @@ const mapLocations: MapLocation[] = locations.map(l => ({
   .btn-outline:hover {
     background-color: var(--color-red);
     color: #ffffff;
+  }
+
+  .btn-primary {
+    background-color: var(--color-red);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.88;
   }
 
   /* ── Responsive ───────────────────────────── */

@@ -5,6 +5,7 @@ type OrderSummary = {
   items: CartItem[];
   total: number;
   locationName: string;
+  locationAddress: string;
   orderType: string;
 };
 
@@ -75,19 +76,32 @@ export default function PaymentTheater() {
               marginBottom: '2rem',
             }}>
               <div style={{
-                padding: '0.875rem 1.25rem',
+                padding: '1rem 1.25rem',
                 background: '#1a1a1a',
                 color: '#ffffff',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
               }}>
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  {summary.locationName}
-                </span>
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.7 }}>
-                  {summary.orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                  <div>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', margin: '0 0 0.2rem' }}>
+                      Ordering from
+                    </p>
+                    <p style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: '1rem', fontWeight: 700, color: '#ffffff', margin: '0 0 0.2rem', lineHeight: 1.2 }}>
+                      {summary.locationName}
+                    </p>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.4 }}>
+                      {summary.locationAddress}
+                    </p>
+                  </div>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap', paddingTop: '0.1rem' }}>
+                    {summary.orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}
+                  </span>
+                </div>
+                <a
+                  href="/order"
+                  style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F5C200', textDecoration: 'none', marginTop: '0.5rem', display: 'inline-block' }}
+                >
+                  Change location →
+                </a>
               </div>
 
               <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>

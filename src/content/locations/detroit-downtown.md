@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Downtown Detroit"
+name: "Downtown Detroit"
 address: "1482 Woodward Ave"
 city: "Detroit"
 state: "MI"

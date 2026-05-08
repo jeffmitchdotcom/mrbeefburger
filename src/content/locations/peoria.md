@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Peoria"
+name: "Peoria"
 address: "619 SW Adams St"
 city: "Peoria"
 state: "IL"

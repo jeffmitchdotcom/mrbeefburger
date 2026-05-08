@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Royal Oak"
+name: "Royal Oak"
 address: "317 S Main St"
 city: "Royal Oak"
 state: "MI"

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import MenuSection from '../components/MenuSection.astro';
 import CartDrawer from '../components/CartDrawer.tsx';
+import LocationBanner from '../components/LocationBanner.tsx';
 
 const allItems = await getCollection('menu');
 const burgers = allItems.filter(i => i.data.category === 'burgers' && i.data.available);
@@ -11,6 +12,7 @@ const drinks = allItems.filter(i => i.data.category === 'drinks' && i.data.avail
 ---
 
 <Layout title="Menu — Mr. Beefburger">
+  <LocationBanner client:load />
   <CartDrawer client:load />
   <main>
     <section class="page-hero">

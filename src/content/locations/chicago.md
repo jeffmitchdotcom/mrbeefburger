@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — The Loop"
+name: "The Loop"
 address: "215 W Madison St"
 city: "Chicago"
 state: "IL"

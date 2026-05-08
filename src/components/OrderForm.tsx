@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { cartItems, cartTotal, clearCart } from '../stores/cart';
+import { $orderLocation, clearOrderLocation } from '../stores/location';
 import LocationCard from './LocationCard';
 
 type Location = {
@@ -52,6 +53,17 @@ export default function OrderForm({ locations }: Props) {
   const total = cartTotal(items);
 
   useEffect(() => {
+    const stored = $orderLocation.get();
+    if (stored) {
+      const match = locations.find(l => l.slug.replace(/\.md$/, '') === stored.slug.replace(/\.md$/, ''));
+      if (match) {
+        setSelectedLocation(match);
+        setStep(2);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const t = setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
     return () => clearTimeout(t);
   }, [step]);
@@ -82,9 +94,11 @@ export default function OrderForm({ locations }: Props) {
         items,
         total: cartTotal(items),
         locationName: selectedLocation!.name,
+        locationAddress: selectedLocation!.address,
         orderType,
       }));
       clearCart();
+      clearOrderLocation();
       window.location.href = '/payment';
     } catch {
       setError('Something went wrong. The chef is devastated.');
@@ -256,8 +270,12 @@ export default function OrderForm({ locations }: Props) {
               color: '#DA291C',
               margin: '0 0 0.5rem',
             }}>A few more details.</h1>
-            <p style={{ color: '#767676', marginBottom: '2rem', fontSize: '0.95rem' }}>
-              {selectedLocation?.name} · {orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}
+            <p style={{ color: '#767676', marginBottom: '2rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
+              <span>{selectedLocation?.name} · {orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}</span>
+              <button
+                onClick={() => { clearOrderLocation(); setStep(1); setSelectedLocation(null); }}
+                style={{ background: 'none', border: 'none', color: '#DA291C', fontSize: '0.775rem', fontWeight: 700, cursor: 'pointer', padding: 0, letterSpacing: '0.05em', fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}
+              >Change →</button>
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
@@ -384,7 +402,7 @@ export default function OrderForm({ locations }: Props) {
               >
                 {loading ? 'Consulting the kitchen...' : 'Place Order'}
               </button>
-              <button onClick={() => setStep(1)} style={btnOutline}>
+              <button onClick={() => { clearOrderLocation(); setStep(1); }} style={btnOutline}>
                 ← Back
               </button>
             </div>

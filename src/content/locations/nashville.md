@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Broadway"
+name: "Broadway"
 address: "320 Broadway"
 city: "Nashville"
 state: "TN"

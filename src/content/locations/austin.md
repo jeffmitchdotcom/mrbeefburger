@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — South Congress"
+name: "South Congress"
 address: "1604 S Congress Ave"
 city: "Austin"
 state: "TX"

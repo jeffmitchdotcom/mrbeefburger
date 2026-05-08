@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Midtown"
+name: "Midtown"
 address: "789 8th Ave"
 city: "New York"
 state: "NY"

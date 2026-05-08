@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { cartItems, removeFromCart, updateQuantity, cartTotal } from '../stores/cart';
+import { $orderLocation, clearOrderLocation } from '../stores/location';
 
 export default function CartDrawer() {
   const [open, setOpen] = useState(false);
   const items = useStore(cartItems);
+  const location = useStore($orderLocation);
   const total = cartTotal(items);
   const count = items.reduce((s, i) => s + i.quantity, 0);
 
@@ -233,8 +235,25 @@ export default function CartDrawer() {
                 textTransform: 'uppercase',
               }}
             >
-              Choose Location →
+              {location ? `Order from ${location.name} →` : 'Choose Location →'}
             </a>
+            {location && (
+              <a
+                href="/locations"
+                onClick={clearOrderLocation}
+                style={{
+                  textAlign: 'center',
+                  fontSize: '0.775rem',
+                  color: '#767676',
+                  textDecoration: 'none',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 600,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Change location
+              </a>
+            )}
           </div>
         )}
       </div>

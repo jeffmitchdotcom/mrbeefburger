@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — Minneapolis"
+name: "Minneapolis"
 address: "740 Hennepin Ave"
 city: "Minneapolis"
 state: "MN"

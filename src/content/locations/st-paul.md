@@ -1,5 +1,5 @@
 ---
-name: "Mr. Beefburger — St. Paul"
+name: "St. Paul"
 address: "411 Wabasha St N"
 city: "Saint Paul"
 state: "MN"
