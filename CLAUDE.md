@@ -30,13 +30,14 @@ Single-page Astro site with no framework integrations (vanilla Astro + scoped CS
 **Design system:** All brand tokens live as CSS custom properties in the `<style is:global>` block in `src/layouts/Layout.astro`. When real brand colors or fonts arrive, update the `:root` variables there — components consume them via `var(--color-*)` and `var(--font-*)`, never hardcoded values.
 
 ```
---color-bg        #0d0d0d   main background
---color-surface   #1a1a1a   cards, footer, nav mobile drawer
---color-accent    #f5c842   gold — logo, headings, borders, CTAs
---color-text      #f0ede8   body text
---color-muted     #888      secondary text, captions
---font-display    Georgia (placeholder — replace when brand font confirmed)
---font-body       system-ui
+--color-bg        #ffffff   page background (white)
+--color-surface   #f7f4f0   cards, footer, hero background (light cream)
+--color-red       #DA291C   logo, headings, CTAs, borders (In-N-Out-inspired red)
+--color-yellow    #F5C200   accents, icon tile backgrounds, hover highlights
+--color-text      #1a1a1a   body text
+--color-muted     #767676   secondary text, captions
+--font-display    Bricolage Grotesque (Google Fonts — bold variable grotesque for headings/logo)
+--font-body       DM Sans (Google Fonts — clean geometric sans for body/UI)
 ```
 
 **Nav mobile behavior:** The hamburger toggle is wired via a small inline `<script>` in `Nav.astro` that toggles an `.open` class on the `<ul>`. No JS framework involved.

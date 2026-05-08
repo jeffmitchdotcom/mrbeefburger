@@ -9,7 +9,7 @@ const navLinks = [
 
 <header class="nav-header">
   <nav class="nav-inner">
-    <a href="/" class="nav-logo">MrBeefburger</a>
+    <a href="/" class="nav-logo">Mr. Beefburger</a>
 
     <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
       <span></span>
@@ -42,7 +42,7 @@ const navLinks = [
     top: 0;
     z-index: 100;
     background-color: var(--color-bg);
-    border-bottom: 1px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-red);
   }
 
   .nav-inner {
@@ -57,12 +57,11 @@ const navLinks = [
 
   .nav-logo {
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-accent);
+    color: var(--color-red);
     text-decoration: none;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
   }
 
   .nav-links {
@@ -75,9 +74,9 @@ const navLinks = [
 
   .nav-links a {
     font-family: var(--font-body);
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-text);
     text-decoration: none;
@@ -85,7 +84,7 @@ const navLinks = [
   }
 
   .nav-links a:hover {
-    color: var(--color-accent);
+    color: var(--color-red);
   }
 
   .nav-toggle {
@@ -107,7 +106,7 @@ const navLinks = [
   }
 
   .nav-toggle:hover span {
-    background-color: var(--color-accent);
+    background-color: var(--color-red);
   }
 
   @media (max-width: 640px) {
@@ -124,7 +123,7 @@ const navLinks = [
       flex-direction: column;
       gap: 0;
       background-color: var(--color-surface);
-      border-bottom: 1px solid var(--color-accent);
+      border-bottom: 2px solid var(--color-red);
     }
 
     .nav-links.open {
@@ -132,7 +131,7 @@ const navLinks = [
     }
 
     .nav-links li {
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
     }
 
     .nav-links a {

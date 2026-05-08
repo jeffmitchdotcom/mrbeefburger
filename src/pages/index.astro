@@ -1,229 +1,355 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const signatures = [
+const categories = [
   {
-    name: 'Signature Burger 1',
-    description: 'Placeholder description for the first signature burger.',
+    label: 'Burgers',
+    href: '/menu',
+    icon: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 28 Q12 20 32 20 Q52 20 52 28 Z" fill="#DA291C"/>
+      <rect x="10" y="29" width="44" height="5" rx="1" fill="#DA291C"/>
+      <rect x="10" y="35" width="44" height="5" rx="1" fill="#DA291C"/>
+      <path d="M10 41 Q10 46 32 46 Q54 46 54 41 Z" fill="#DA291C"/>
+      <path d="M14 28 Q18 22 32 22 Q46 22 50 28" stroke="#F5C200" stroke-width="2" fill="none"/>
+    </svg>`,
   },
   {
-    name: 'Signature Burger 2',
-    description: 'Placeholder description for the second signature burger.',
+    label: 'Fries',
+    href: '/menu',
+    icon: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M18 44 L22 24 H42 L46 44 Z" fill="#DA291C"/>
+      <rect x="24" y="14" width="4" height="14" rx="2" fill="#DA291C"/>
+      <rect x="30" y="11" width="4" height="17" rx="2" fill="#DA291C"/>
+      <rect x="36" y="14" width="4" height="14" rx="2" fill="#DA291C"/>
+      <path d="M20 34 L44 34" stroke="#F5C200" stroke-width="1.5"/>
+    </svg>`,
   },
   {
-    name: 'Signature Burger 3',
-    description: 'Placeholder description for the third signature burger.',
+    label: 'Shakes & Drinks',
+    href: '/menu',
+    icon: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M22 22 L26 50 H38 L42 22 Z" fill="#DA291C"/>
+      <rect x="20" y="18" width="24" height="6" rx="2" fill="#DA291C"/>
+      <path d="M28 18 Q26 12 28 10 Q30 8 32 10 Q34 8 36 10 Q38 12 36 18" fill="#F5C200"/>
+      <line x1="34" y1="14" x2="44" y2="10" stroke="#DA291C" stroke-width="2" stroke-linecap="round"/>
+    </svg>`,
+  },
+  {
+    label: 'Extras',
+    href: '/menu',
+    icon: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M32 14 L35.5 25 H47 L37.7 31.8 L41.2 43 L32 36.2 L22.8 43 L26.3 31.8 L17 25 H28.5 Z" fill="#DA291C"/>
+      <circle cx="32" cy="32" r="4" fill="#F5C200"/>
+    </svg>`,
   },
 ];
 ---
 
 <Layout>
   <main>
+
     <!-- Hero -->
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">MrBeefburger</h1>
-        <p class="hero-sub">Placeholder headline — the future tastes like beef.</p>
-        <a href="/menu" class="btn">See the Menu</a>
+        <h1 class="hero-title">Mr. Beefburger</h1>
+        <div class="hero-accent-bar" aria-hidden="true"></div>
+        <p class="hero-tagline">Home of the Meaty Faced Sauce Burger.</p>
+        <a href="/menu" class="btn btn-primary">See the Menu</a>
       </div>
     </section>
 
-    <!-- Signature Burgers -->
-    <section class="signatures">
+    <!-- Menu Category Icons -->
+    <section class="categories">
       <div class="section-inner">
-        <h2 class="section-heading">Our Signatures</h2>
-        <div class="card-grid">
-          {signatures.map(item => (
-            <div class="card">
-              <div class="card-img-placeholder" aria-hidden="true"></div>
-              <div class="card-body">
-                <h3 class="card-title">{item.name}</h3>
-                <p class="card-desc">{item.description}</p>
-              </div>
-            </div>
+        <p class="categories-label">Explore the Menu</p>
+        <div class="category-grid">
+          {categories.map(cat => (
+            <a href={cat.href} class="category-tile">
+              <div class="category-icon" set:html={cat.icon} />
+              <span class="category-label">{cat.label}</span>
+            </a>
           ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Burger -->
+    <section class="featured">
+      <div class="section-inner featured-inner">
+        <div class="featured-img-placeholder" aria-hidden="true"></div>
+        <div class="featured-text">
+          <p class="featured-eyebrow">Our Signature</p>
+          <h2 class="featured-title">The Meaty Faced Sauce Burger</h2>
+          <p class="featured-desc">
+            Placeholder description — a legendary stack of flavor that'll be described right here
+            once the full menu copy arrives.
+          </p>
+          <a href="/menu" class="btn btn-primary">Order Now</a>
         </div>
       </div>
     </section>
 
     <!-- Locations Teaser -->
     <section class="locations-teaser">
-      <div class="section-inner locations-inner">
+      <div class="section-inner">
+        <h2 class="locations-heading">Find Us</h2>
         <p class="locations-copy">Now open in cities near you. Placeholder location copy goes here.</p>
         <a href="/locations" class="btn btn-outline">Find a Location</a>
       </div>
     </section>
+
   </main>
 </Layout>
 
 <style>
-  /* Hero */
+  /* ── Hero ─────────────────────────────────── */
   .hero {
+    background-color: var(--color-surface);
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 70vh;
     text-align: center;
-    padding: 4rem 1.5rem;
-    border-bottom: 1px solid rgba(245, 200, 66, 0.2);
+    padding: 5rem 1.5rem;
+    border-bottom: 1px solid rgba(218, 41, 28, 0.15);
   }
 
   .hero-inner {
-    max-width: 800px;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .hero-title {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 10vw, 7rem);
+    font-size: clamp(3.5rem, 11vw, 7.5rem);
     font-weight: 700;
-    color: var(--color-accent);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin: 0 0 1rem;
+    color: var(--color-red);
+    margin: 0 0 0.5rem;
     line-height: 1;
+    letter-spacing: -0.01em;
   }
 
-  .hero-sub {
+  .hero-accent-bar {
+    width: 80px;
+    height: 5px;
+    background-color: var(--color-yellow);
+    border-radius: 999px;
+    margin: 0 0 1.25rem;
+  }
+
+  .hero-tagline {
+    font-family: var(--font-display);
     font-size: clamp(1rem, 2.5vw, 1.375rem);
     color: var(--color-muted);
-    margin: 0 0 2.5rem;
     font-style: italic;
+    margin: 0 0 2.5rem;
   }
 
-  /* Shared section styles */
+  /* ── Category Icons ───────────────────────── */
+  .categories {
+    background-color: var(--color-bg);
+    padding: 4rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .categories-label {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    text-align: center;
+    margin: 0 0 2.5rem;
+  }
+
+  .category-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .category-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    transition: transform 0.2s;
+  }
+
+  .category-tile:hover {
+    transform: translateY(-4px);
+  }
+
+  .category-icon {
+    width: 96px;
+    height: 96px;
+    background-color: var(--color-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    transition: background-color 0.2s;
+  }
+
+  .category-tile:hover .category-icon {
+    background-color: var(--color-red);
+  }
+
+  .category-tile:hover .category-icon :global(svg path),
+  .category-tile:hover .category-icon :global(svg rect),
+  .category-tile:hover .category-icon :global(svg circle) {
+    fill: var(--color-yellow);
+  }
+
+  .category-tile:hover .category-icon :global(svg line),
+  .category-tile:hover .category-icon :global(svg path[stroke]) {
+    stroke: var(--color-yellow);
+  }
+
+  .category-label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  /* ── Featured Burger ──────────────────────── */
+  .featured {
+    background-color: var(--color-surface);
+    padding: 5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .featured-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .featured-img-placeholder {
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    background-color: #e8e2dc;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 12px,
+      rgba(218, 41, 28, 0.06) 12px,
+      rgba(218, 41, 28, 0.06) 24px
+    );
+  }
+
+  .featured-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-red);
+    margin: 0 0 0.75rem;
+  }
+
+  .featured-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 1rem;
+    line-height: 1.15;
+  }
+
+  .featured-desc {
+    font-size: 1rem;
+    color: var(--color-muted);
+    line-height: 1.7;
+    margin: 0 0 2rem;
+  }
+
+  /* ── Locations Teaser ─────────────────────── */
+  .locations-teaser {
+    background-color: var(--color-bg);
+    padding: 5rem 0;
+    text-align: center;
+  }
+
+  .locations-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--color-red);
+    margin: 0 0 0.75rem;
+  }
+
+  .locations-copy {
+    font-size: 1.0625rem;
+    color: var(--color-muted);
+    margin: 0 auto 2rem;
+    max-width: 480px;
+  }
+
+  /* ── Shared utilities ─────────────────────── */
   .section-inner {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
   }
 
-  .section-heading {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 4vw, 2.25rem);
-    font-weight: 700;
-    color: var(--color-accent);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 0 0 2.5rem;
-  }
-
-  /* Signature burgers */
-  .signatures {
-    padding: 5rem 0;
-    border-bottom: 1px solid rgba(245, 200, 66, 0.2);
-  }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-
-  .card {
-    background-color: var(--color-surface);
-    border: 1px solid rgba(245, 200, 66, 0.15);
-    border-radius: 4px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .card:hover {
-    border-color: var(--color-accent);
-  }
-
-  .card-img-placeholder {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    background-color: #2a2a2a;
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(245, 200, 66, 0.04) 10px,
-      rgba(245, 200, 66, 0.04) 20px
-    );
-  }
-
-  .card-body {
-    padding: 1.25rem;
-  }
-
-  .card-title {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0 0 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .card-desc {
-    font-size: 0.875rem;
-    color: var(--color-muted);
-    margin: 0;
-    line-height: 1.6;
-  }
-
-  /* Locations teaser */
-  .locations-teaser {
-    padding: 5rem 0;
-  }
-
-  .locations-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-
-  .locations-copy {
-    font-size: 1.125rem;
-    color: var(--color-text);
-    margin: 0;
-    max-width: 560px;
-  }
-
-  /* Buttons */
   .btn {
     display: inline-block;
-    padding: 0.875rem 2rem;
-    background-color: var(--color-accent);
-    color: #0d0d0d;
+    padding: 0.875rem 2.25rem;
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
-    border: 2px solid var(--color-accent);
+    border-radius: 999px;
+    border: 2px solid var(--color-red);
     transition: background-color 0.2s, color 0.2s;
     white-space: nowrap;
   }
 
-  .btn:hover {
+  .btn-primary {
+    background-color: var(--color-red);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
     background-color: transparent;
-    color: var(--color-accent);
+    color: var(--color-red);
   }
 
   .btn-outline {
     background-color: transparent;
-    color: var(--color-accent);
+    color: var(--color-red);
   }
 
   .btn-outline:hover {
-    background-color: var(--color-accent);
-    color: #0d0d0d;
+    background-color: var(--color-red);
+    color: #ffffff;
   }
 
+  /* ── Responsive ───────────────────────────── */
   @media (max-width: 768px) {
-    .card-grid {
+    .featured-inner {
       grid-template-columns: 1fr;
+      gap: 2rem;
     }
 
-    .locations-inner {
-      flex-direction: column;
-      align-items: flex-start;
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      justify-items: center;
     }
   }
 </style>

@@ -11,7 +11,10 @@ import Footer from '../components/Footer.astro';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-    <title>MrBeefburger</title>
+    <title>Mr. Beefburger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
   </head>
   <body>
     <Nav />
@@ -22,13 +25,14 @@ import Footer from '../components/Footer.astro';
 
 <style is:global>
   :root {
-    --color-bg: #0d0d0d;
-    --color-surface: #1a1a1a;
-    --color-accent: #f5c842;
-    --color-text: #f0ede8;
-    --color-muted: #888;
-    --font-display: 'Georgia', serif;
-    --font-body: system-ui, sans-serif;
+    --color-bg: #ffffff;
+    --color-surface: #f7f4f0;
+    --color-red: #DA291C;
+    --color-yellow: #F5C200;
+    --color-text: #1a1a1a;
+    --color-muted: #767676;
+    --font-display: 'Bricolage Grotesque', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
   }
 
   *, *::before, *::after {
