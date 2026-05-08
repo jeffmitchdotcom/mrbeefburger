@@ -1,0 +1,363 @@
+---
+export const prerender = false;
+
+import { getCollection } from 'astro:content';
+import { db } from '../../lib/db';
+import { orders } from '../../lib/schema';
+import { eq } from 'drizzle-orm';
+import Layout from '../../layouts/Layout.astro';
+
+const { id } = Astro.params;
+
+const rows = await db.select().from(orders).where(eq(orders.orderNumber, id!));
+const order = rows[0];
+
+if (!order) return Astro.redirect('/menu');
+
+const allMenuItems = await getCollection('menu');
+const menuMap = Object.fromEntries(allMenuItems.map(i => [i.data.slug, i.data]));
+
+type OrderItem = {
+  slug: string;
+  title: string;
+  price: number;
+  quantity: number;
+  customizations: string[];
+};
+
+const enrichedItems = (order.items as OrderItem[]).map(item => ({
+  ...item,
+  menuData: menuMap[item.slug],
+}));
+
+const orderTotal = (order.items as OrderItem[]).reduce(
+  (sum, item) => sum + item.price * item.quantity,
+  0
+);
+---
+
+<Layout title={`Order ${order.orderNumber} — Mr. Beefburger`}>
+  <main class="receipt-page">
+    <div class="receipt">
+      <div class="receipt-header">
+        <p class="receipt-brand">Mr. Beefburger</p>
+        <h1 class="receipt-order-number">#{order.orderNumber}</h1>
+        <span class="receipt-type-badge">
+          {order.orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}
+        </span>
+      </div>
+
+      <div class="receipt-location">
+        <p class="loc-name">{order.locationName}</p>
+        <p class="loc-address">{order.locationAddress}</p>
+      </div>
+
+      <div class="receipt-customer">
+        <div class="detail-row">
+          <span class="detail-label">For</span>
+          <span class="detail-value">{order.customerName}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">
+            {order.orderType === 'dine-in' ? 'Arrival time' : 'Pickup time'}
+          </span>
+          <span class="detail-value">{order.pickupTime}</span>
+        </div>
+      </div>
+
+      <ul class="receipt-items">
+        {enrichedItems.map((item) => (
+          <li class="receipt-item">
+            <div class="item-row">
+              <span class="item-name">{item.title}</span>
+              <div class="item-right">
+                <span class="item-qty">× {item.quantity}</span>
+                <span class="item-price">${(item.price * item.quantity).toFixed(2)}</span>
+              </div>
+            </div>
+            {item.customizations?.length > 0 && (
+              <ul class="item-customizations">
+                {item.customizations.map((c: string) => <li>{c}</li>)}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      <div class="receipt-total">
+        <span>Total</span>
+        <span>${orderTotal.toFixed(2)}</span>
+      </div>
+
+      {order.specialRequests && (
+        <p class="special-requests">
+          <strong>Note:</strong> {order.specialRequests}
+        </p>
+      )}
+
+      <div class="wait-time">
+        <p class="wait-label">Estimated wait time</p>
+        <p class="wait-phrase">"{order.waitPhrase}"</p>
+      </div>
+
+      <div class="share-section">
+        <p class="share-label">Share this order</p>
+        <code class="share-url">mrbeefburger.com/order/{order.orderNumber}</code>
+      </div>
+
+      <div class="receipt-actions">
+        <a href="/menu" class="btn-back">← Order Something Else</a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .receipt-page {
+    background-color: var(--color-surface);
+    min-height: 100vh;
+    padding: 4rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .receipt {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    max-width: 520px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .receipt-header {
+    background-color: var(--color-red);
+    color: #ffffff;
+    padding: 2rem 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .receipt-brand {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.5rem;
+    opacity: 0.85;
+  }
+
+  .receipt-order-number {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .receipt-type-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 999px;
+    padding: 0.25rem 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .receipt-location {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--color-surface);
+  }
+
+  .loc-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    margin: 0 0 0.25rem;
+  }
+
+  .loc-address {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  .receipt-customer {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+  }
+
+  .detail-label {
+    color: var(--color-muted);
+  }
+
+  .detail-value {
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .receipt-items {
+    list-style: none;
+    margin: 0;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .receipt-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.9rem;
+  }
+
+  .item-name {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .item-right {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    flex-shrink: 0;
+    margin-left: 1rem;
+  }
+
+  .item-qty {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  .item-price {
+    font-weight: 700;
+    color: var(--color-red);
+  }
+
+  .item-customizations {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .item-customizations li {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+
+  .item-customizations li::before {
+    content: '+ ';
+    color: var(--color-red);
+    font-weight: 700;
+  }
+
+  .receipt-total {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    font-size: 1.1rem;
+    font-family: var(--font-display);
+    color: var(--color-text);
+  }
+
+  .receipt-total span:last-child {
+    color: var(--color-red);
+  }
+
+  .special-requests {
+    padding: 1rem 2rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    margin: 0;
+  }
+
+  .wait-time {
+    padding: 1.5rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--color-surface);
+  }
+
+  .wait-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin: 0 0 0.4rem;
+  }
+
+  .wait-phrase {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-red);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .share-section {
+    padding: 1.25rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .share-label {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    margin: 0 0 0.4rem;
+  }
+
+  .share-url {
+    font-size: 0.8rem;
+    color: var(--color-red);
+    word-break: break-all;
+  }
+
+  .receipt-actions {
+    padding: 1.5rem 2rem;
+    text-align: center;
+  }
+
+  .btn-back {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-red);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-back:hover {
+    text-decoration: underline;
+  }
+</style>

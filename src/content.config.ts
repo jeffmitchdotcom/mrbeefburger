@@ -15,4 +15,17 @@ const locations = defineCollection({
   }),
 });
 
-export const collections = { locations };
+const menu = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/menu' }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    price: z.number(),
+    description: z.string(),
+    category: z.enum(['burgers', 'sides', 'drinks']),
+    toppings: z.array(z.string()).optional(),
+    available: z.boolean().default(true),
+  }),
+});
+
+export const collections = { locations, menu };

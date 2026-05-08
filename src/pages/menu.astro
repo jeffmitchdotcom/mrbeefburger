@@ -1,0 +1,71 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import MenuSection from '../components/MenuSection.astro';
+import CartDrawer from '../components/CartDrawer.tsx';
+
+const allItems = await getCollection('menu');
+const burgers = allItems.filter(i => i.data.category === 'burgers' && i.data.available);
+const sides = allItems.filter(i => i.data.category === 'sides' && i.data.available);
+const drinks = allItems.filter(i => i.data.category === 'drinks' && i.data.available);
+---
+
+<Layout title="Menu — Mr. Beefburger">
+  <CartDrawer client:load />
+  <main>
+    <section class="page-hero">
+      <div class="page-hero-inner">
+        <h1 class="page-title">The Menu</h1>
+        <p class="page-sub">Curated. Considered. Smashed.</p>
+      </div>
+    </section>
+
+    <section class="menu-body">
+      <div class="section-inner">
+        <MenuSection title="Burgers" items={burgers} />
+        <MenuSection title="Sides" items={sides} />
+        <MenuSection title="Drinks" items={drinks} />
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .page-hero {
+    background-color: var(--color-surface);
+    padding: 4rem 1.5rem;
+    border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+  }
+
+  .page-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: var(--color-red);
+    margin: 0 0 0.5rem;
+    line-height: 1;
+  }
+
+  .page-sub {
+    font-size: 1.0625rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .menu-body {
+    padding: 4rem 0;
+    background-color: var(--color-bg);
+  }
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+</style>

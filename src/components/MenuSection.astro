@@ -1,0 +1,50 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import MenuItemCard from './MenuItemCard.tsx';
+
+interface Props {
+  title: string;
+  items: CollectionEntry<'menu'>[];
+}
+
+const { title, items } = Astro.props;
+---
+
+<section class="menu-section">
+  <h2 class="section-title">{title}</h2>
+  <div class="item-grid">
+    {items.map((item) => (
+      <MenuItemCard
+        client:load
+        slug={item.data.slug}
+        title={item.data.title}
+        price={item.data.price}
+        description={item.data.description}
+        toppings={item.data.toppings}
+      />
+    ))}
+  </div>
+</section>
+
+<style>
+  .menu-section {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-red);
+    display: inline-block;
+  }
+
+  .item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+</style>
