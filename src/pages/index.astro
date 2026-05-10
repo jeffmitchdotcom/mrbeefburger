@@ -58,15 +58,20 @@ const categories = [
         <div class="hero-slide" style="background-image: url('/images/patty-melt.webp')"></div>
       </div>
       <div class="hero-inner">
-        <h1 class="hero-title">Home of the Meaty Faced Sauce Burger</h1>
+        <h1 class="hero-title">
+          <span class="hero-overline">Home of the</span>
+          <span class="hero-headline">Meaty Faced Sauce Burger</span>
+        </h1>
         <a href="/menu" class="btn btn-hero">See the Menu</a>
       </div>
-      <div class="hero-dots">
-        <button class="hero-dot active" aria-label="Slide 1"></button>
-        <button class="hero-dot" aria-label="Slide 2"></button>
-        <button class="hero-dot" aria-label="Slide 3"></button>
-        <button class="hero-dot" aria-label="Slide 4"></button>
-        <button class="hero-dot" aria-label="Slide 5"></button>
+      <div class="hero-dots-rail">
+        <div class="hero-dots">
+          <button class="hero-dot active" aria-label="Slide 1"></button>
+          <button class="hero-dot" aria-label="Slide 2"></button>
+          <button class="hero-dot" aria-label="Slide 3"></button>
+          <button class="hero-dot" aria-label="Slide 4"></button>
+          <button class="hero-dot" aria-label="Slide 5"></button>
+        </div>
       </div>
     </section>
 
@@ -234,15 +239,25 @@ const categories = [
   }
 
   /* Slider dot/line controls */
-  .hero-dots {
+  .hero-dots-rail {
     position: absolute;
-    bottom: 1.75rem;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 2rem;
+    left: 0;
+    right: 0;
     z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 3rem;
+    display: flex;
+    justify-content: flex-end;
+    pointer-events: none;
+  }
+
+  .hero-dots {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    pointer-events: all;
   }
 
   .hero-dot {
@@ -262,13 +277,29 @@ const categories = [
   }
 
   .hero-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0;
+  }
+
+  .hero-overline {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-headline {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4.5vw, 3.75rem);
+    font-size: clamp(2rem, 4vw, 3.25rem);
     font-weight: 800;
     color: #ffffff;
-    margin: 0;
-    line-height: 1.1;
-    max-width: 600px;
+    line-height: 1.05;
+    white-space: nowrap;
     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
   }
 
@@ -301,12 +332,18 @@ const categories = [
     }
 
     .hero-inner {
-      padding: 0 1.5rem 2.5rem;
+      padding: 0 1.5rem 4rem;
       gap: 1.25rem;
     }
 
-    .hero-title {
-      max-width: 100%;
+    .hero-headline {
+      white-space: normal;
+      font-size: clamp(1.6rem, 7vw, 2rem);
+    }
+
+    .hero-dots-rail {
+      padding: 0 1.5rem;
+      bottom: 1.5rem;
     }
   }
 
