@@ -50,9 +50,23 @@ const categories = [
 
     <!-- Hero -->
     <section class="hero">
+      <div class="hero-slides">
+        <div class="hero-slide active" style="background-image: url('/images/mrbeefburger-hero-image.webp')"></div>
+        <div class="hero-slide" style="background-image: url('/images/meaty-faced-sauce-burger.webp')"></div>
+        <div class="hero-slide" style="background-image: url('/images/ranchero-chicken.webp')"></div>
+        <div class="hero-slide" style="background-image: url('/images/bacon-swiss.webp')"></div>
+        <div class="hero-slide" style="background-image: url('/images/patty-melt.webp')"></div>
+      </div>
       <div class="hero-inner">
         <h1 class="hero-title">Home of the Meaty Faced Sauce Burger</h1>
         <a href="/menu" class="btn btn-hero">See the Menu</a>
+      </div>
+      <div class="hero-dots">
+        <button class="hero-dot active" aria-label="Slide 1"></button>
+        <button class="hero-dot" aria-label="Slide 2"></button>
+        <button class="hero-dot" aria-label="Slide 3"></button>
+        <button class="hero-dot" aria-label="Slide 4"></button>
+        <button class="hero-dot" aria-label="Slide 5"></button>
       </div>
     </section>
 
@@ -133,16 +147,62 @@ const categories = [
   </main>
 </Layout>
 
+<script>
+  const slides = document.querySelectorAll<HTMLElement>('.hero-slide');
+  const dots = document.querySelectorAll<HTMLButtonElement>('.hero-dot');
+  let current = 0;
+  let timer: ReturnType<typeof setInterval>;
+
+  function goTo(index: number) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = index;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function startTimer() {
+    timer = setInterval(() => goTo((current + 1) % slides.length), 5000);
+  }
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      clearInterval(timer);
+      goTo(i);
+      startTimer();
+    });
+  });
+
+  startTimer();
+</script>
+
 <style>
   /* ── Hero ─────────────────────────────────── */
   .hero {
     position: relative;
-    background-image: url('/images/mrbeefburger-hero-image.webp');
-    background-size: cover;
-    background-position: center;
     min-height: 82vh;
     display: flex;
     align-items: flex-end;
+    overflow: hidden;
+  }
+
+  /* Slides sit behind everything */
+  .hero-slides {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+
+  .hero-slide.active {
+    opacity: 1;
   }
 
   /* Dark gradient up from bottom for text legibility */
@@ -150,6 +210,7 @@ const categories = [
     content: '';
     position: absolute;
     inset: 0;
+    z-index: 1;
     background: linear-gradient(
       to top,
       rgba(0, 0, 0, 0.72) 0%,
@@ -161,7 +222,7 @@ const categories = [
 
   .hero-inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
@@ -170,6 +231,34 @@ const categories = [
     flex-direction: column;
     align-items: flex-start;
     gap: 1.75rem;
+  }
+
+  /* Slider dot/line controls */
+  .hero-dots {
+    position: absolute;
+    bottom: 1.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .hero-dot {
+    height: 4px;
+    width: 8px;
+    border-radius: 999px;
+    border: none;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: width 0.35s ease, background 0.35s ease;
+  }
+
+  .hero-dot.active {
+    width: 28px;
+    background: #ffffff;
   }
 
   .hero-title {
@@ -209,7 +298,6 @@ const categories = [
   @media (max-width: 640px) {
     .hero {
       min-height: 75vh;
-      background-position: center top;
     }
 
     .hero-inner {

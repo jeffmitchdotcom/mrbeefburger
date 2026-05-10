@@ -10,7 +10,8 @@ const navLinks = [
 <header class="nav-header">
   <nav class="nav-inner">
     <a href="/" class="nav-logo">
-      <img src="/images/MrBeefburger-Logo.png" alt="Mr. Beefburger" class="nav-logo-img" />
+      <img src="/images/MrBeefburger-Icon-web.png" alt="" class="nav-logo-img" />
+      <span class="nav-logo-text">Mr. Beefburger</span>
     </a>
 
     <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
@@ -61,12 +62,22 @@ const navLinks = [
     text-decoration: none;
     display: flex;
     align-items: center;
+    gap: 0.625rem;
   }
 
   .nav-logo-img {
-    height: 70px;
+    height: 58px;
     width: auto;
     display: block;
+  }
+
+  .nav-logo-text {
+    font-family: var(--font-display);
+    font-size: 1.44rem;
+    font-weight: 800;
+    color: var(--color-red);
+    line-height: 1;
+    letter-spacing: -0.01em;
   }
 
   .nav-links {

@@ -9,7 +9,9 @@ const allItems = await getCollection('menu');
 const burgers = allItems
   .filter(i => i.data.category === 'burgers' && i.data.available)
   .sort((a, b) => (a.data.signature ? -1 : 0) - (b.data.signature ? -1 : 0));
-const sides = allItems.filter(i => i.data.category === 'sides' && i.data.available);
+const sides = allItems
+  .filter(i => i.data.category === 'sides' && i.data.available)
+  .sort((a, b) => (a.data.signature ? -1 : 0) - (b.data.signature ? -1 : 0));
 const drinks = allItems.filter(i => i.data.category === 'drinks' && i.data.available);
 ---
 
