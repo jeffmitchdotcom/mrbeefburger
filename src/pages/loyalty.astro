@@ -78,8 +78,9 @@ for (const cat of Object.keys(menuByCategory)) {
         </div>
 
         <!-- The Receipt (desktop: absolute float; mobile: static) -->
-        <div class="receipt-outline" aria-hidden="true"></div>
-        <div class="receipt" aria-hidden="true">
+        <div class="receipt-container">
+          <div class="receipt-outline" aria-hidden="true"></div>
+          <div class="receipt" aria-hidden="true">
           <div class="receipt-body">
             <pre class="receipt-text">================================
    MR. BEEFBURGER
@@ -120,6 +121,7 @@ Gerald has been informed.
 Thank you for your continued
 participation in the Accord.
 ================================</pre>
+          </div>
           </div>
         </div>
 
@@ -479,13 +481,19 @@ participation in the Accord.
   }
 
   /* ── The Receipt ─────────────────────────────────────────── */
-  .receipt-outline {
+  .receipt-container {
     position: absolute;
     right: 0;
     top: 1.5rem;
     width: 320px;
-    transform: rotate(3deg) scale(1.03);
-    z-index: 9;
+    transform: rotate(3deg);
+    z-index: 10;
+  }
+
+  .receipt-outline {
+    position: absolute;
+    inset: 0;
+    transform: scale(1.03);
     background: rgba(0, 0, 0, 0.18);
     clip-path: polygon(
       0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
@@ -503,12 +511,7 @@ participation in the Accord.
   }
 
   .receipt {
-    position: absolute;
-    right: 0;
-    top: 1.5rem;
-    width: 320px;
-    transform: rotate(3deg);
-    z-index: 10;
+    position: relative;
     background: #f5f0e8;
     clip-path: polygon(
       0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
@@ -1073,17 +1076,17 @@ participation in the Accord.
       min-height: unset;
     }
 
-    .receipt-outline {
-      display: none;
-    }
-
-    .receipt {
+    .receipt-container {
       position: static;
       display: block;
       width: 100%;
       max-width: 360px;
       margin: 2.5rem auto 0;
       transform: rotate(1deg);
+    }
+
+    .receipt-outline {
+      display: none;
     }
 
     .tiers-grid {
