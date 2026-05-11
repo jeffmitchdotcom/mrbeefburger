@@ -6,6 +6,7 @@ import { db } from '../../lib/db';
 import { orders } from '../../lib/schema';
 import { eq } from 'drizzle-orm';
 import Layout from '../../layouts/Layout.astro';
+import ProjectAttribution from '../../components/ProjectAttribution.astro';
 
 const { id } = Astro.params;
 
@@ -112,31 +113,8 @@ const orderTotal = (order.items as OrderItem[]).reduce(
     </div>
 
     <!-- Attribution -->
-    <div class="attribution">
-      <p class="attr-byline">
-        A demo project by{' '}
-        <a href="https://jeffmitch.com" target="_blank" rel="noopener noreferrer" class="attr-link">
-          Jeff Mitchell
-        </a>
-        {' '}·{' '}
-        <a href="https://jeffmitch.com" target="_blank" rel="noopener noreferrer" class="attr-link">
-          jeffmitch.com
-        </a>
-      </p>
-      <p class="attr-desc">
-        This site was built as a full-stack showcase — a fictional ordering system
-        with a real database, real deploys, and zero actual burgers.
-      </p>
-      <div class="tech-stack">
-        <span class="tech-badge"><span class="tech-dot" style="background:#FF5D01"></span>Astro</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#61DAFB"></span>React</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#3178C6"></span>TypeScript</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#00E599"></span>Neon Postgres</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#C5F74F"></span>Drizzle ORM</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#000000"></span>Vercel</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#181717"></span>GitHub</span>
-        <span class="tech-badge"><span class="tech-dot" style="background:#D97757"></span>Claude Code</span>
-      </div>
+    <div class="attribution-wrapper">
+      <ProjectAttribution />
     </div>
 
   </main>
@@ -401,66 +379,9 @@ const orderTotal = (order.items as OrderItem[]).reduce(
     text-decoration: underline;
   }
 
-  /* ── Attribution ──────────────────────────── */
-  .attribution {
+  .attribution-wrapper {
     max-width: 520px;
     width: 100%;
     margin-top: 2.5rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-
-  .attr-byline {
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    color: var(--color-muted);
-    margin: 0 0 0.5rem;
-  }
-
-  .attr-link {
-    color: var(--color-red);
-    font-weight: 700;
-    text-decoration: none;
-  }
-
-  .attr-link:hover {
-    text-decoration: underline;
-  }
-
-  .attr-desc {
-    font-family: var(--font-body);
-    font-size: 0.8rem;
-    color: var(--color-muted);
-    line-height: 1.6;
-    margin: 0 0 1.5rem;
-  }
-
-  .tech-stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-  }
-
-  .tech-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.3rem 0.75rem;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-text);
-  }
-
-  .tech-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
   }
 </style>

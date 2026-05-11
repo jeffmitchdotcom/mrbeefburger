@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProjectAttribution from '../components/ProjectAttribution.astro';
 ---
 
 <Layout title="About — Mr. Beefburger">
@@ -75,6 +76,13 @@ import Layout from '../layouts/Layout.astro';
         <p class="coda-quote">"A burger should ask something of you. Not a lot. Just enough."</p>
         <p class="coda-attr">— Gerald B. Beefburger III, 2001 opening night, Royal Oak</p>
         <a href="/menu" class="btn">See the Menu</a>
+      </div>
+    </section>
+
+    <!-- Project attribution -->
+    <section class="attr-section">
+      <div class="attr-section-inner">
+        <ProjectAttribution />
       </div>
     </section>
 
@@ -220,5 +228,16 @@ import Layout from '../layouts/Layout.astro';
   .btn:hover {
     background-color: #ffffff;
     color: var(--color-red);
+  }
+
+  /* ── Attribution ──────────────────────────── */
+  .attr-section {
+    background-color: var(--color-surface);
+    padding: 3.5rem 1.5rem 4rem;
+  }
+
+  .attr-section-inner {
+    max-width: 720px;
+    margin: 0 auto;
   }
 </style>

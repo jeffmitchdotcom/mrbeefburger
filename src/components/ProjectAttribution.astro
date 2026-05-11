@@ -1,0 +1,88 @@
+---
+// Central store for project attribution content.
+// Used on: /order/[id] (receipt) and /about.
+// To add a library or update details, edit this file only.
+---
+
+<div class="attribution">
+  <p class="attr-byline">
+    A demo project by <a href="https://jeffmitch.com" target="_blank" rel="noopener noreferrer" class="attr-link">Jeff Mitchell</a>
+    &nbsp;·&nbsp;
+    <a href="https://jeffmitch.com" target="_blank" rel="noopener noreferrer" class="attr-link">jeffmitch.com</a>
+  </p>
+  <p class="attr-desc">
+    Built as a full-stack showcase — a fictional ordering system with a real database, real deploys, and zero actual burgers.
+  </p>
+  <div class="tech-stack">
+    <span class="tech-badge"><span class="tech-dot" style="background:#FF5D01"></span>Astro</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#61DAFB"></span>React</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#3178C6"></span>TypeScript</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#00E599"></span>Neon Postgres</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#C5F74F"></span>Drizzle ORM</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#000000"></span>Vercel</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#181717"></span>GitHub</span>
+    <span class="tech-badge"><span class="tech-dot" style="background:#D97757"></span>Claude Code</span>
+  </div>
+</div>
+
+<style>
+  .attribution {
+    width: 100%;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .attr-byline {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0 0 0.5rem;
+  }
+
+  .attr-link {
+    color: var(--color-red);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .attr-link:hover {
+    text-decoration: underline;
+  }
+
+  .attr-desc {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+  }
+
+  .tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .tech-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3rem 0.75rem;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tech-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+</style>

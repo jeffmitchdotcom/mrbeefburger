@@ -227,23 +227,6 @@ export default function PaymentTheater() {
               See My Order Anyway →
             </a>
 
-            <p style={{
-              marginTop: '2rem',
-              fontSize: '0.775rem',
-              color: 'rgba(0,0,0,0.35)',
-              fontFamily: "'DM Sans', sans-serif",
-              lineHeight: 1.6,
-            }}>
-              A pet project by{' '}
-              <a
-                href="https://jeffmitch.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#DA291C', fontWeight: 700, textDecoration: 'none' }}
-              >
-                jeffmitch.com
-              </a>
-            </p>
           </div>
         </div>
       )}
