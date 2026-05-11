@@ -79,7 +79,9 @@ for (const cat of Object.keys(menuByCategory)) {
 
         <!-- The Receipt (desktop: absolute float; mobile: static) -->
         <div class="receipt-container">
-          <div class="receipt-outline" aria-hidden="true"></div>
+          <div class="receipt-shadow" aria-hidden="true">
+            <div class="receipt-shadow-shape"></div>
+          </div>
           <div class="receipt" aria-hidden="true">
           <div class="receipt-body">
             <pre class="receipt-text">================================
@@ -490,11 +492,16 @@ participation in the Accord.
     z-index: 10;
   }
 
-  .receipt-outline {
+  .receipt-shadow {
     position: absolute;
     inset: 0;
-    transform: scale(1.03);
-    background: rgba(0, 0, 0, 0.18);
+    filter: blur(8px);
+  }
+
+  .receipt-shadow-shape {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
     clip-path: polygon(
       0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
       22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
@@ -1085,7 +1092,7 @@ participation in the Accord.
       transform: rotate(1deg);
     }
 
-    .receipt-outline {
+    .receipt-shadow {
       display: none;
     }
 
