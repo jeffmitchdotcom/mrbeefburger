@@ -155,7 +155,10 @@ participation in the Accord.
           </div>
 
           <div class="tier-card tier-card--dark">
-            <span class="tier-number">Tier 04</span>
+            <div class="tier-card-header">
+              <span class="tier-number">Tier 04</span>
+              <span class="tier-pinnacle-badge">✦ Pinnacle</span>
+            </div>
             <h3 class="tier-name">The Beefborn</h3>
             <p class="tier-range">1,000+ Sauce Units</p>
             <p class="tier-badge">"There is no going back."</p>
@@ -328,6 +331,15 @@ participation in the Accord.
     form.style.display = 'none';
     success.style.display = 'block';
   });
+
+  const perkBlocks = document.querySelectorAll<HTMLDetailsElement>('.perk-block');
+  perkBlocks.forEach(block => {
+    block.addEventListener('toggle', () => {
+      if (block.open) {
+        perkBlocks.forEach(other => { if (other !== block) other.open = false; });
+      }
+    });
+  });
 </script>
 
 <style>
@@ -475,8 +487,9 @@ participation in the Accord.
     z-index: 10;
     background: #f5f0e8;
     filter:
-      drop-shadow(2px 4px 10px rgba(0, 0, 0, 0.18))
-      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12))
+      drop-shadow(0 8px 20px rgba(0, 0, 0, 0.2))
+      drop-shadow(0 20px 48px rgba(0, 0, 0, 0.18));
     clip-path: polygon(
       0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
       22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
@@ -493,7 +506,7 @@ participation in the Accord.
   }
 
   .receipt-body {
-    padding: 28px 14px;
+    padding: 52px 16px;
   }
 
   .receipt-text {
@@ -547,6 +560,25 @@ participation in the Accord.
     box-shadow:
       0 0 0 1px rgba(201, 150, 62, 0.12),
       0 4px 24px rgba(201, 150, 62, 0.12);
+  }
+
+  .tier-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tier-pinnacle-badge {
+    font-family: var(--font-body);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a8762a;
+    border: 1px solid rgba(168, 118, 42, 0.45);
+    border-radius: 999px;
+    padding: 0.2em 0.65em;
+    white-space: nowrap;
   }
 
   .tier-number {
@@ -735,12 +767,11 @@ participation in the Accord.
 
   .perk-summary {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 1.25rem 0;
     cursor: pointer;
     list-style: none;
-    gap: 1rem;
+    gap: 0.75rem;
     user-select: none;
   }
 
@@ -752,7 +783,7 @@ participation in the Accord.
     content: '';
   }
 
-  .perk-summary::after {
+  .perk-summary::before {
     content: '▾';
     font-size: 1rem;
     color: var(--color-muted);
@@ -762,7 +793,7 @@ participation in the Accord.
     line-height: 1;
   }
 
-  details[open] > .perk-summary::after {
+  details[open] > .perk-summary::before {
     transform: rotate(-180deg);
   }
 
