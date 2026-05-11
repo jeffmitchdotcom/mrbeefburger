@@ -78,7 +78,6 @@ for (const cat of Object.keys(menuByCategory)) {
         </div>
 
         <!-- The Receipt (desktop: absolute float; mobile: static) -->
-        <div class="receipt-wrapper">
         <div class="receipt" aria-hidden="true">
           <div class="receipt-body">
             <pre class="receipt-text">================================
@@ -121,7 +120,6 @@ Thank you for your continued
 participation in the Accord.
 ================================</pre>
           </div>
-        </div>
         </div>
 
       </div>
@@ -480,24 +478,19 @@ participation in the Accord.
   }
 
   /* ── The Receipt ─────────────────────────────────────────── */
-  .receipt-wrapper {
+  .receipt {
     position: absolute;
     right: 0;
     top: 1.5rem;
     width: 320px;
     transform: rotate(3deg);
     z-index: 10;
-    border-radius: 2px;
-    box-shadow:
-      0 0 0 2px rgba(255, 255, 255, 0.95),
-      0 0 18px 6px rgba(255, 255, 255, 0.75),
-      0 0 40px 10px rgba(255, 255, 255, 0.4),
-      0 10px 28px rgba(0, 0, 0, 0.22),
-      0 24px 56px rgba(0, 0, 0, 0.15);
-  }
-
-  .receipt {
     background: #f5f0e8;
+    filter:
+      drop-shadow(0 2px 3px rgba(0, 0, 0, 0.18))
+      drop-shadow(0 8px 16px rgba(0, 0, 0, 0.22))
+      drop-shadow(0 20px 40px rgba(0, 0, 0, 0.18))
+      drop-shadow(0 36px 72px rgba(0, 0, 0, 0.12));
     clip-path: polygon(
       0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
       22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
@@ -1061,7 +1054,7 @@ participation in the Accord.
       min-height: unset;
     }
 
-    .receipt-wrapper {
+    .receipt {
       position: static;
       display: block;
       width: 100%;
