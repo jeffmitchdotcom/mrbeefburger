@@ -33,6 +33,7 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 - **Order flow** — multi-step form (location → details → review), writes to Neon Postgres via Drizzle
 - **Payment theater** — personalized review screen; Pay Now reveals a gotcha modal
 - **Receipt page** — shareable `/order/[id]` page pulled from the database; includes estimated wait time and tech stack attribution
+- **Loyalty program** — "The Beefburger Loyalty Accord" at `/loyalty`: Sauce Units currency, four membership tiers, perks accordion, and an application form that writes to a real Neon Postgres table. Duplicate email detection returns a Gerald-flavored error. Points are tracked in a transaction ledger (`loyalty_transactions`) so full earning history is queryable — designed to connect to a future login system
 - **Contact form** — stubbed API endpoint ready for Resend/SMTP2GO wiring
 - **About page** — outlandish origin story of Gerald Beaufort Beefburger III, with tech attribution section
 - **Locations page** — interactive map with all 11 locations and geolocation-based nearest sort
@@ -76,12 +77,13 @@ src/
 │   └── Layout.astro  # Shared layout with Nav, Footer, global CSS tokens
 ├── lib/
 │   ├── db.ts         # Drizzle + Neon client
-│   └── schema.ts     # orders + game_scores table schemas
+│   └── schema.ts     # orders, game_scores, loyalty_members, loyalty_transactions
 ├── pages/
 │   ├── api/
 │   │   ├── orders.ts       # POST — saves order to Neon
 │   │   ├── contact.ts      # POST — stub, ready for email provider
-│   │   └── game-scores.ts  # GET top 10 / POST score / GET?clear=... to reset
+│   │   ├── game-scores.ts  # GET top 10 / POST score / GET?clear=... to reset
+│   │   └── loyalty.ts      # POST — saves loyalty application, seeds 10 SU transaction
 │   ├── order/
 │   │   └── [id].astro  # SSR receipt page (reads from DB by order number)
 │   ├── about.astro
@@ -89,6 +91,7 @@ src/
 │   ├── game.astro      # Game page (noindex, not in nav)
 │   ├── index.astro
 │   ├── locations.astro
+│   ├── loyalty.astro   # The Beefburger Loyalty Accord
 │   ├── menu.astro
 │   ├── order.astro
 │   └── payment.astro

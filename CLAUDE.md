@@ -31,7 +31,13 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 **Rendering modes:** Most pages are static. Pages that read from the database (`src/pages/order/[id].astro`) and all API routes use `export const prerender = false` for SSR.
 
-**Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. Two tables: `orders` (full order as JSON blob + flat fields) and `game_scores` (playerName, score, durationSeconds).
+**Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. Four tables:
+- `orders` — full order as JSON blob + flat fields
+- `game_scores` — playerName, score, durationSeconds
+- `loyalty_members` — one row per Accord member; email is unique and is the future account key
+- `loyalty_transactions` — point ledger; one row per earning/redemption event. Balance = `SUM(sauce_units)` for a given member. `sauce_units` is signed (negative for redemptions). `reference_id` is nullable text, reserved for future order number linkage.
+
+No migration runner is configured. To add tables, run raw SQL via the Neon MCP (`mcp__Neon__run_sql`, project ID `odd-cloud-33776174`) or the Neon console, then add the matching Drizzle table definition to `schema.ts`.
 
 **State management:** Nanostores with `@nanostores/persistent` for cross-page client state:
 - `src/stores/cart.ts` — cart items, persisted to localStorage key `mrb-cart`
@@ -42,6 +48,7 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 - `POST /api/contact` — stub endpoint, returns `{ ok: true }` (email provider not yet wired)
 - `GET /api/game-scores` — returns top 10 scores; accepts `?clear=GBB3-great-escape-reset` to wipe all scores
 - `POST /api/game-scores` — inserts a score row (playerName, score, durationSeconds)
+- `POST /api/loyalty` — validates loyalty application fields, checks for duplicate email (409 if found), inserts into `loyalty_members` + seeds a 10 SU `application_signup` transaction in `loyalty_transactions`
 
 **Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details) → `/payment` (PaymentTheater: review + fake Pay Now) → `/order/[id]` (receipt from DB). Order summary is passed to the payment page via `sessionStorage`.
 
@@ -79,6 +86,7 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 | `/order` | `order.astro` | OrderForm island — location + order details, posts to `/api/orders` |
 | `/payment` | `payment.astro` | PaymentTheater island — review screen + gotcha modal |
 | `/order/[id]` | `order/[id].astro` | SSR receipt page; reads order from Neon by order number + ProjectAttribution |
+| `/loyalty` | `loyalty.astro` | The Beefburger Loyalty Accord — Sauce Units explainer, tier system, perks accordion, application form wired to `/api/loyalty` |
 | `/game` | `game.astro` | "Mr. Beefburger's Great Escape" sidescroller; noindex, not in nav |
 
 ## Key component behaviors
@@ -97,8 +105,12 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 **OrderForm** (step 1): The pickup/dine-in toggle and "Continue" button are `position: fixed` to the viewport bottom so they stay visible while the user scrolls the location list.
 
+**Loyalty application** (`loyalty.astro` + `/api/loyalty`): All fields are required (HTML native validation). The burger dropdown is filtered to `category === 'burgers'` only, sorted so `signature: true` items (Meaty Faced Sauce Burger) appear first. On submit, the form POSTs JSON to `/api/loyalty`. Duplicate emails return a 409 — the client surfaces a distinct snarky error message for duplicates vs. a generic server failure. On success, `loyalty_members` gets the member row and `loyalty_transactions` gets a `+10 SU` signup event. The transaction ledger pattern means future point-earning actions (Tuesday bonus, ordering the signature burger, referrals) are each their own row — balance is always `SUM(sauce_units)`, never a stored running total.
+
 ## What's coming
 
 - Wire up contact form email (Resend or SMTP2GO) — stub is at `src/pages/api/contact.ts`
 - Food photography for remaining menu items (drop in `public/images/menu/`, add `image:` to frontmatter)
 - Logo/mascot asset (replace text wordmark in Nav and Footer)
+- Login system — `loyalty_members.email` is the intended account key; `loyalty_transactions.reference_id` is reserved for linking order numbers so members can see their full point history
+- Additional point-earning actions wired into existing flows (e.g. crediting SU on order completion, Tuesday bonus detection)
