@@ -14,7 +14,7 @@ for (const cat of Object.keys(menuByCategory)) {
 }
 ---
 
-<Layout title="Rewards — Mr. Beefburger">
+<Layout title="Loyalty — Mr. Beefburger">
   <link slot="head" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
 
   <main>
@@ -188,7 +188,7 @@ participation in the Accord.
 
           <div class="perks-list">
 
-            <details class="perk-block">
+            <details class="perk-block" open>
               <summary class="perk-summary">
                 <span class="perk-tier-name">The Initiated</span>
                 <span class="perk-su-range">0–199 SU</span>
@@ -392,7 +392,7 @@ participation in the Accord.
     max-width: 1100px;
     margin: 0 auto;
     position: relative;
-    min-height: 520px;
+    min-height: 680px;
   }
 
   .sauce-content {
@@ -470,7 +470,7 @@ participation in the Accord.
     position: absolute;
     right: 0;
     top: 1.5rem;
-    width: 260px;
+    width: 320px;
     transform: rotate(3deg);
     z-index: 10;
     background: #f5f0e8;
@@ -498,7 +498,7 @@ participation in the Accord.
 
   .receipt-text {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.58rem;
+    font-size: 0.72rem;
     color: #2a2a2a;
     line-height: 1.65;
     white-space: pre;
@@ -543,8 +543,10 @@ participation in the Accord.
   }
 
   .tier-card--dark {
-    background: #1a1a1a;
-    border-color: transparent;
+    border-color: rgba(201, 150, 62, 0.5);
+    box-shadow:
+      0 0 0 1px rgba(201, 150, 62, 0.12),
+      0 4px 24px rgba(201, 150, 62, 0.12);
   }
 
   .tier-number {
@@ -556,10 +558,6 @@ participation in the Accord.
     color: var(--color-muted);
   }
 
-  .tier-card--dark .tier-number {
-    color: rgba(255, 255, 255, 0.35);
-  }
-
   .tier-name {
     font-family: var(--font-display);
     font-size: clamp(1.2rem, 2.5vw, 1.65rem);
@@ -569,19 +567,11 @@ participation in the Accord.
     line-height: 1.15;
   }
 
-  .tier-card--dark .tier-name {
-    color: #ffffff;
-  }
-
   .tier-range {
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.75rem;
     color: var(--color-muted);
     margin: 0.2rem 0 0;
-  }
-
-  .tier-card--dark .tier-range {
-    color: rgba(255, 255, 255, 0.4);
   }
 
   .tier-badge {
@@ -594,7 +584,7 @@ participation in the Accord.
   }
 
   .tier-card--dark .tier-badge {
-    color: #c9963e;
+    color: #a8762a;
   }
 
   /* ── Perks + The Card ────────────────────────────────────── */
@@ -740,11 +730,7 @@ participation in the Accord.
   }
 
   .perk-block--dark {
-    background: #1a1a1a;
-    border-radius: 8px;
-    border-top: none;
-    border-bottom: none;
-    margin-top: 1.5rem;
+    border-top-color: rgba(201, 150, 62, 0.4);
   }
 
   .perk-summary {
@@ -758,16 +744,26 @@ participation in the Accord.
     user-select: none;
   }
 
-  .perk-block--dark .perk-summary {
-    padding: 1.25rem 1.5rem;
-  }
-
   .perk-summary::-webkit-details-marker {
     display: none;
   }
 
   .perk-summary::marker {
     content: '';
+  }
+
+  .perk-summary::after {
+    content: '▾';
+    font-size: 1rem;
+    color: var(--color-muted);
+    flex-shrink: 0;
+    display: inline-block;
+    transition: transform 0.2s ease;
+    line-height: 1;
+  }
+
+  details[open] > .perk-summary::after {
+    transform: rotate(-180deg);
   }
 
   .perk-tier-name {
@@ -778,7 +774,7 @@ participation in the Accord.
   }
 
   .perk-block--dark .perk-tier-name {
-    color: #ffffff;
+    color: #a8762a;
   }
 
   .perk-su-range {
@@ -786,10 +782,11 @@ participation in the Accord.
     font-size: 0.72rem;
     color: var(--color-muted);
     white-space: nowrap;
+    margin-left: auto;
   }
 
   .perk-block--dark .perk-su-range {
-    color: rgba(255, 255, 255, 0.35);
+    color: #a8762a;
   }
 
   .perk-items {
@@ -799,10 +796,6 @@ participation in the Accord.
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-  }
-
-  .perk-block--dark .perk-items {
-    padding: 0 1.5rem 1.5rem;
   }
 
   .perk-items li {
@@ -822,12 +815,8 @@ participation in the Accord.
     font-weight: 700;
   }
 
-  .perk-block--dark .perk-items li {
-    color: rgba(255, 255, 255, 0.72);
-  }
-
   .perk-block--dark .perk-items li::before {
-    color: #c9963e;
+    color: #a8762a;
   }
 
   /* ── Application ─────────────────────────────────────────── */
@@ -857,6 +846,8 @@ participation in the Accord.
     border-radius: 8px;
     padding: 2.5rem;
     max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .app-doc-header {
@@ -1035,7 +1026,7 @@ participation in the Accord.
       position: static;
       display: block;
       width: 100%;
-      max-width: 290px;
+      max-width: 360px;
       margin: 2.5rem auto 0;
       transform: rotate(1deg);
     }
