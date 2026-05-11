@@ -1,5 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allMenu = await getCollection('menu');
+const homepageItems = allMenu
+  .filter(i => i.data.homepage === true && i.data.available !== false)
+  .slice(0, 3);
 
 const categories = [
   {
@@ -94,7 +100,7 @@ const categories = [
     <section class="featured">
       <div class="section-inner featured-inner">
         <img
-          src="/images/meaty-faced-sauce-burger.webp"
+          src="/images/menu/the-meaty-faced-sauce-burger.png"
           alt="The Meaty Faced Sauce Burger"
           class="featured-img"
         />
@@ -115,27 +121,17 @@ const categories = [
       <div class="section-inner">
         <h2 class="section-heading">More from the Menu</h2>
         <div class="sig-grid">
-          <a href="/menu" class="sig-card">
-            <img src="/images/ranchero-chicken.webp" alt="Ranchero Chicken Sandwich" class="sig-img" />
-            <div class="sig-body">
-              <h3 class="sig-name">Ranchero Chicken Sandwich</h3>
-              <p class="sig-desc">Crispy chicken, curly onion straws, ranch drizzle. Placeholder copy coming soon.</p>
-            </div>
-          </a>
-          <a href="/menu" class="sig-card">
-            <img src="/images/bacon-swiss.webp" alt="Bacon Swiss Burger" class="sig-img" />
-            <div class="sig-body">
-              <h3 class="sig-name">Bacon Swiss Burger</h3>
-              <p class="sig-desc">Swiss melt, crispy bacon, onion rings stacked high. Placeholder copy coming soon.</p>
-            </div>
-          </a>
-          <a href="/menu" class="sig-card">
-            <img src="/images/patty-melt.webp" alt="Patty Melt" class="sig-img" />
-            <div class="sig-body">
-              <h3 class="sig-name">Patty Melt</h3>
-              <p class="sig-desc">Griddled sourdough, caramelized onions, Swiss. A classic done right. Placeholder copy coming soon.</p>
-            </div>
-          </a>
+          {homepageItems.map((item) => (
+            <a href="/menu" class="sig-card">
+              {item.data.image && (
+                <img src={item.data.image} alt={item.data.title} class="sig-img" />
+              )}
+              <div class="sig-body">
+                <h3 class="sig-name">{item.data.title}</h3>
+                <p class="sig-desc">{item.data.description}</p>
+              </div>
+            </a>
+          ))}
         </div>
       </div>
     </section>

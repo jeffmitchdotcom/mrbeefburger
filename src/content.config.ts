@@ -26,6 +26,7 @@ const menu = defineCollection({
     toppings: z.array(z.string()).optional(),
     image: z.string().optional(),
     signature: z.boolean().optional(),
+    homepage: z.boolean().optional(),
     available: z.boolean().default(true),
   }),
 });
