@@ -5,7 +5,25 @@ import { db } from '../../lib/db';
 import { gameScores } from '../../lib/schema';
 import { desc } from 'drizzle-orm';
 
-export const GET: APIRoute = async () => {
+const CLEAR_SECRET = 'GBB3-great-escape-reset';
+
+export const GET: APIRoute = async ({ url }) => {
+  if (url.searchParams.get('clear') === CLEAR_SECRET) {
+    try {
+      await db.delete(gameScores);
+      return new Response(JSON.stringify({ ok: true, message: 'Leaderboard cleared.' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (err) {
+      console.error(err);
+      return new Response(JSON.stringify({ error: 'Failed to clear scores' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
   try {
     const scores = await db
       .select()
