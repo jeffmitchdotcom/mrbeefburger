@@ -78,6 +78,7 @@ for (const cat of Object.keys(menuByCategory)) {
         </div>
 
         <!-- The Receipt (desktop: absolute float; mobile: static) -->
+        <div class="receipt-outline" aria-hidden="true"></div>
         <div class="receipt" aria-hidden="true">
           <div class="receipt-body">
             <pre class="receipt-text">================================
@@ -478,6 +479,29 @@ participation in the Accord.
   }
 
   /* ── The Receipt ─────────────────────────────────────────── */
+  .receipt-outline {
+    position: absolute;
+    right: 0;
+    top: 1.5rem;
+    width: 320px;
+    transform: rotate(3deg) scale(1.03);
+    z-index: 9;
+    background: rgba(0, 0, 0, 0.18);
+    clip-path: polygon(
+      0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
+      22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
+      42.5% 0%, 45% 3%, 47.5% 0%, 50% 3%, 52.5% 0%, 55% 3%, 57.5% 0%, 60% 3%,
+      62.5% 0%, 65% 3%, 67.5% 0%, 70% 3%, 72.5% 0%, 75% 3%, 77.5% 0%, 80% 3%,
+      82.5% 0%, 85% 3%, 87.5% 0%, 90% 3%, 92.5% 0%, 95% 3%, 97.5% 0%, 100% 3%,
+      100% 97%,
+      97.5% 100%, 95% 97%, 92.5% 100%, 90% 97%, 87.5% 100%, 85% 97%, 82.5% 100%, 80% 97%,
+      77.5% 100%, 75% 97%, 72.5% 100%, 70% 97%, 67.5% 100%, 65% 97%, 62.5% 100%, 60% 97%,
+      57.5% 100%, 55% 97%, 52.5% 100%, 50% 97%, 47.5% 100%, 45% 97%, 42.5% 100%, 40% 97%,
+      37.5% 100%, 35% 97%, 32.5% 100%, 30% 97%, 27.5% 100%, 25% 97%, 22.5% 100%, 20% 97%,
+      17.5% 100%, 15% 97%, 12.5% 100%, 10% 97%, 7.5% 100%, 5% 97%, 2.5% 100%, 0% 97%
+    );
+  }
+
   .receipt {
     position: absolute;
     right: 0;
@@ -486,12 +510,6 @@ participation in the Accord.
     transform: rotate(3deg);
     z-index: 10;
     background: #f5f0e8;
-    filter:
-      drop-shadow(0 0 1px rgba(0, 0, 0, 0.45))
-      drop-shadow(0 0 5px rgba(0, 0, 0, 0.22))
-      drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28))
-      drop-shadow(0 18px 36px rgba(0, 0, 0, 0.2))
-      drop-shadow(0 32px 64px rgba(0, 0, 0, 0.12));
     clip-path: polygon(
       0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
       22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
@@ -1053,6 +1071,10 @@ participation in the Accord.
   @media (max-width: 768px) {
     .sauce-inner {
       min-height: unset;
+    }
+
+    .receipt-outline {
+      display: none;
     }
 
     .receipt {
