@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BeefburgerGame from '../components/BeefburgerGame.tsx';
+---
+
+<Layout title="Mr. Beefburger's Great Escape">
+  <main class="game-page">
+    <section class="game-hero">
+      <div class="game-hero-inner">
+        <h1 class="game-title">Mr. Beefburger's Great Escape</h1>
+        <p class="game-sub">He made it too well.</p>
+      </div>
+    </section>
+
+    <section class="game-section">
+      <BeefburgerGame client:only="react" />
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .game-page {
+    background-color: var(--color-bg);
+  }
+
+  .game-hero {
+    background-color: var(--color-surface);
+    padding: 3rem 1.5rem 2rem;
+    border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+  }
+
+  .game-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .game-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 800;
+    color: var(--color-red);
+    margin: 0 0 0.4rem;
+    line-height: 1;
+  }
+
+  .game-sub {
+    font-size: 1rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .game-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+</style>
