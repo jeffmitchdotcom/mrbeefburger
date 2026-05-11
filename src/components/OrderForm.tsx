@@ -278,7 +278,7 @@ export default function OrderForm({ locations }: Props) {
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
               gap: '1rem',
-              marginBottom: '2.5rem',
+              paddingBottom: '5.5rem',
             }}>
               {sortedLocations.map((loc) => (
                 <LocationCard
@@ -290,54 +290,6 @@ export default function OrderForm({ locations }: Props) {
                 />
               ))}
             </div>
-
-            <div style={{ marginBottom: '2.5rem' }}>
-              <p style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: '#1a1a1a',
-                marginBottom: '1rem',
-              }}>How will you be joining us?</p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                {(['pickup', 'dine-in'] as const).map((type) => (
-                  <label key={type} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    cursor: 'pointer',
-                    padding: '0.75rem 1.25rem',
-                    border: `2px solid ${orderType === type ? '#DA291C' : 'rgba(0,0,0,0.12)'}`,
-                    borderRadius: '6px',
-                    background: orderType === type ? '#fff5f4' : '#ffffff',
-                    transition: 'border-color 0.2s',
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    color: '#1a1a1a',
-                  }}>
-                    <input
-                      type="radio"
-                      value={type}
-                      checked={orderType === type}
-                      onChange={() => setOrderType(type)}
-                      style={{ accentColor: '#DA291C' }}
-                    />
-                    {type === 'pickup' ? 'Pickup' : 'Dine-In'}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setStep(2)}
-              disabled={!selectedLocation}
-              style={{ ...btnPrimary, opacity: selectedLocation ? 1 : 0.4, cursor: selectedLocation ? 'pointer' : 'not-allowed' }}
-            >
-              Continue to Order Details →
-            </button>
           </div>
         )}
 
@@ -490,6 +442,72 @@ export default function OrderForm({ locations }: Props) {
           </div>
         )}
       </div>
+
+      {step === 1 && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: '#ffffff',
+          borderTop: '1px solid rgba(0,0,0,0.1)',
+          boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
+          zIndex: 50,
+          padding: '0.875rem 1.5rem',
+        }}>
+          <div style={{
+            maxWidth: '900px',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
+          }}>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              {(['pickup', 'dine-in'] as const).map((type) => (
+                <label key={type} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  cursor: 'pointer',
+                  padding: '0.5rem 1rem',
+                  border: `2px solid ${orderType === type ? '#DA291C' : 'rgba(0,0,0,0.12)'}`,
+                  borderRadius: '6px',
+                  background: orderType === type ? '#fff5f4' : '#f7f4f0',
+                  transition: 'border-color 0.2s',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  color: '#1a1a1a',
+                }}>
+                  <input
+                    type="radio"
+                    value={type}
+                    checked={orderType === type}
+                    onChange={() => setOrderType(type)}
+                    style={{ accentColor: '#DA291C' }}
+                  />
+                  {type === 'pickup' ? 'Pickup' : 'Dine-In'}
+                </label>
+              ))}
+            </div>
+            <button
+              onClick={() => setStep(2)}
+              disabled={!selectedLocation}
+              style={{
+                ...btnPrimary,
+                opacity: selectedLocation ? 1 : 0.4,
+                cursor: selectedLocation ? 'pointer' : 'not-allowed',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              Continue to Order Details →
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
