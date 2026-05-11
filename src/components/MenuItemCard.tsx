@@ -7,9 +7,10 @@ type Props = {
   price: number;
   description: string;
   toppings?: string[];
+  image?: string;
 };
 
-export default function MenuItemCard({ slug, title, price, description, toppings }: Props) {
+export default function MenuItemCard({ slug, title, price, description, toppings, image }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [added, setAdded] = useState(false);
@@ -35,6 +36,22 @@ export default function MenuItemCard({ slug, title, price, description, toppings
       flexDirection: 'column',
       gap: '0.75rem',
     }}>
+      {image && (
+        <div style={{
+          width: '100%',
+          aspectRatio: '16 / 9',
+          borderRadius: '6px',
+          border: '1.5px solid #F5C200',
+          overflow: 'hidden',
+          flexShrink: 0,
+        }}>
+          <img
+            src={image}
+            alt={title}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
         <h3 style={{
           fontFamily: "'Bricolage Grotesque', sans-serif",
