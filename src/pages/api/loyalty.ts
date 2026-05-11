@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
       sauceUnits: 10,
     });
 
-    return new Response(JSON.stringify({ ok: true, sauceUnits: 10 }), {
+    return new Response(JSON.stringify({ ok: true, sauceUnits: 10, memberId: member.id }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

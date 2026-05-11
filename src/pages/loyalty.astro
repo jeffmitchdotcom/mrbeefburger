@@ -320,6 +320,7 @@ participation in the Accord.
             <p>Gerald will not reply. This is not a slight. It is procedure.</p>
             <p>Your Sauce Units have been credited.</p>
             <p class="app-success-tier">Welcome to The Initiated.</p>
+            <p class="app-success-member">Member No. <span id="app-success-member-id">—</span></p>
           </div>
 
         </div>
@@ -356,6 +357,9 @@ participation in the Accord.
         return;
       }
       if (!res.ok) throw new Error();
+      const { memberId } = await res.json();
+      const memberIdEl = document.getElementById('app-success-member-id');
+      if (memberIdEl && memberId) memberIdEl.textContent = String(memberId).padStart(4, '0');
       form.style.display = 'none';
       success.style.display = 'block';
     } catch {
@@ -1110,6 +1114,14 @@ participation in the Accord.
     color: var(--color-red);
     margin: 0.75rem 0 0;
     font-style: italic;
+  }
+
+  .app-success-member {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 1.5rem 0 0;
+    letter-spacing: 0.08em;
   }
 
   /* ── Mobile ──────────────────────────────────────────────── */
