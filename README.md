@@ -27,15 +27,16 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 
 ## Features
 
-- **Menu** — content collection of burger items with customizations (add-ons, remove options)
+- **Menu** — content collection of items with food photography, toppings customization, and per-item `homepage` / `signature` flags
 - **Cart** — persistent cart drawer with quantity controls, stored in localStorage via nanostores
-- **Location selection** — interactive Leaflet map; "Order Now" from any location pre-selects it and skips the location step in the order flow
+- **Location selection** — interactive Leaflet map with geolocation sort; "Order Now" pre-selects a location across the order flow
 - **Order flow** — multi-step form (location → details → review), writes to Neon Postgres via Drizzle
-- **Payment theater** — personalized "Almost there, [Name]..." review screen with order summary; Pay Now reveals a gotcha modal
+- **Payment theater** — personalized review screen; Pay Now reveals a gotcha modal
 - **Receipt page** — shareable `/order/[id]` page pulled from the database; includes estimated wait time and tech stack attribution
 - **Contact form** — stubbed API endpoint ready for Resend/SMTP2GO wiring
-- **About page** — outlandish origin story of Gerald Beaufort Beefburger III
-- **Locations page** — interactive map with all 11 locations
+- **About page** — outlandish origin story of Gerald Beaufort Beefburger III, with tech attribution section
+- **Locations page** — interactive map with all 11 locations and geolocation-based nearest sort
+- **Browser game** — "Mr. Beefburger's Great Escape" canvas sidescroller at `/game` (not in nav); Neon-backed leaderboard
 
 ## Running locally
 
@@ -57,13 +58,17 @@ DATABASE_URL=your_neon_connection_string
 ```
 src/
 ├── components/       # React islands + Astro components
+│   ├── BeefburgerGame.tsx    # Canvas sidescroller game
 │   ├── CartDrawer.tsx
 │   ├── ContactForm.tsx
 │   ├── LocationBanner.tsx
 │   ├── LocationCard.tsx
 │   ├── MenuItemCard.tsx
+│   ├── MenuSection.astro
+│   ├── Nav.astro
 │   ├── OrderForm.tsx
-│   └── PaymentTheater.tsx
+│   ├── PaymentTheater.tsx
+│   └── ProjectAttribution.astro  # Shared byline + tech stack (receipt + about)
 ├── content/
 │   ├── menu/         # Menu items as Markdown content collection
 │   └── locations/    # Location data as Markdown content collection
@@ -71,15 +76,17 @@ src/
 │   └── Layout.astro  # Shared layout with Nav, Footer, global CSS tokens
 ├── lib/
 │   ├── db.ts         # Drizzle + Neon client
-│   └── schema.ts     # Orders table schema
+│   └── schema.ts     # orders + game_scores table schemas
 ├── pages/
 │   ├── api/
-│   │   ├── orders.ts   # POST — saves order to Neon, returns order number
-│   │   └── contact.ts  # POST — stub, ready for email provider
+│   │   ├── orders.ts       # POST — saves order to Neon
+│   │   ├── contact.ts      # POST — stub, ready for email provider
+│   │   └── game-scores.ts  # GET top 10 / POST score / GET?clear=... to reset
 │   ├── order/
 │   │   └── [id].astro  # SSR receipt page (reads from DB by order number)
 │   ├── about.astro
 │   ├── contact.astro
+│   ├── game.astro      # Game page (noindex, not in nav)
 │   ├── index.astro
 │   ├── locations.astro
 │   ├── menu.astro

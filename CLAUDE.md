@@ -31,7 +31,7 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 **Rendering modes:** Most pages are static. Pages that read from the database (`src/pages/order/[id].astro`) and all API routes use `export const prerender = false` for SSR.
 
-**Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. The single `orders` table stores the full order as a JSON blob (items array) alongside flat fields (customerName, locationName, etc.).
+**Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. Two tables: `orders` (full order as JSON blob + flat fields) and `game_scores` (playerName, score, durationSeconds).
 
 **State management:** Nanostores with `@nanostores/persistent` for cross-page client state:
 - `src/stores/cart.ts` — cart items, persisted to localStorage key `mrb-cart`
@@ -40,6 +40,8 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 **API routes:**
 - `POST /api/orders` — validates and writes an order to Neon, returns `{ orderNumber }`
 - `POST /api/contact` — stub endpoint, returns `{ ok: true }` (email provider not yet wired)
+- `GET /api/game-scores` — returns top 10 scores; accepts `?clear=GBB3-great-escape-reset` to wipe all scores
+- `POST /api/game-scores` — inserts a score row (playerName, score, durationSeconds)
 
 **Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details) → `/payment` (PaymentTheater: review + fake Pay Now) → `/order/[id]` (receipt from DB). Order summary is passed to the payment page via `sessionStorage`.
 
@@ -60,21 +62,24 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 ## Content collections
 
-- `src/content/menu/` — one Markdown file per menu item; fields: `slug`, `title`, `description`, `price`, `category`, `image`, `customizations` (array of add/remove options)
-- `src/content/locations/` — one Markdown file per location (11 total); fields: `name`, `address`, `hours`, `lat`, `lng`; location names do NOT include the brand prefix ("South Congress", not "Mr. Beefburger — South Congress")
+- `src/content/menu/` — one Markdown file per menu item; fields: `title`, `slug`, `price`, `description`, `category` (burgers/sides/drinks), `toppings` (optional string array — the customize checklist), `image` (optional, absolute path from `/public/`), `signature` (optional bool — sorts item first in its category on the menu page), `homepage` (optional bool — surfaces item in the "More from the Menu" section on the homepage, max 3 shown), `available` (bool, default true)
+- `src/content/locations/` — one Markdown file per location (11 total); fields: `name`, `address`, `city`, `state`, `lat`, `lng`, `hours`, `phone`; location names do NOT include the brand prefix ("South Congress", not "Mr. Beefburger — South Congress")
+
+**Menu images** live in `public/images/menu/`. Add `image: /images/menu/filename.png` to a menu item's frontmatter to display it on the menu page (16:9 yellow-bordered box) and homepage grid.
 
 ## Pages
 
 | Route | File | Notes |
 |---|---|---|
-| `/` | `index.astro` | Hero, signatures teaser, locations teaser |
+| `/` | `index.astro` | Hero slider, category icons, featured burger, dynamic "More from the Menu" (homepage: true items), locations teaser |
 | `/menu` | `menu.astro` | Menu grouped by category; CartDrawer + LocationBanner islands |
-| `/locations` | `locations.astro` | Interactive Leaflet map; "Order Now" pre-selects location |
-| `/about` | `about.astro` | Gerald Beaufort Beefburger III origin story |
+| `/locations` | `locations.astro` | Interactive Leaflet map + geolocation sort; "Order Now" pre-selects location |
+| `/about` | `about.astro` | Gerald Beaufort Beefburger III origin story + ProjectAttribution section |
 | `/contact` | `contact.astro` | ContactForm island + sidebar with email addresses |
 | `/order` | `order.astro` | OrderForm island — location + order details, posts to `/api/orders` |
 | `/payment` | `payment.astro` | PaymentTheater island — review screen + gotcha modal |
-| `/order/[id]` | `order/[id].astro` | SSR receipt page; reads order from Neon by order number |
+| `/order/[id]` | `order/[id].astro` | SSR receipt page; reads order from Neon by order number + ProjectAttribution |
+| `/game` | `game.astro` | "Mr. Beefburger's Great Escape" sidescroller; noindex, not in nav |
 
 ## Key component behaviors
 
@@ -86,8 +91,14 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 **ContactForm**: On successful POST, shows a success state with Gerald-flavored copy. The `/api/contact` endpoint is a stub — a `// TODO` comment marks where to add Resend or SMTP2GO.
 
+**BeefburgerGame** (`game.astro` + `BeefburgerGame.tsx`): Canvas sidescroller. Sprite sheets in `public/sprites/` use magenta (#FF00FF) chroma key for transparency. Frame coordinates are marked `// TUNE` for easy adjustment if sprites change. Leaderboard reads/writes via `/api/game-scores`. Secret reset URL: `/api/game-scores?clear=GBB3-great-escape-reset`.
+
+**ProjectAttribution** (`src/components/ProjectAttribution.astro`): Single source of truth for the byline, description, and tech stack badges shown on the receipt page and about page. Edit this one file to update either location.
+
+**OrderForm** (step 1): The pickup/dine-in toggle and "Continue" button are `position: fixed` to the viewport bottom so they stay visible while the user scrolls the location list.
+
 ## What's coming
 
 - Wire up contact form email (Resend or SMTP2GO) — stub is at `src/pages/api/contact.ts`
-- Real burger names, images, and copy from the owner
+- Food photography for remaining menu items (drop in `public/images/menu/`, add `image:` to frontmatter)
 - Logo/mascot asset (replace text wordmark in Nav and Footer)
