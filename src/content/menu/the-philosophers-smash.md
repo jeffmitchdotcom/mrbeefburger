@@ -1,4 +1,5 @@
 ---
+image: /images/menu/the-philosophers-smash.png
 title: "The Philosopher's Smash"
 slug: "philosophers-smash"
 price: 18

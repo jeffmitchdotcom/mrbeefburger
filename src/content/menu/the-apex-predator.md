@@ -1,4 +1,5 @@
 ---
+image: /images/menu/the-apex-predator.png
 title: "The Apex Predator"
 slug: "apex-predator"
 price: 22

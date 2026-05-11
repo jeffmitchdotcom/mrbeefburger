@@ -1,4 +1,5 @@
 ---
+image: /images/menu/the-meaty-faced-sauce-burger.png
 title: "The Meaty Faced Sauce Burger"
 slug: "meaty-faced-sauce-burger"
 price: 19

@@ -1,4 +1,5 @@
 ---
+image: /images/menu/the-fungal-aristocrat.png
 title: "The Fungal Aristocrat"
 slug: "fungal-aristocrat"
 price: 20
