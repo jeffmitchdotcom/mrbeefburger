@@ -1,0 +1,1066 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allItems = (await getCollection('menu')).filter(item => item.data.available !== false);
+const menuByCategory: Record<string, typeof allItems> = {};
+for (const item of allItems) {
+  const cat = item.data.category;
+  if (!menuByCategory[cat]) menuByCategory[cat] = [];
+  menuByCategory[cat].push(item);
+}
+for (const cat of Object.keys(menuByCategory)) {
+  menuByCategory[cat].sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+---
+
+<Layout title="Rewards — Mr. Beefburger">
+  <link slot="head" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+
+  <main>
+
+    <!-- ── Hero ────────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="section-label">Membership</p>
+        <h1 class="hero-title">The Beefburger<br />Loyalty Accord</h1>
+        <p class="hero-sub">Not a program. Not a club. An Accord. Gerald drafted it himself. It took eleven months.</p>
+      </div>
+    </section>
+
+    <!-- ── Sauce Units ─────────────────────────────────────── -->
+    <section class="sauce-section">
+      <div class="sauce-inner">
+
+        <div class="sauce-content">
+          <p class="section-label">The Currency</p>
+          <h2 class="section-heading">Sauce Units</h2>
+          <p class="sauce-intro">Points are called Sauce Units. All transactions within the Accord are denominated in Sauce Units. Gerald does not round up. He does not round down. He calculates precisely.</p>
+          <blockquote class="sauce-quote">"You have earned Sauce Units. Gerald is aware."</blockquote>
+
+          <ul class="earning-list">
+            <li class="earning-item">
+              <div class="earning-info">
+                <span class="earning-label">Every Purchase</span>
+                <span class="earning-desc">The baseline. The floor. The non-negotiable.</span>
+              </div>
+              <span class="earning-su">1 SU / $1</span>
+            </li>
+            <li class="earning-item">
+              <div class="earning-info">
+                <span class="earning-label">Ordering the Meaty Faced Sauce Burger</span>
+                <span class="earning-desc">The Original. Gerald considers this a correct decision.</span>
+              </div>
+              <span class="earning-su">+5 SU</span>
+            </li>
+            <li class="earning-item">
+              <div class="earning-info">
+                <span class="earning-label">Visiting on a Tuesday</span>
+                <span class="earning-desc">Gerald's Day. No further explanation is given.</span>
+              </div>
+              <span class="earning-su">+3 SU</span>
+            </li>
+            <li class="earning-item">
+              <div class="earning-info">
+                <span class="earning-label">Completing the Application with Honest Answers</span>
+                <span class="earning-desc">One time only. Gerald will know.</span>
+              </div>
+              <span class="earning-su">+10 SU</span>
+            </li>
+            <li class="earning-item">
+              <div class="earning-info">
+                <span class="earning-label">Referring Someone Who Joins</span>
+                <span class="earning-desc">The Propagation. Gerald respects it.</span>
+              </div>
+              <span class="earning-su">+15 SU</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- The Receipt (desktop: absolute float; mobile: static) -->
+        <div class="receipt" aria-hidden="true">
+          <div class="receipt-body">
+            <pre class="receipt-text">================================
+   MR. BEEFBURGER
+   HOME OF THE MEATY FACED
+   SAUCE BURGER
+================================
+
+SAUCE UNIT STATEMENT
+Member Since: 03/14/2022
+Tier: THE COMMITTED
+
+--------------------------------
+ACTIVITY SUMMARY
+--------------------------------
+Burgers Consumed:         14
+Tuesdays Honored:          3
+SU Earned (Total):       247
+SU Redeemed:              40
+SU Balance:              207
+--------------------------------
+
+CURRENT STATUS:
+  THE COMMITTED
+
+NEXT TIER:
+  THE CONSECRATED
+  (293 SU REQUIRED)
+
+--------------------------------
+Gerald has been informed.
+--------------------------------
+
+** THIS IS NOT A RECEIPT **
+** THIS IS A RECORD       **
+** THERE IS A DIFFERENCE  **
+
+================================
+Thank you for your continued
+participation in the Accord.
+================================</pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Tier System ─────────────────────────────────────── -->
+    <section class="tiers-section">
+      <div class="tiers-inner">
+        <p class="section-label">The Structure</p>
+        <h2 class="section-heading">The Four Tiers</h2>
+        <p class="tiers-intro">Four tiers. Named with escalating gravity. No discount percentages. No exclamation points.</p>
+        <div class="tiers-grid">
+
+          <div class="tier-card">
+            <span class="tier-number">Tier 01</span>
+            <h3 class="tier-name">The Initiated</h3>
+            <p class="tier-range">0–199 Sauce Units</p>
+            <p class="tier-badge">"You have arrived."</p>
+          </div>
+
+          <div class="tier-card">
+            <span class="tier-number">Tier 02</span>
+            <h3 class="tier-name">The Committed</h3>
+            <p class="tier-range">200–499 Sauce Units</p>
+            <p class="tier-badge">"Gerald has been informed."</p>
+          </div>
+
+          <div class="tier-card">
+            <span class="tier-number">Tier 03</span>
+            <h3 class="tier-name">The Consecrated</h3>
+            <p class="tier-range">500–999 Sauce Units</p>
+            <p class="tier-badge">"Something has shifted."</p>
+          </div>
+
+          <div class="tier-card tier-card--dark">
+            <span class="tier-number">Tier 04</span>
+            <h3 class="tier-name">The Beefborn</h3>
+            <p class="tier-range">1,000+ Sauce Units</p>
+            <p class="tier-badge">"There is no going back."</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Perks + The Card ────────────────────────────────── -->
+    <section class="perks-section">
+      <div class="perks-inner">
+
+        <!-- The Card (desktop: absolute float; mobile: static block) -->
+        <div class="loyalty-card" aria-hidden="true">
+          <span class="card-brand">Mr. Beefburger</span>
+          <div class="card-stripe"></div>
+          <span class="card-word">KNOWN</span>
+          <div class="card-bottom">
+            <span class="card-tier">The Consecrated</span>
+            <span class="card-number">0047</span>
+          </div>
+        </div>
+
+        <div class="perks-content">
+          <p class="section-label">The Privileges</p>
+          <h2 class="section-heading">Perks by Tier</h2>
+          <p class="card-copy">The Card is issued upon joining. It contains no points balance. It contains no expiration date. It contains one word. That word is sufficient.</p>
+          <p class="perks-intro">Perks are not discounts. They are privileges. They are extended with sincerity and received accordingly.</p>
+
+          <div class="perks-list">
+
+            <details class="perk-block">
+              <summary class="perk-summary">
+                <span class="perk-tier-name">The Initiated</span>
+                <span class="perk-su-range">0–199 SU</span>
+              </summary>
+              <ul class="perk-items">
+                <li>Priority seating in the third booth from the restrooms. The booth with the USDA letter.</li>
+                <li>Your name is entered into the Register. The Register is not digital. Gerald keeps it in a drawer.</li>
+                <li>Access to the sauce in the standard vessel.</li>
+              </ul>
+            </details>
+
+            <details class="perk-block">
+              <summary class="perk-summary">
+                <span class="perk-tier-name">The Committed</span>
+                <span class="perk-su-range">200–499 SU</span>
+              </summary>
+              <ul class="perk-items">
+                <li>A formal acknowledgment from Gerald. Not a thank-you. An acknowledgment.</li>
+                <li>Access to the Thursday menu. Gerald does not explain the Thursday menu.</li>
+                <li>Your name is now known to someone in the kitchen. They will not use it. But they know.</li>
+              </ul>
+            </details>
+
+            <details class="perk-block">
+              <summary class="perk-summary">
+                <span class="perk-tier-name">The Consecrated</span>
+                <span class="perk-su-range">500–999 SU</span>
+              </summary>
+              <ul class="perk-items">
+                <li>Access to the sauce in a slightly larger vessel.</li>
+                <li>A private telephone number. It rings twice and then goes silent. This is normal.</li>
+                <li>Your photograph is considered for the wall. Gerald curates the wall personally. Not every photograph makes it.</li>
+              </ul>
+            </details>
+
+            <details class="perk-block perk-block--dark">
+              <summary class="perk-summary">
+                <span class="perk-tier-name">The Beefborn</span>
+                <span class="perk-su-range">1,000+ SU</span>
+              </summary>
+              <ul class="perk-items">
+                <li>A standing reservation. Not for a specific time. Just a reservation. It exists.</li>
+                <li>Access to the Beefborn menu. There is one item. It changes monthly. Gerald has never described it in writing.</li>
+                <li>Gerald will, upon your next visit, nod at you. You will know what it means.</li>
+              </ul>
+            </details>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── The Application ─────────────────────────────────── -->
+    <section class="app-section">
+      <div class="app-inner">
+        <p class="section-label">The Application</p>
+        <h2 class="section-heading">Join the Accord</h2>
+        <p class="app-intro">The Accord is not difficult to join. It is simply formal. Gerald believes formality is a sign of respect. Complete the following with accuracy and sincerity.</p>
+
+        <div class="app-document">
+
+          <div class="app-doc-header">
+            <h3 class="app-doc-title">Application to the Beefburger Loyalty Accord</h3>
+            <p class="app-doc-sub">All fields are reviewed personally. Some answers have moved Gerald. Not many. But some.</p>
+          </div>
+
+          <form class="app-form" id="app-form" novalidate>
+
+            <div class="field-group">
+              <label class="field-label" for="legal-name">Full Legal Name</label>
+              <p class="field-note">As it appears on government-issued documentation. Gerald will verify nothing. But he will know.</p>
+              <input type="text" id="legal-name" name="legal-name" class="field-input" />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="city">City of Residence</label>
+              <p class="field-note">Gerald keeps a personal atlas. He maintains it by hand.</p>
+              <input type="text" id="city" name="city" class="field-input" />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="burger">Preferred Burger</label>
+              <p class="field-note">Your answer is noted. If you select something from the chicken section, your application will still be processed. Gerald will simply be aware.</p>
+              <select id="burger" name="burger" class="field-input field-select">
+                {Object.entries(menuByCategory).map(([category, items]) => (
+                  <optgroup label={category.charAt(0).toUpperCase() + category.slice(1)}>
+                    {items.map(item => (
+                      <option value={item.data.title}>{item.data.title}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="beef-relationship">Describe Your Relationship With Beef</label>
+              <p class="field-note">Three sentences maximum. Gerald reads these. Some have moved him.</p>
+              <textarea id="beef-relationship" name="beef-relationship" class="field-input field-textarea" rows="4"></textarea>
+            </div>
+
+            <div class="field-group">
+              <fieldset class="field-fieldset">
+                <legend class="field-label">Have you ever ordered a burger well-done?</legend>
+                <p class="field-note">This answer is recorded.</p>
+                <div class="radio-group">
+                  <label class="radio-label"><input type="radio" name="well-done" value="yes" /> Yes</label>
+                  <label class="radio-label"><input type="radio" name="well-done" value="no" checked /> No</label>
+                </div>
+              </fieldset>
+            </div>
+
+            <button type="submit" class="app-submit">Submit Application to the Accord</button>
+
+          </form>
+
+          <div class="app-success" id="app-success">
+            <p>Your application has been received.</p>
+            <p>Gerald will not reply. This is not a slight. It is procedure.</p>
+            <p>Your Sauce Units have been credited.</p>
+            <p class="app-success-tier">Welcome to The Initiated.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+</Layout>
+
+<script>
+  const form = document.getElementById('app-form') as HTMLFormElement;
+  const success = document.getElementById('app-success') as HTMLElement;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    form.style.display = 'none';
+    success.style.display = 'block';
+  });
+</script>
+
+<style>
+  /* ── Shared typography helpers ──────────────────────────── */
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-red);
+    margin: 0 0 0.5rem;
+  }
+
+  .section-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0 0 1.25rem;
+    line-height: 1.1;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────── */
+  .hero {
+    background-color: var(--color-surface);
+    padding: 5rem 1.5rem;
+    border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+  }
+
+  .hero-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6.5vw, 4.75rem);
+    font-weight: 800;
+    color: var(--color-red);
+    margin: 0.25rem 0 1rem;
+    line-height: 1.03;
+  }
+
+  .hero-sub {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  /* ── Sauce Units ─────────────────────────────────────────── */
+  .sauce-section {
+    background-color: var(--color-bg);
+    padding: 5rem 1.5rem 6rem;
+  }
+
+  .sauce-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    min-height: 520px;
+  }
+
+  .sauce-content {
+    max-width: 580px;
+  }
+
+  .sauce-intro {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0 0 1rem;
+  }
+
+  .sauce-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--color-muted);
+    border-left: 3px solid var(--color-red);
+    padding-left: 1rem;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .earning-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .earning-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .earning-item:last-child {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .earning-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .earning-label {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text);
+  }
+
+  .earning-desc {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    font-style: italic;
+  }
+
+  .earning-su {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--color-red);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── The Receipt ─────────────────────────────────────────── */
+  .receipt {
+    position: absolute;
+    right: 0;
+    top: 1.5rem;
+    width: 260px;
+    transform: rotate(3deg);
+    z-index: 10;
+    background: #f5f0e8;
+    filter:
+      drop-shadow(2px 4px 10px rgba(0, 0, 0, 0.18))
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    clip-path: polygon(
+      0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
+      22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
+      42.5% 0%, 45% 3%, 47.5% 0%, 50% 3%, 52.5% 0%, 55% 3%, 57.5% 0%, 60% 3%,
+      62.5% 0%, 65% 3%, 67.5% 0%, 70% 3%, 72.5% 0%, 75% 3%, 77.5% 0%, 80% 3%,
+      82.5% 0%, 85% 3%, 87.5% 0%, 90% 3%, 92.5% 0%, 95% 3%, 97.5% 0%, 100% 3%,
+      100% 97%,
+      97.5% 100%, 95% 97%, 92.5% 100%, 90% 97%, 87.5% 100%, 85% 97%, 82.5% 100%, 80% 97%,
+      77.5% 100%, 75% 97%, 72.5% 100%, 70% 97%, 67.5% 100%, 65% 97%, 62.5% 100%, 60% 97%,
+      57.5% 100%, 55% 97%, 52.5% 100%, 50% 97%, 47.5% 100%, 45% 97%, 42.5% 100%, 40% 97%,
+      37.5% 100%, 35% 97%, 32.5% 100%, 30% 97%, 27.5% 100%, 25% 97%, 22.5% 100%, 20% 97%,
+      17.5% 100%, 15% 97%, 12.5% 100%, 10% 97%, 7.5% 100%, 5% 97%, 2.5% 100%, 0% 97%
+    );
+  }
+
+  .receipt-body {
+    padding: 28px 14px;
+  }
+
+  .receipt-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.58rem;
+    color: #2a2a2a;
+    line-height: 1.65;
+    white-space: pre;
+    margin: 0;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* ── Tier System ─────────────────────────────────────────── */
+  .tiers-section {
+    background-color: var(--color-surface);
+    padding: 5rem 1.5rem;
+  }
+
+  .tiers-inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .tiers-intro {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0 0 3rem;
+  }
+
+  .tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .tier-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .tier-card--dark {
+    background: #1a1a1a;
+    border-color: transparent;
+  }
+
+  .tier-number {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .tier-card--dark .tier-number {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .tier-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0.2rem 0 0;
+    line-height: 1.15;
+  }
+
+  .tier-card--dark .tier-name {
+    color: #ffffff;
+  }
+
+  .tier-range {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin: 0.2rem 0 0;
+  }
+
+  .tier-card--dark .tier-range {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .tier-badge {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--color-red);
+    margin: 0.75rem 0 0;
+    line-height: 1.4;
+  }
+
+  .tier-card--dark .tier-badge {
+    color: #c9963e;
+  }
+
+  /* ── Perks + The Card ────────────────────────────────────── */
+  .perks-section {
+    background-color: var(--color-bg);
+    padding: 5rem 1.5rem;
+  }
+
+  .perks-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .perks-content {
+    padding-left: 360px;
+  }
+
+  .card-copy {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+    border-left: 3px solid var(--color-red);
+    padding-left: 1rem;
+  }
+
+  .perks-intro {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0 0 2rem;
+    line-height: 1.7;
+  }
+
+  /* ── Loyalty Card ────────────────────────────────────────── */
+  .loyalty-card {
+    position: absolute;
+    left: -20px;
+    top: 3.5rem;
+    width: 300px;
+    height: 192px;
+    background: #3d0e0e;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    transform: rotate(-4deg);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 6px 16px rgba(0, 0, 0, 0.35),
+      0 14px 40px rgba(0, 0, 0, 0.25),
+      0 24px 64px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    animation: card-settle 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes card-settle {
+    from {
+      opacity: 0;
+      transform: translateY(24px) rotate(-5deg);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) rotate(-4deg);
+    }
+  }
+
+  .card-brand {
+    font-family: var(--font-body);
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c9963e;
+    font-variant: small-caps;
+  }
+
+  .card-stripe {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 38%;
+    height: 18%;
+    background: linear-gradient(180deg, #c9963e 0%, #b8832e 100%);
+    opacity: 0.9;
+  }
+
+  .card-word {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.32em;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    text-shadow:
+      1px 2px 4px rgba(0, 0, 0, 0.5),
+      -1px -1px 2px rgba(255, 255, 255, 0.06);
+  }
+
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .card-tier {
+    font-family: var(--font-body);
+    font-size: 0.46rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c9963e;
+  }
+
+  .card-number {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Perks accordion ─────────────────────────────────────── */
+  .perks-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .perk-block {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .perk-block:last-child {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .perk-block--dark {
+    background: #1a1a1a;
+    border-radius: 8px;
+    border-top: none;
+    border-bottom: none;
+    margin-top: 1.5rem;
+  }
+
+  .perk-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    list-style: none;
+    gap: 1rem;
+    user-select: none;
+  }
+
+  .perk-block--dark .perk-summary {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .perk-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .perk-summary::marker {
+    content: '';
+  }
+
+  .perk-tier-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .perk-block--dark .perk-tier-name {
+    color: #ffffff;
+  }
+
+  .perk-su-range {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .perk-block--dark .perk-su-range {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .perk-items {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .perk-block--dark .perk-items {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .perk-items li {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.7;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .perk-items li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--color-red);
+    font-weight: 700;
+  }
+
+  .perk-block--dark .perk-items li {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .perk-block--dark .perk-items li::before {
+    color: #c9963e;
+  }
+
+  /* ── Application ─────────────────────────────────────────── */
+  .app-section {
+    background-color: var(--color-surface);
+    padding: 5rem 1.5rem 6rem;
+  }
+
+  .app-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .app-intro {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0 0 3rem;
+    line-height: 1.7;
+  }
+
+  .app-document {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 4px solid var(--color-red);
+    border-radius: 8px;
+    padding: 2.5rem;
+    max-width: 640px;
+  }
+
+  .app-doc-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .app-doc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+    margin: 0 0 0.5rem;
+  }
+
+  .app-doc-sub {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .app-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .field-label {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .field-note {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0 0 0.25rem;
+    line-height: 1.5;
+  }
+
+  .field-input {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .field-input:focus {
+    border-color: var(--color-red);
+  }
+
+  .field-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23767676' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  .field-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .field-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .field-fieldset legend {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    padding: 0;
+    margin-bottom: 0;
+    float: left;
+    width: 100%;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .radio-label {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .app-submit {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--color-red);
+    border: none;
+    border-radius: 6px;
+    padding: 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .app-submit:hover {
+    background: #b82018;
+  }
+
+  .app-success {
+    display: none;
+    padding: 2rem 0 0.5rem;
+  }
+
+  .app-success p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0 0 0.5rem;
+  }
+
+  .app-success-tier {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-red) !important;
+    margin-top: 1.5rem !important;
+  }
+
+  /* ── Mobile ──────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .sauce-inner {
+      min-height: unset;
+    }
+
+    .receipt {
+      position: static;
+      display: block;
+      width: 100%;
+      max-width: 290px;
+      margin: 2.5rem auto 0;
+      transform: rotate(1deg);
+    }
+
+    .tiers-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .loyalty-card {
+      position: static;
+      display: block;
+      margin: 0 auto 2.5rem;
+      transform: rotate(-1deg);
+      width: 300px;
+      max-width: 90vw;
+      animation: none;
+      opacity: 1;
+    }
+
+    .perks-content {
+      padding-left: 0;
+    }
+
+    .app-document {
+      padding: 1.5rem;
+    }
+  }
+</style>
