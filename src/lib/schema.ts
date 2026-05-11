@@ -28,3 +28,30 @@ export const gameScores = pgTable('game_scores', {
 
 export type GameScore = typeof gameScores.$inferSelect;
 export type NewGameScore = typeof gameScores.$inferInsert;
+
+export const loyaltyMembers = pgTable('loyalty_members', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').unique().notNull(),
+  city: text('city').notNull(),
+  preferredBurger: text('preferred_burger').notNull(),
+  beefRelationship: text('beef_relationship').notNull(),
+  wellDone: text('well_done').notNull(),
+  tier: text('tier').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const loyaltyTransactions = pgTable('loyalty_transactions', {
+  id: serial('id').primaryKey(),
+  memberId: integer('member_id').notNull(),
+  action: text('action').notNull(),
+  description: text('description').notNull(),
+  sauceUnits: integer('sauce_units').notNull(),
+  referenceId: text('reference_id'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export type LoyaltyMember = typeof loyaltyMembers.$inferSelect;
+export type NewLoyaltyMember = typeof loyaltyMembers.$inferInsert;
+export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
+export type NewLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;

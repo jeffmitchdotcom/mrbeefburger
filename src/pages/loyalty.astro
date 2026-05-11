@@ -2,16 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
-const allItems = (await getCollection('menu')).filter(item => item.data.available !== false);
-const menuByCategory: Record<string, typeof allItems> = {};
-for (const item of allItems) {
-  const cat = item.data.category;
-  if (!menuByCategory[cat]) menuByCategory[cat] = [];
-  menuByCategory[cat].push(item);
-}
-for (const cat of Object.keys(menuByCategory)) {
-  menuByCategory[cat].sort((a, b) => a.data.title.localeCompare(b.data.title));
-}
+const allItems = (await getCollection('menu')).filter(
+  item => item.data.available !== false && item.data.category === 'burgers'
+);
+const burgers = allItems.sort((a, b) => {
+  if (a.data.signature && !b.data.signature) return -1;
+  if (!a.data.signature && b.data.signature) return 1;
+  return a.data.title.localeCompare(b.data.title);
+});
 ---
 
 <Layout title="Loyalty — Mr. Beefburger">
@@ -264,30 +262,32 @@ participation in the Accord.
             <p class="app-doc-sub">All fields are reviewed personally. Some answers have moved Gerald. Not many. But some.</p>
           </div>
 
-          <form class="app-form" id="app-form" novalidate>
+          <form class="app-form" id="app-form">
 
             <div class="field-group">
               <label class="field-label" for="legal-name">Full Legal Name</label>
               <p class="field-note">As it appears on government-issued documentation. Gerald will verify nothing. But he will know.</p>
-              <input type="text" id="legal-name" name="legal-name" class="field-input" />
+              <input type="text" id="legal-name" name="legal-name" class="field-input" required />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="email">Email Address</label>
+              <p class="field-note">For Accord correspondence only. Gerald does not send newsletters. He considers them beneath the relationship.</p>
+              <input type="email" id="email" name="email" class="field-input" required />
             </div>
 
             <div class="field-group">
               <label class="field-label" for="city">City of Residence</label>
               <p class="field-note">Gerald keeps a personal atlas. He maintains it by hand.</p>
-              <input type="text" id="city" name="city" class="field-input" />
+              <input type="text" id="city" name="city" class="field-input" required />
             </div>
 
             <div class="field-group">
               <label class="field-label" for="burger">Preferred Burger</label>
-              <p class="field-note">Your answer is noted. If you select something from the chicken section, your application will still be processed. Gerald will simply be aware.</p>
-              <select id="burger" name="burger" class="field-input field-select">
-                {Object.entries(menuByCategory).map(([category, items]) => (
-                  <optgroup label={category.charAt(0).toUpperCase() + category.slice(1)}>
-                    {items.map(item => (
-                      <option value={item.data.title}>{item.data.title}</option>
-                    ))}
-                  </optgroup>
+              <p class="field-note">Your answer is noted. Gerald considers the Meaty Faced Sauce Burger the correct answer. He will still process other selections.</p>
+              <select id="burger" name="burger" class="field-input field-select" required>
+                {burgers.map(item => (
+                  <option value={item.data.title}>{item.data.title}</option>
                 ))}
               </select>
             </div>
@@ -295,7 +295,7 @@ participation in the Accord.
             <div class="field-group">
               <label class="field-label" for="beef-relationship">Describe Your Relationship With Beef</label>
               <p class="field-note">Three sentences maximum. Gerald reads these. Some have moved him.</p>
-              <textarea id="beef-relationship" name="beef-relationship" class="field-input field-textarea" rows="4"></textarea>
+              <textarea id="beef-relationship" name="beef-relationship" class="field-input field-textarea" rows="4" required></textarea>
             </div>
 
             <div class="field-group">
@@ -310,6 +310,8 @@ participation in the Accord.
             </div>
 
             <button type="submit" class="app-submit">Submit Application to the Accord</button>
+            <p class="app-error" id="app-error">The Accord encountered a difficulty. Gerald is looking into it.</p>
+            <p class="app-error" id="app-error-duplicate">You are already enrolled in the Accord. Gerald has your record. Attempting to join twice does not earn additional Sauce Units. Gerald checked.</p>
 
           </form>
 
@@ -331,10 +333,34 @@ participation in the Accord.
   const form = document.getElementById('app-form') as HTMLFormElement;
   const success = document.getElementById('app-success') as HTMLElement;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    form.style.display = 'none';
-    success.style.display = 'block';
+    document.getElementById('app-error')!.style.display = 'none';
+    document.getElementById('app-error-duplicate')!.style.display = 'none';
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      const res = await fetch('/api/loyalty', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data['legal-name'],
+          email: data['email'],
+          city: data['city'],
+          preferredBurger: data['burger'],
+          beefRelationship: data['beef-relationship'],
+          wellDone: data['well-done'],
+        }),
+      });
+      if (res.status === 409) {
+        document.getElementById('app-error-duplicate')!.style.display = 'block';
+        return;
+      }
+      if (!res.ok) throw new Error();
+      form.style.display = 'none';
+      success.style.display = 'block';
+    } catch {
+      document.getElementById('app-error')!.style.display = 'block';
+    }
   });
 
   const perkBlocks = document.querySelectorAll<HTMLDetailsElement>('.perk-block');
@@ -1075,6 +1101,15 @@ participation in the Accord.
     font-weight: 800;
     color: var(--color-red) !important;
     margin-top: 1.5rem !important;
+  }
+
+  .app-error {
+    display: none;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-red);
+    margin: 0.75rem 0 0;
+    font-style: italic;
   }
 
   /* ── Mobile ──────────────────────────────────────────────── */
