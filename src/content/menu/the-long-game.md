@@ -1,5 +1,5 @@
 ---
-image: /images/menu/the-long-game.png
+image: /images/menu/the-long-game.jpg
 title: "The Long Game"
 slug: "long-game"
 price: 18

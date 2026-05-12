@@ -1,5 +1,5 @@
 ---
-image: /images/menu/the-philosophers-smash.png
+image: /images/menu/the-philosophers-smash.jpg
 homepage: true
 title: "The Philosopher's Smash"
 slug: "philosophers-smash"

@@ -1,4 +1,5 @@
 ---
+image: /images/menu/smash-cola.jpg
 title: "Smash Cola"
 slug: "smash-cola"
 price: 5

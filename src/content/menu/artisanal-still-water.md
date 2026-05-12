@@ -1,4 +1,5 @@
 ---
+image: /images/menu/artisanal-still-water.jpg
 title: "Artisanal Still Water"
 slug: "artisanal-water"
 price: 7

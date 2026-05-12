@@ -1,4 +1,5 @@
 ---
+image: /images/menu/truffle-frites.jpg
 title: "Truffle Frites"
 slug: "truffle-frites"
 price: 9

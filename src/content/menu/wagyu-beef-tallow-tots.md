@@ -1,4 +1,5 @@
 ---
+image: /images/menu/wagyu-beef-tallow-tots.jpg
 title: "Wagyu Beef Tallow Tots"
 slug: "wagyu-tots"
 price: 8
