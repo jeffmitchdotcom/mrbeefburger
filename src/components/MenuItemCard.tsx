@@ -55,8 +55,8 @@ export default function MenuItemCard({ slug, title, price, description, toppings
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
-          <svg viewBox="0 0 80 58" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-            style={{ width: '64px', opacity: 0.15 }}>
+          <svg viewBox="0 0 80 58" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ width: '128px', opacity: 0.15 }}>
             <path d="M14 27 Q14 9 40 9 Q66 9 66 27" />
             <line x1="12" y1="27" x2="68" y2="27" />
             <path d="M12 31 Q20 26 28 31 Q36 36 44 31 Q52 26 60 31 Q65 29 68 31" />
