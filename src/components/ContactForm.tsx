@@ -67,7 +67,7 @@ export default function ContactForm() {
         borderRadius: '8px',
         padding: '3rem 2rem',
         textAlign: 'center',
-        maxWidth: '560px',
+        maxWidth: '720px',
         margin: '0 auto',
       }}>
         <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>📬</div>
@@ -75,8 +75,7 @@ export default function ContactForm() {
           Message received.
         </h2>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.95rem', color: '#767676', lineHeight: 1.7, margin: '0 0 2rem' }}>
-          Gerald or someone on his team will get back to you. Please allow 1–3 business days,
-          or longer if Gerald is having a Sauce Day.
+          Gerald or someone on his team will get back to you.
         </p>
         <a href="/" style={{
           display: 'inline-block',
@@ -96,7 +95,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: '560px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <form onSubmit={handleSubmit} style={{ maxWidth: '720px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
         <label style={labelStyle}>
