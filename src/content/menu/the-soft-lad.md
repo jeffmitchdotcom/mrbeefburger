@@ -1,4 +1,5 @@
 ---
+image: /images/menu/the-soft-lad.png
 title: "The Soft Lad"
 slug: "soft-lad"
 price: 16
