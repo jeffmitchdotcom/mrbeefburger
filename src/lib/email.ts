@@ -8,7 +8,7 @@ const ses = new SESClient({
   },
 });
 
-const FROM = 'Mr. Beefburger <hello@mrbeefburger.com>';
+const FROM = 'Mr. Beefburger <noreply@mrbeefburger.com>';
 
 export async function sendEmail({
   to,
