@@ -25,13 +25,27 @@ import ContactForm from '../components/ContactForm.tsx';
 <style>
   .page-hero {
     background-color: var(--color-surface);
+    background-image: url('/images/mrbeefburger-interior-1.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
     padding: 4rem 1.5rem;
     border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+  }
+
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-surface);
+    opacity: 0.85;
   }
 
   .page-hero-inner {
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
   }
 
   .page-title {

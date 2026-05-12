@@ -401,13 +401,27 @@ participation in the Accord.
   /* ── Hero ────────────────────────────────────────────────── */
   .hero {
     background-color: var(--color-surface);
+    background-image: url('/images/mrbeefburger-interior-2.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
     padding: 5rem 1.5rem;
     border-bottom: 1px solid rgba(218, 41, 28, 0.15);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-surface);
+    opacity: 0.85;
   }
 
   .hero-inner {
     max-width: 800px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
   }
 
   .hero-title {
