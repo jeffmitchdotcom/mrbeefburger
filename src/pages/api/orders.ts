@@ -57,6 +57,8 @@ export const POST: APIRoute = async ({ request }) => {
       waitPhrase,
     });
 
+    // TODO: sendEmail(orderConfirmation) — wire up when order confirmation emails are scoped
+
     return new Response(JSON.stringify({ orderNumber }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
