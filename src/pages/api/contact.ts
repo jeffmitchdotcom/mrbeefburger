@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  const { name, email, message } = body;
+  const { name, email, subject, message } = body;
 
   try {
     await Promise.all([
@@ -34,13 +34,17 @@ export const POST: APIRoute = async ({ request }) => {
                 <td style="padding: 0.5rem 0;"><a href="mailto:${email}">${email}</a></td>
               </tr>
               <tr>
+                <td style="padding: 0.5rem 1rem 0.5rem 0; font-weight: 600; white-space: nowrap; vertical-align: top;">Subject</td>
+                <td style="padding: 0.5rem 0;">${subject}</td>
+              </tr>
+              <tr>
                 <td style="padding: 0.5rem 1rem 0.5rem 0; font-weight: 600; white-space: nowrap; vertical-align: top;">Message</td>
                 <td style="padding: 0.5rem 0; white-space: pre-wrap;">${message}</td>
               </tr>
             </table>
           </div>
         `,
-        text: `New contact form submission\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        text: `New contact form submission\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
       }),
 
       // Auto-reply to sender
