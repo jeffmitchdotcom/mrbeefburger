@@ -36,22 +36,36 @@ export default function MenuItemCard({ slug, title, price, description, toppings
       flexDirection: 'column',
       gap: '0.75rem',
     }}>
-      {image && (
-        <div style={{
-          width: '100%',
-          aspectRatio: '16 / 9',
-          borderRadius: '6px',
-          border: '1.5px solid #F5C200',
-          overflow: 'hidden',
-          flexShrink: 0,
-        }}>
+      <div style={{
+        width: '100%',
+        aspectRatio: '16 / 9',
+        borderRadius: '6px',
+        border: '1.5px solid #F5C200',
+        overflow: 'hidden',
+        flexShrink: 0,
+        background: image ? undefined : '#f0f0f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {image ? (
           <img
             src={image}
             alt={title}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
-        </div>
-      )}
+        ) : (
+          <svg viewBox="0 0 80 58" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ width: '64px', opacity: 0.15 }}>
+            <path d="M14 27 Q14 9 40 9 Q66 9 66 27" />
+            <line x1="12" y1="27" x2="68" y2="27" />
+            <path d="M12 31 Q20 26 28 31 Q36 36 44 31 Q52 26 60 31 Q65 29 68 31" />
+            <rect x="13" y="33" width="54" height="8" rx="4" />
+            <line x1="12" y1="43" x2="68" y2="43" />
+            <path d="M12 43 Q12 53 40 53 Q68 53 68 43" />
+          </svg>
+        )}
+      </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
         <h3 style={{
           fontFamily: "'Bricolage Grotesque', sans-serif",
