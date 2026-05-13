@@ -59,6 +59,7 @@ export default function OrderForm({ locations }: Props) {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [orderType, setOrderType] = useState<'pickup' | 'dine-in'>('pickup');
   const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [pickupTime, setPickupTime] = useState('ASAP');
   const [specialRequests, setSpecialRequests] = useState('');
   const [loading, setLoading] = useState(false);
@@ -88,7 +89,7 @@ export default function OrderForm({ locations }: Props) {
   }, [step]);
 
   const handleSubmit = async () => {
-    if (!customerName.trim() || !selectedLocation || items.length === 0) return;
+    if (!customerName.trim() || !customerEmail.trim() || !selectedLocation || items.length === 0) return;
     setLoading(true);
     setError('');
     try {
@@ -97,6 +98,7 @@ export default function OrderForm({ locations }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerName: customerName.trim(),
+          customerEmail: customerEmail.trim(),
           orderType,
           locationSlug: selectedLocation.slug,
           locationName: selectedLocation.name,
@@ -115,6 +117,7 @@ export default function OrderForm({ locations }: Props) {
         locationName: selectedLocation!.name,
         locationAddress: selectedLocation!.address,
         customerName: customerName.trim(),
+        customerEmail: customerEmail.trim(),
         orderType,
       }));
       clearCart();
@@ -328,6 +331,21 @@ export default function OrderForm({ locations }: Props) {
               </label>
 
               <label style={labelStyle}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  Email address
+                  <span style={{ color: '#DA291C', fontWeight: 800 }}>*</span>
+                  <span style={{ fontSize: '0.65rem', color: '#767676', letterSpacing: '0.1em', fontWeight: 700 }}>REQUIRED</span>
+                </span>
+                <input
+                  type="email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="For your order confirmation"
+                  style={inputStyle}
+                />
+              </label>
+
+              <label style={labelStyle}>
                 {orderType === 'dine-in' ? 'Arrival time' : 'Pickup time'}
                 <select
                   value={pickupTime}
@@ -426,11 +444,11 @@ export default function OrderForm({ locations }: Props) {
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <button
                 onClick={handleSubmit}
-                disabled={loading || !customerName.trim() || items.length === 0}
+                disabled={loading || !customerName.trim() || !customerEmail.trim() || items.length === 0}
                 style={{
                   ...btnPrimary,
-                  opacity: (loading || !customerName.trim() || items.length === 0) ? 0.4 : 1,
-                  cursor: (loading || !customerName.trim() || items.length === 0) ? 'not-allowed' : 'pointer',
+                  opacity: (loading || !customerName.trim() || !customerEmail.trim() || items.length === 0) ? 0.4 : 1,
+                  cursor: (loading || !customerName.trim() || !customerEmail.trim() || items.length === 0) ? 'not-allowed' : 'pointer',
                 }}
               >
                 {loading ? 'Consulting the kitchen...' : 'Place Order'}

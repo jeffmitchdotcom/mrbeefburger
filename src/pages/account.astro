@@ -1,0 +1,61 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import AccountIsland from '../components/AccountIsland';
+import { auth } from '../lib/auth';
+import { db } from '../lib/db';
+import { orders, loyaltyMembers, loyaltyTransactions } from '../lib/schema';
+import { eq, desc, sum } from 'drizzle-orm';
+
+const session = await auth.api.getSession({ headers: Astro.request.headers });
+const user = session?.user ?? null;
+
+let userOrders: typeof orders.$inferSelect[] = [];
+let loyaltyMember: typeof loyaltyMembers.$inferSelect | null = null;
+let sauceUnits = 0;
+let transactions: typeof loyaltyTransactions.$inferSelect[] = [];
+
+if (user?.email) {
+  [userOrders, [loyaltyMember]] = await Promise.all([
+    db.select().from(orders).where(eq(orders.customerEmail, user.email)).orderBy(desc(orders.createdAt)),
+    db.select().from(loyaltyMembers).where(eq(loyaltyMembers.email, user.email)).limit(1),
+  ]);
+
+  if (loyaltyMember) {
+    const [suRow] = await db
+      .select({ total: sum(loyaltyTransactions.sauceUnits) })
+      .from(loyaltyTransactions)
+      .where(eq(loyaltyTransactions.memberId, loyaltyMember.id));
+    sauceUnits = Number(suRow?.total ?? 0);
+
+    transactions = await db
+      .select()
+      .from(loyaltyTransactions)
+      .where(eq(loyaltyTransactions.memberId, loyaltyMember.id))
+      .orderBy(desc(loyaltyTransactions.createdAt));
+  }
+}
+---
+
+<Layout title="My Account — Mr. Beefburger">
+  <AccountIsland
+    client:load
+    user={user ? { name: user.name, email: user.email } : null}
+    orders={userOrders.map(o => ({
+      orderNumber: o.orderNumber,
+      locationName: o.locationName,
+      orderType: o.orderType,
+      total: (o.items as { price: number; quantity: number }[]).reduce((s, i) => s + i.price * i.quantity, 0),
+      createdAt: o.createdAt?.toISOString() ?? '',
+    }))}
+    loyaltyMember={loyaltyMember ? { tier: loyaltyMember.tier } : null}
+    sauceUnits={sauceUnits}
+    transactions={transactions.map(t => ({
+      action: t.action,
+      description: t.description,
+      sauceUnits: t.sauceUnits,
+      createdAt: t.createdAt?.toISOString() ?? '',
+    }))}
+  />
+</Layout>

@@ -1,4 +1,6 @@
 ---
+import AuthButton from './AuthButton';
+
 const navLinks = [
   { label: 'Menu', href: '/menu' },
   { label: 'About', href: '/about' },
@@ -25,6 +27,7 @@ const navLinks = [
       {navLinks.map(link => (
         <li><a href={link.href}>{link.label}</a></li>
       ))}
+      <li class="nav-auth"><AuthButton client:only="react" /></li>
     </ul>
   </nav>
 </header>
@@ -117,6 +120,19 @@ const navLinks = [
 
   .nav-links a:hover {
     color: var(--color-red);
+  }
+
+  .nav-auth a {
+    color: var(--color-red) !important;
+    border: 1.5px solid var(--color-red);
+    border-radius: 999px;
+    padding: 0.35rem 1rem !important;
+    transition: background 0.2s, color 0.2s !important;
+  }
+
+  .nav-auth a:hover {
+    background: var(--color-red) !important;
+    color: #ffffff !important;
   }
 
   .nav-toggle {

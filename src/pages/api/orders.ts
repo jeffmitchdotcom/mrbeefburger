@@ -2,8 +2,10 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { db } from '../../lib/db';
-import { orders } from '../../lib/schema';
+import { orders, loyaltyMembers, loyaltyTransactions } from '../../lib/schema';
+import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { sendEmail } from '../../lib/email';
 
 const waitPhrases = [
   'Heat death of the universe',
@@ -25,6 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const {
       customerName,
+      customerEmail,
       orderType,
       locationSlug,
       locationName,
@@ -34,19 +37,22 @@ export const POST: APIRoute = async ({ request }) => {
       items,
     } = body;
 
-    if (!customerName || !orderType || !locationSlug || !pickupTime || !items?.length) {
+    if (!customerName || !customerEmail || !orderType || !locationSlug || !pickupTime || !items?.length) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
+    const normalizedEmail = customerEmail.trim().toLowerCase();
     const orderNumber = `MRB-${nanoid(6).toUpperCase()}`;
     const waitPhrase = waitPhrases[Math.floor(Math.random() * waitPhrases.length)];
+    const total: number = items.reduce((sum: number, item: { price: number; quantity: number }) => sum + item.price * item.quantity, 0);
 
     await db.insert(orders).values({
       orderNumber,
       customerName,
+      customerEmail: normalizedEmail,
       orderType,
       locationSlug,
       locationName,
@@ -57,7 +63,88 @@ export const POST: APIRoute = async ({ request }) => {
       waitPhrase,
     });
 
-    // TODO: sendEmail(orderConfirmation) — wire up when order confirmation emails are scoped
+    // Credit Sauce Units if email matches a loyalty member — non-fatal
+    const suToCredit = Math.floor(total);
+    if (suToCredit > 0) {
+      db.select({ id: loyaltyMembers.id })
+        .from(loyaltyMembers)
+        .where(eq(loyaltyMembers.email, normalizedEmail))
+        .limit(1)
+        .then(([member]) => {
+          if (member) {
+            return db.insert(loyaltyTransactions).values({
+              memberId: member.id,
+              action: 'order_purchase',
+              description: `Order ${orderNumber} — ${suToCredit} Sauce Units`,
+              sauceUnits: suToCredit,
+              referenceId: orderNumber,
+            });
+          }
+        })
+        .catch((err) => console.error('SU credit failed:', err));
+    }
+
+    // Send order confirmation email — non-fatal
+    const itemRows = (items as { title: string; quantity: number; price: number; customizations?: string[] }[])
+      .map((item) => {
+        const customLine = item.customizations?.length
+          ? `<div style="font-size:0.8rem;color:#767676;margin-top:2px">${item.customizations.join(', ')}</div>`
+          : '';
+        return `<tr>
+          <td style="padding:6px 0;border-bottom:1px solid #f0ece6">
+            ${item.title} × ${item.quantity}${customLine}
+          </td>
+          <td style="padding:6px 0;border-bottom:1px solid #f0ece6;text-align:right;font-weight:600">
+            $${(item.price * item.quantity).toFixed(2)}
+          </td>
+        </tr>`;
+      })
+      .join('');
+
+    sendEmail({
+      to: normalizedEmail,
+      subject: `Your order has been received. Gerald is aware. — ${orderNumber}`,
+      html: `
+        <div style="font-family:Georgia,serif;max-width:520px;margin:0 auto;padding:2rem;color:#1a1a1a">
+          <h1 style="font-family:'Bricolage Grotesque',Georgia,serif;font-size:1.5rem;color:#DA291C;margin:0 0 0.25rem">
+            Mr. Beefburger
+          </h1>
+          <p style="font-size:0.8rem;color:#767676;margin:0 0 2rem;letter-spacing:0.08em;text-transform:uppercase">
+            Order Confirmation
+          </p>
+
+          <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
+            <tr><td style="color:#767676;font-size:0.85rem;padding:4px 0">Order No.</td>
+                <td style="font-weight:700;text-align:right;padding:4px 0">${orderNumber}</td></tr>
+            <tr><td style="color:#767676;font-size:0.85rem;padding:4px 0">Name</td>
+                <td style="text-align:right;padding:4px 0">${customerName}</td></tr>
+            <tr><td style="color:#767676;font-size:0.85rem;padding:4px 0">Location</td>
+                <td style="text-align:right;padding:4px 0">${locationName}</td></tr>
+            <tr><td style="color:#767676;font-size:0.85rem;padding:4px 0">Type</td>
+                <td style="text-align:right;padding:4px 0">${orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}</td></tr>
+            <tr><td style="color:#767676;font-size:0.85rem;padding:4px 0">Time</td>
+                <td style="text-align:right;padding:4px 0">${pickupTime}</td></tr>
+          </table>
+
+          <table style="width:100%;border-collapse:collapse;margin-bottom:1rem">
+            ${itemRows}
+            <tr>
+              <td style="padding:10px 0 0;font-weight:700">Total</td>
+              <td style="padding:10px 0 0;font-weight:700;text-align:right;color:#DA291C;font-size:1.1rem">
+                $${total.toFixed(2)}
+              </td>
+            </tr>
+          </table>
+
+          <p style="font-size:0.875rem;color:#767676;border-top:1px solid #f0ece6;padding-top:1.5rem;line-height:1.7;margin:0">
+            Gerald does not send reminders. He does not send updates. This email is the update.
+            Plan accordingly.
+          </p>
+          <p style="font-size:0.875rem;color:#767676;margin:1rem 0 0">— Mr. Beefburger</p>
+        </div>
+      `,
+      text: `Mr. Beefburger — Order Confirmation\n\nOrder No.: ${orderNumber}\nName: ${customerName}\nLocation: ${locationName}\nType: ${orderType}\nTime: ${pickupTime}\n\nItems:\n${(items as { title: string; quantity: number; price: number }[]).map((i) => `  ${i.title} × ${i.quantity}  $${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\nTotal: $${total.toFixed(2)}\n\nGerald does not send reminders. He does not send updates. This email is the update. Plan accordingly.\n\n— Mr. Beefburger`,
+    }).catch((err) => console.error('Order confirmation email failed:', err));
 
     return new Response(JSON.stringify({ orderNumber }), {
       status: 200,

@@ -7,6 +7,7 @@ type OrderSummary = {
   locationName: string;
   locationAddress: string;
   customerName: string;
+  customerEmail: string;
   orderType: string;
 };
 
@@ -14,13 +15,29 @@ export default function PaymentTheater() {
   const [orderNumber, setOrderNumber] = useState('');
   const [summary, setSummary] = useState<OrderSummary | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [loyaltyStatus, setLoyaltyStatus] = useState<'loading' | 'member' | 'non-member'>('loading');
 
   useEffect(() => {
     const num = sessionStorage.getItem('orderNumber');
     if (num) setOrderNumber(num);
     const raw = sessionStorage.getItem('orderSummary');
     if (raw) {
-      try { setSummary(JSON.parse(raw)); } catch {}
+      try {
+        const parsed: OrderSummary = JSON.parse(raw);
+        setSummary(parsed);
+        if (parsed.customerEmail) {
+          fetch(`/api/loyalty/check?email=${encodeURIComponent(parsed.customerEmail)}`)
+            .then((r) => r.json())
+            .then((d) => setLoyaltyStatus(d.isMember ? 'member' : 'non-member'))
+            .catch(() => setLoyaltyStatus('non-member'));
+        } else {
+          setLoyaltyStatus('non-member');
+        }
+      } catch {
+        setLoyaltyStatus('non-member');
+      }
+    } else {
+      setLoyaltyStatus('non-member');
     }
   }, []);
 
@@ -135,6 +152,43 @@ export default function PaymentTheater() {
                 <span>Total</span>
                 <span style={{ color: '#DA291C' }}>${summary.total.toFixed(2)}</span>
               </div>
+            </div>
+          )}
+
+          {/* Loyalty banner */}
+          {loyaltyStatus === 'member' && (
+            <div style={{
+              background: '#fffbea',
+              border: '1.5px solid #F5C200',
+              borderRadius: '8px',
+              padding: '0.875rem 1.25rem',
+              marginBottom: '1.25rem',
+              fontSize: '0.875rem',
+              color: '#1a1a1a',
+              lineHeight: 1.5,
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              <span style={{ fontWeight: 700 }}>You're in the Accord.</span>{' '}
+              Gerald will credit your Sauce Units once he's reviewed the transaction.
+            </div>
+          )}
+          {loyaltyStatus === 'non-member' && (
+            <div style={{
+              background: '#f7f4f0',
+              border: '1px solid rgba(0,0,0,0.08)',
+              borderRadius: '8px',
+              padding: '0.875rem 1.25rem',
+              marginBottom: '1.25rem',
+              fontSize: '0.875rem',
+              color: '#767676',
+              lineHeight: 1.5,
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              Not in the Accord?{' '}
+              <a href="/loyalty" style={{ color: '#DA291C', fontWeight: 700, textDecoration: 'none' }}>
+                Join →
+              </a>
+              {'  '}Your order history will appear in your account regardless.
             </div>
           )}
 

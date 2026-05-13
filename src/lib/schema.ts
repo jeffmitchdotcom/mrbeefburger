@@ -12,6 +12,7 @@ export const orders = pgTable('orders', {
   specialRequests: text('special_requests'),
   items: jsonb('items').notNull(),
   waitPhrase: text('wait_phrase').notNull(),
+  customerEmail: text('customer_email'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
