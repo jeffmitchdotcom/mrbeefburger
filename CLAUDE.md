@@ -61,7 +61,7 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 - `POST /api/game-scores` — inserts a score row (playerName, score, durationSeconds)
 - `POST /api/loyalty` — validates loyalty application fields, checks for duplicate email (409 if found), inserts into `loyalty_members` + seeds a 10 SU `application_signup` transaction in `loyalty_transactions`
 
-**Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details, **email required**) → `/payment` (PaymentTheater: loyalty status banner + review + fake Pay Now) → `/order/[id]` (receipt from DB). Order summary is passed to the payment page via `sessionStorage`. On order placement, SES sends a confirmation email and loyalty SU are credited if the email matches a member.
+**Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details, **email required**; saves full order payload to `sessionStorage`, no API call) → `/payment` (PaymentTheater: reads summary from `sessionStorage`, shows loyalty banner; **Pay Now** POSTs to `/api/orders`, credits SU, sends confirmation email, then shows gotcha modal) → `/order/[id]` (receipt from DB). The order is not created in the database until Pay Now is clicked.
 
 **Design system:** All brand tokens live as CSS custom properties in the `<style is:global>` block in `src/layouts/Layout.astro`. Components consume them via `var(--color-*)` and `var(--font-*)`, never hardcoded values.
 
@@ -94,8 +94,8 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 | `/locations` | `locations.astro` | Interactive Leaflet map + geolocation sort; "Order Now" pre-selects location |
 | `/about` | `about.astro` | Gerald Beaufort Beefburger III origin story + ProjectAttribution section |
 | `/contact` | `contact.astro` | ContactForm island + sidebar with email addresses |
-| `/order` | `order.astro` | OrderForm island — location + order details (email required), posts to `/api/orders` |
-| `/payment` | `payment.astro` | PaymentTheater island — loyalty status banner + review screen + gotcha modal |
+| `/order` | `order.astro` | SSR; checks Better Auth session, passes `user` prop to OrderForm. OrderForm collects location + details (email required); saves to `sessionStorage` and navigates to `/payment` — no API call here |
+| `/payment` | `payment.astro` | PaymentTheater island — loyalty status banner + review screen; **Pay Now** makes the POST to `/api/orders`, then shows the gotcha modal |
 | `/order/[id]` | `order/[id].astro` | SSR receipt page; reads order from Neon by order number + ProjectAttribution |
 | `/loyalty` | `loyalty.astro` | The Beefburger Loyalty Accord — Sauce Units explainer, tier system, perks accordion, application form wired to `/api/loyalty` |
 | `/account` | `account.astro` | SSR; checks Better Auth session. Unauthenticated: OTP login form (AccountIsland). Authenticated: dashboard with loyalty card, SU balance, transaction ledger, order history, sign out |
@@ -105,9 +105,9 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 **LocationCard** (`locations.astro` + `LocationCard.tsx`): "Order Now" button uses `e.stopPropagation()` to prevent the parent card's Leaflet flyover handler from firing. It writes to the location nanostore and navigates to `/menu`.
 
-**OrderForm**: On mount, reads the location nanostore and skips to step 2 (details) if a location is already stored. Slug comparison normalizes `.md` suffix on both sides to avoid mismatch.
+**OrderForm**: On mount, reads the location nanostore and skips to step 2 (details) if a location is already stored. Slug comparison normalizes `.md` suffix on both sides to avoid mismatch. Receives an optional `user` prop from `order.astro` (server-side session check); signed-in users see a locked "Ordering as / name / email" display block instead of the name and email inputs, with a "Not you? →" link to `/account`. The step 2 button is labeled "Review Order →" — clicking it saves the full order payload to `sessionStorage` (including `locationSlug`, `pickupTime`, `specialRequests`) and navigates to `/payment`. No API call happens here.
 
-**PaymentTheater**: Reads `orderNumber` and `orderSummary` from `sessionStorage` (set by OrderForm after successful POST). Heading personalizes with customer name: "Almost there, [Name]..." On mount, also fetches `/api/loyalty/check?email=x` and shows a loyalty status banner above Pay Now — yellow-tinted for members ("Gerald will credit your Sauce Units…"), cream for non-members ("Not in the Accord? [Join →]").
+**PaymentTheater**: On mount, reads `orderSummary` from `sessionStorage` and fetches `/api/loyalty/check?email=x`. Shows a loyalty status banner — yellow-tinted for members (with SU preview: "This order earns you X Sauce Units"), cream for non-members. Heading personalizes with customer name. **Pay Now** makes the `POST /api/orders` call; on success, stores the returned `orderNumber` in `sessionStorage` and shows the gotcha modal. The modal's "See My Order Anyway →" link uses the live order number. Shows a loading state ("One moment...") and error message on the button if the API call fails.
 
 **ContactForm**: On successful POST, shows a success state with Gerald-flavored copy. The `/api/contact` endpoint is a stub — a `// TODO` comment marks where to add Resend or SMTP2GO.
 
