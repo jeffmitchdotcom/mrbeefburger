@@ -45,7 +45,7 @@ function LoginForm() {
     padding: '0.75rem 1rem',
     border: '1.5px solid rgba(0,0,0,0.15)',
     borderRadius: '6px',
-    fontSize: '0.95rem',
+    fontSize: '1rem',
     fontFamily: "'DM Sans', sans-serif",
     color: '#1a1a1a',
     background: '#ffffff',
