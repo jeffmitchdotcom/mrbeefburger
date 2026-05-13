@@ -1,10 +1,20 @@
 import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { emailOTP } from 'better-auth/plugins';
-import { Pool } from '@neondatabase/serverless';
+import { db } from './db';
+import { authUser, authSession, authAccount, authVerification } from './schema';
 import { sendEmail } from './email';
 
 export const auth = betterAuth({
-  database: new Pool({ connectionString: import.meta.env.DATABASE_URL }),
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+    schema: {
+      user: authUser,
+      session: authSession,
+      account: authAccount,
+      verification: authVerification,
+    },
+  }),
   secret: import.meta.env.BETTER_AUTH_SECRET,
   baseURL: import.meta.env.BETTER_AUTH_URL,
   plugins: [
