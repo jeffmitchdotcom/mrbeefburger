@@ -6,9 +6,12 @@ type OrderSummary = {
   total: number;
   locationName: string;
   locationAddress: string;
+  locationSlug: string;
   customerName: string;
   customerEmail: string;
   orderType: string;
+  pickupTime: string;
+  specialRequests: string;
 };
 
 export default function PaymentTheater() {
@@ -16,10 +19,10 @@ export default function PaymentTheater() {
   const [summary, setSummary] = useState<OrderSummary | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loyaltyStatus, setLoyaltyStatus] = useState<'loading' | 'member' | 'non-member'>('loading');
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState('');
 
   useEffect(() => {
-    const num = sessionStorage.getItem('orderNumber');
-    if (num) setOrderNumber(num);
     const raw = sessionStorage.getItem('orderSummary');
     if (raw) {
       try {
@@ -200,8 +203,45 @@ export default function PaymentTheater() {
             </div>
           )}
 
+          {placeError && (
+            <p style={{ color: '#DA291C', fontSize: '0.875rem', marginBottom: '1rem', fontFamily: "'DM Sans', sans-serif" }}>
+              {placeError}
+            </p>
+          )}
+
           <button
-            onClick={() => setShowModal(true)}
+            onClick={async () => {
+              if (!summary || placing) return;
+              setPlacing(true);
+              setPlaceError('');
+              try {
+                const res = await fetch('/api/orders', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    customerName: summary.customerName,
+                    customerEmail: summary.customerEmail,
+                    orderType: summary.orderType,
+                    locationSlug: summary.locationSlug,
+                    locationName: summary.locationName,
+                    locationAddress: summary.locationAddress,
+                    pickupTime: summary.pickupTime,
+                    specialRequests: summary.specialRequests,
+                    items: summary.items,
+                  }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                setOrderNumber(data.orderNumber);
+                sessionStorage.setItem('orderNumber', data.orderNumber);
+                setShowModal(true);
+              } catch {
+                setPlaceError('Something went wrong. Gerald is not surprised. Try again.');
+              } finally {
+                setPlacing(false);
+              }
+            }}
+            disabled={placing || !summary}
             style={{
               width: '100%',
               background: '#DA291C',
@@ -213,11 +253,12 @@ export default function PaymentTheater() {
               fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              cursor: 'pointer',
+              cursor: placing || !summary ? 'not-allowed' : 'pointer',
+              opacity: placing || !summary ? 0.7 : 1,
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            Pay Now
+            {placing ? 'One moment...' : 'Pay Now'}
           </button>
         </div>
       </main>

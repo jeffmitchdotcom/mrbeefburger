@@ -63,8 +63,6 @@ export default function OrderForm({ locations, user }: Props) {
   const [customerEmail, setCustomerEmail] = useState(user?.email ?? '');
   const [pickupTime, setPickupTime] = useState('ASAP');
   const [specialRequests, setSpecialRequests] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [sortedLocations, setSortedLocations] = useState<Location[]>(() => defaultSort(locations));
   const [distances, setDistances] = useState<Record<string, string>>({});
   const [geoLabel, setGeoLabel] = useState('Use my location');
@@ -89,45 +87,23 @@ export default function OrderForm({ locations, user }: Props) {
     return () => clearTimeout(t);
   }, [step]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!customerName.trim() || !customerEmail.trim() || !selectedLocation || items.length === 0) return;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: customerName.trim(),
-          customerEmail: customerEmail.trim(),
-          orderType,
-          locationSlug: selectedLocation.slug,
-          locationName: selectedLocation.name,
-          locationAddress: selectedLocation.address,
-          pickupTime,
-          specialRequests,
-          items,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      sessionStorage.setItem('orderNumber', data.orderNumber);
-      sessionStorage.setItem('orderSummary', JSON.stringify({
-        items,
-        total: cartTotal(items),
-        locationName: selectedLocation!.name,
-        locationAddress: selectedLocation!.address,
-        customerName: customerName.trim(),
-        customerEmail: customerEmail.trim(),
-        orderType,
-      }));
-      clearCart();
-      clearOrderLocation();
-      window.location.href = '/payment';
-    } catch {
-      setError('Something went wrong. The chef is devastated.');
-      setLoading(false);
-    }
+    sessionStorage.setItem('orderSummary', JSON.stringify({
+      items,
+      total: cartTotal(items),
+      locationName: selectedLocation.name,
+      locationAddress: selectedLocation.address,
+      locationSlug: selectedLocation.slug,
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
+      orderType,
+      pickupTime,
+      specialRequests,
+    }));
+    clearCart();
+    clearOrderLocation();
+    window.location.href = '/payment';
   };
 
   const handleGeo = () => {
@@ -472,21 +448,17 @@ export default function OrderForm({ locations, user }: Props) {
               )}
             </div>
 
-            {error && (
-              <p style={{ color: '#DA291C', fontSize: '0.875rem', marginBottom: '1rem' }}>{error}</p>
-            )}
-
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <button
                 onClick={handleSubmit}
-                disabled={loading || !customerName.trim() || !customerEmail.trim() || items.length === 0}
+                disabled={!customerName.trim() || !customerEmail.trim() || items.length === 0}
                 style={{
                   ...btnPrimary,
-                  opacity: (loading || !customerName.trim() || !customerEmail.trim() || items.length === 0) ? 0.4 : 1,
-                  cursor: (loading || !customerName.trim() || !customerEmail.trim() || items.length === 0) ? 'not-allowed' : 'pointer',
+                  opacity: (!customerName.trim() || !customerEmail.trim() || items.length === 0) ? 0.4 : 1,
+                  cursor: (!customerName.trim() || !customerEmail.trim() || items.length === 0) ? 'not-allowed' : 'pointer',
                 }}
               >
-                {loading ? 'Consulting the kitchen...' : 'Place Order'}
+                Review Order →
               </button>
               <button onClick={() => { clearOrderLocation(); setStep(1); }} style={btnOutline}>
                 ← Back
