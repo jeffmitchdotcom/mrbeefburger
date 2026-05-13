@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { cartItems, cartTotal } from '../stores/cart';
-import { $orderLocation, clearOrderLocation } from '../stores/location';
+import { $orderLocation, setOrderLocation, clearOrderLocation } from '../stores/location';
 import LocationCard from './LocationCard';
 
 type Location = {
@@ -513,7 +513,7 @@ export default function OrderForm({ locations, user }: Props) {
               ))}
             </div>
             <button
-              onClick={() => setStep(2)}
+              onClick={() => { if (selectedLocation) setOrderLocation({ slug: selectedLocation.slug, name: selectedLocation.name, address: selectedLocation.address }); setStep(2); }}
               disabled={!selectedLocation}
               style={{
                 ...btnPrimary,
