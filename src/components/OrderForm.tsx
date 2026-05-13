@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { cartItems, cartTotal, clearCart } from '../stores/cart';
+import { cartItems, cartTotal } from '../stores/cart';
 import { $orderLocation, clearOrderLocation } from '../stores/location';
 import LocationCard from './LocationCard';
 
@@ -101,8 +101,6 @@ export default function OrderForm({ locations, user }: Props) {
       pickupTime,
       specialRequests,
     }));
-    clearCart();
-    clearOrderLocation();
     window.location.href = '/payment';
   };
 
@@ -459,9 +457,6 @@ export default function OrderForm({ locations, user }: Props) {
                 }}
               >
                 Review Order →
-              </button>
-              <button onClick={() => { clearOrderLocation(); setStep(1); }} style={btnOutline}>
-                ← Back
               </button>
             </div>
           </div>

@@ -15,6 +15,10 @@ const burgers = allItems.sort((a, b) => {
 <Layout title="Loyalty — Mr. Beefburger">
   <link slot="head" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
 
+  <div id="accord-context-bar" style="display:none;position:fixed;top:90px;left:0;right:0;z-index:90;background:#1a1a1a;color:#ffffff;padding:0.625rem 1.5rem;font-family:var(--font-body);font-size:0.8rem;text-align:center;border-bottom:2px solid #F5C200;">
+    <span id="accord-context-text"></span>
+  </div>
+
   <main>
 
     <!-- ── Hero ────────────────────────────────────────────── -->
@@ -249,7 +253,7 @@ participation in the Accord.
     </section>
 
     <!-- ── The Application ─────────────────────────────────── -->
-    <section class="app-section">
+    <section class="app-section" id="join-accord">
       <div class="app-inner">
         <p class="section-label">The Application</p>
         <h2 class="section-heading">Join the Accord</h2>
@@ -309,6 +313,7 @@ participation in the Accord.
               </fieldset>
             </div>
 
+            <input type="hidden" id="loyalty-order-ref" name="order-number" />
             <button type="submit" class="app-submit">Submit Application to the Accord</button>
             <p class="app-error" id="app-error">The Accord encountered a difficulty. Gerald is looking into it.</p>
             <p class="app-error" id="app-error-duplicate">You are already enrolled in the Accord. Gerald has your record. Attempting to join twice does not earn additional Sauce Units. Gerald checked.</p>
@@ -331,6 +336,43 @@ participation in the Accord.
 </Layout>
 
 <script>
+  // Handle prefill from a just-placed order (checkout → Accord flow)
+  const prefillRaw = sessionStorage.getItem('loyaltyPrefill');
+  if (prefillRaw) {
+    try {
+      const prefill = JSON.parse(prefillRaw);
+      sessionStorage.removeItem('loyaltyPrefill');
+
+      if (prefill.email) {
+        const emailInput = document.getElementById('email') as HTMLInputElement;
+        if (emailInput) {
+          emailInput.value = prefill.email;
+          emailInput.readOnly = true;
+          emailInput.style.opacity = '0.6';
+          emailInput.style.cursor = 'not-allowed';
+        }
+      }
+
+      if (prefill.orderNumber) {
+        const orderRefInput = document.getElementById('loyalty-order-ref') as HTMLInputElement;
+        if (orderRefInput) orderRefInput.value = prefill.orderNumber;
+
+        const contextBar = document.getElementById('accord-context-bar') as HTMLElement;
+        const contextText = document.getElementById('accord-context-text') as HTMLElement;
+        if (contextBar && contextText) {
+          contextText.textContent = `Order ${prefill.orderNumber} is placed. Complete your application and Gerald will credit your Sauce Units.`;
+          contextBar.style.display = 'block';
+          document.body.style.paddingTop = '2.5rem';
+        }
+      }
+
+      const section = document.getElementById('join-accord');
+      if (section) setTimeout(() => section.scrollIntoView({ behavior: 'smooth' }), 100);
+    } catch {
+      // malformed prefill — proceed normally
+    }
+  }
+
   const form = document.getElementById('app-form') as HTMLFormElement;
   const success = document.getElementById('app-success') as HTMLElement;
 
@@ -350,6 +392,7 @@ participation in the Accord.
           preferredBurger: data['burger'],
           beefRelationship: data['beef-relationship'],
           wellDone: data['well-done'],
+          orderNumber: data['order-number'] || undefined,
         }),
       });
       if (res.status === 409) {
@@ -357,9 +400,21 @@ participation in the Accord.
         return;
       }
       if (!res.ok) throw new Error();
-      const { memberId } = await res.json();
+      const { memberId, orderSauceUnits } = await res.json();
+
       const memberIdEl = document.getElementById('app-success-member-id');
       if (memberIdEl && memberId) memberIdEl.textContent = String(memberId).padStart(4, '0');
+
+      // Update success message if retroactive SU were credited
+      if (orderSauceUnits && orderSauceUnits > 0) {
+        const suLine = success.querySelector('p:nth-child(3)');
+        if (suLine) suLine.textContent = `Your Sauce Units have been credited — 10 for joining, ${orderSauceUnits} for your order. Gerald is keeping score.`;
+      }
+
+      // Dismiss context bar on success
+      const contextBar = document.getElementById('accord-context-bar') as HTMLElement;
+      if (contextBar) contextBar.style.display = 'none';
+
       form.style.display = 'none';
       success.style.display = 'block';
     } catch {

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { CartItem } from '../stores/cart';
+import { clearCart } from '../stores/cart';
+import { clearOrderLocation } from '../stores/location';
 
 type OrderSummary = {
   items: CartItem[];
@@ -21,6 +23,7 @@ export default function PaymentTheater() {
   const [loyaltyStatus, setLoyaltyStatus] = useState<'loading' | 'member' | 'non-member'>('loading');
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState('');
+  const [joinAccord, setJoinAccord] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem('orderSummary');
@@ -116,12 +119,20 @@ export default function PaymentTheater() {
                     {summary.orderType === 'dine-in' ? 'Dine-In' : 'Pickup'}
                   </span>
                 </div>
-                <a
-                  href="/order"
-                  style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F5C200', textDecoration: 'none', marginTop: '0.5rem', display: 'inline-block' }}
-                >
-                  Change location →
-                </a>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                  <a
+                    href="/order"
+                    style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F5C200', textDecoration: 'none' }}
+                  >
+                    Change location →
+                  </a>
+                  <a
+                    href="/menu"
+                    style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}
+                  >
+                    Edit Cart →
+                  </a>
+                </div>
               </div>
 
               <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
@@ -184,7 +195,10 @@ export default function PaymentTheater() {
             </div>
           )}
           {loyaltyStatus === 'non-member' && (
-            <div style={{
+            <label style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.75rem',
               background: '#f7f4f0',
               border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: '8px',
@@ -194,13 +208,19 @@ export default function PaymentTheater() {
               color: '#767676',
               lineHeight: 1.5,
               fontFamily: "'DM Sans', sans-serif",
+              cursor: 'pointer',
             }}>
-              Not in the Accord?{' '}
-              <a href="/loyalty" style={{ color: '#DA291C', fontWeight: 700, textDecoration: 'none' }}>
-                Join →
-              </a>
-              {'  '}Your order history will appear in your account regardless.
-            </div>
+              <input
+                type="checkbox"
+                checked={joinAccord}
+                onChange={(e) => setJoinAccord(e.target.checked)}
+                style={{ marginTop: '0.2rem', accentColor: '#DA291C', flexShrink: 0 }}
+              />
+              <span>
+                <span style={{ color: '#1a1a1a', fontWeight: 600 }}>Apply to the Accord after checkout</span>
+                {' '}— Gerald will hold your Sauce Units.
+              </span>
+            </label>
           )}
 
           {placeError && (
@@ -234,6 +254,14 @@ export default function PaymentTheater() {
                 if (!res.ok) throw new Error(data.error);
                 setOrderNumber(data.orderNumber);
                 sessionStorage.setItem('orderNumber', data.orderNumber);
+                if (joinAccord) {
+                  sessionStorage.setItem('loyaltyPrefill', JSON.stringify({
+                    email: summary.customerEmail,
+                    orderNumber: data.orderNumber,
+                  }));
+                }
+                clearCart();
+                clearOrderLocation();
                 setShowModal(true);
               } catch {
                 setPlaceError('Something went wrong. Gerald is not surprised. Try again.');
@@ -311,24 +339,57 @@ export default function PaymentTheater() {
               We can't even make burgers.
             </p>
 
-            <a
-              href={orderNumber ? `/order/${orderNumber}` : '/menu'}
-              style={{
-                display: 'inline-block',
-                background: '#DA291C',
-                color: '#ffffff',
-                textDecoration: 'none',
-                padding: '0.9rem 2rem',
-                borderRadius: '999px',
-                fontFamily: "'DM Sans', sans-serif",
+            {joinAccord && (
+              <p style={{
                 fontSize: '0.875rem',
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              See My Order Anyway →
-            </a>
+                color: '#767676',
+                margin: '0 0 1.5rem',
+                fontFamily: "'DM Sans', sans-serif",
+              }}>
+                Gerald also notes your interest in the Accord.
+              </p>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
+              <a
+                href={orderNumber ? `/order/${orderNumber}` : '/menu'}
+                style={{
+                  display: 'inline-block',
+                  background: '#DA291C',
+                  color: '#ffffff',
+                  textDecoration: 'none',
+                  padding: '0.9rem 2rem',
+                  borderRadius: '999px',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '0.875rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                See My Order Anyway →
+              </a>
+              {joinAccord && (
+                <a
+                  href="/loyalty"
+                  style={{
+                    display: 'inline-block',
+                    background: '#1a1a1a',
+                    color: '#F5C200',
+                    textDecoration: 'none',
+                    padding: '0.9rem 2rem',
+                    borderRadius: '999px',
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '0.875rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Apply to the Accord →
+                </a>
+              )}
+            </div>
 
           </div>
         </div>

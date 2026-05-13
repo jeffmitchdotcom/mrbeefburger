@@ -16,9 +16,9 @@ const drinks = allItems.filter(i => i.data.category === 'drinks' && i.data.avail
 ---
 
 <Layout title="Menu — Mr. Beefburger">
-  <LocationBanner client:load />
   <CartDrawer client:load />
   <main>
+    <LocationBanner client:load />
     <section class="page-hero">
       <div class="page-hero-inner">
         <h1 class="page-title">The Menu</h1>

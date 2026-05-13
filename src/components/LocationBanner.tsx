@@ -7,6 +7,9 @@ export default function LocationBanner() {
 
   return (
     <div style={{
+      position: 'sticky',
+      top: '90px',
+      zIndex: 90,
       background: '#fff5f4',
       borderBottom: '2px solid #DA291C',
       padding: '0.625rem 1.5rem',
