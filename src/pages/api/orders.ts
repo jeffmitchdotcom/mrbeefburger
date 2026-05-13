@@ -123,10 +123,11 @@ export const POST: APIRoute = async ({ request }) => {
       })
       .join('');
 
-    sendEmail({
-      to: normalizedEmail,
-      subject: `Your order has been received. Gerald is aware. — ${orderNumber}`,
-      html: `
+    try {
+      await sendEmail({
+        to: normalizedEmail,
+        subject: `Your order has been received. Gerald is aware. — ${orderNumber}`,
+        html: `
         <div style="font-family:Georgia,serif;max-width:520px;margin:0 auto;padding:2rem;color:#1a1a1a">
           <h1 style="font-family:'Bricolage Grotesque',Georgia,serif;font-size:1.5rem;color:#DA291C;margin:0 0 0.25rem">
             Mr. Beefburger
@@ -175,8 +176,11 @@ export const POST: APIRoute = async ({ request }) => {
           <p style="font-size:0.875rem;color:#767676;margin:1rem 0 0">— Mr. Beefburger</p>
         </div>
       `,
-      text: `Mr. Beefburger — Order Confirmation\n\nOrder No.: ${orderNumber}\nName: ${customerName}\nLocation: ${locationName}\nType: ${orderType}\nTime: ${pickupTime}\n\nItems:\n${(items as { title: string; quantity: number; price: number }[]).map((i) => `  ${i.title} × ${i.quantity}  $${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\nTotal: $${total.toFixed(2)}${suAwarded > 0 && suNewBalance !== null ? `\nSauce Units earned: +${suAwarded} SU\nAccord balance: ${suNewBalance} SU total` : ''}\n\nGerald does not send reminders. He does not send updates. This email is the update. Plan accordingly.\n\n— Mr. Beefburger`,
-    }).catch((err) => console.error('Order confirmation email failed:', err));
+        text: `Mr. Beefburger — Order Confirmation\n\nOrder No.: ${orderNumber}\nName: ${customerName}\nLocation: ${locationName}\nType: ${orderType}\nTime: ${pickupTime}\n\nItems:\n${(items as { title: string; quantity: number; price: number }[]).map((i) => `  ${i.title} × ${i.quantity}  $${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\nTotal: $${total.toFixed(2)}${suAwarded > 0 && suNewBalance !== null ? `\nSauce Units earned: +${suAwarded} SU\nAccord balance: ${suNewBalance} SU total` : ''}\n\nGerald does not send reminders. He does not send updates. This email is the update. Plan accordingly.\n\n— Mr. Beefburger`,
+      });
+    } catch (err) {
+      console.error('Order confirmation email failed:', err);
+    }
 
     return new Response(JSON.stringify({ orderNumber, sauceUnitsAwarded: suAwarded }), {
       status: 200,
