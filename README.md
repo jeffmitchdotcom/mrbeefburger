@@ -6,6 +6,14 @@ Live at **[mrbeefburger.com](https://mrbeefburger.com)**
 
 ---
 
+## Why I built it
+
+Most portfolio projects stop at the interesting part. They demo a UI, mock the backend, and call it done. I wanted to build something that goes all the way through — real database, real auth, real emails, real deploys — so there's nothing to hand-wave when someone asks how it actually works.
+
+The fictional brand was a deliberate choice. "Mr. Beefburger" gave me room to build a complete, production-like system (multi-step ordering, a loyalty program with a transaction ledger, passwordless sign-in, automated emails) without the constraints of a real business. It also made it more fun to use. Gerald's personality runs through the copy, the error messages, the verification emails — it's a reminder that the technical choices and the product experience are the same decision.
+
+Every tool in the stack was chosen because it's what I'd reach for on a real project: Neon for serverless Postgres, Drizzle for type-safe queries, Better Auth for passwordless OTP, Amazon SES for transactional email, Vercel for deployment. No mocks, no stubs where it counted.
+
 ## What it is
 
 Mr. Beefburger is a fictional "futuristic-retro" burger chain. The site includes a full ordering flow: browse the menu, pick a location, customize your order, place it (saved to a real Postgres database), and land on a shareable receipt page. The "Pay Now" button reveals a gotcha modal — this isn't a real restaurant.
