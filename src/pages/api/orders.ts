@@ -4,6 +4,13 @@ import type { APIRoute } from 'astro';
 import { db } from '../../lib/db';
 import { orders, loyaltyMembers, loyaltyTransactions } from '../../lib/schema';
 import { eq, sum } from 'drizzle-orm';
+
+function tierForBalance(balance: number): string {
+  if (balance >= 1000) return 'The Beefborn';
+  if (balance >= 500) return 'The Consecrated';
+  if (balance >= 200) return 'The Committed';
+  return 'The Initiated';
+}
 import { nanoid } from 'nanoid';
 import { sendEmail } from '../../lib/email';
 
@@ -88,6 +95,11 @@ export const POST: APIRoute = async ({ request }) => {
             .from(loyaltyTransactions)
             .where(eq(loyaltyTransactions.memberId, member.id));
           suNewBalance = Number(balRow?.total ?? 0);
+          const newTier = tierForBalance(suNewBalance);
+          await db
+            .update(loyaltyMembers)
+            .set({ tier: newTier })
+            .where(eq(loyaltyMembers.id, member.id));
         }
       } catch (err) {
         console.error('SU credit failed:', err);
