@@ -264,7 +264,11 @@ function Dashboard({ user, orders, loyaltyMember, sauceUnits, transactions }: Pr
               <p style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: '1rem', margin: '0 0 0.25rem' }}>Not in the Accord yet.</p>
               <p style={{ color: MUTED, fontSize: '0.875rem', margin: 0 }}>Join to earn Sauce Units on every order.</p>
             </div>
-            <a href="/loyalty" style={{ background: RED, color: '#ffffff', textDecoration: 'none', borderRadius: '999px', padding: '0.6rem 1.5rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
+            <a
+              href="/loyalty"
+              onClick={() => sessionStorage.setItem('loyaltyPrefill', JSON.stringify({ email: user.email }))}
+              style={{ background: RED, color: '#ffffff', textDecoration: 'none', borderRadius: '999px', padding: '0.6rem 1.5rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}
+            >
               Join →
             </a>
           </div>
