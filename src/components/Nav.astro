@@ -17,18 +17,21 @@ const navLinks = [
       <span class="nav-logo-text">Mr. Beefburger</span>
     </a>
 
-    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
     <ul class="nav-links">
       {navLinks.map(link => (
         <li><a href={link.href}>{link.label}</a></li>
       ))}
-      <li class="nav-auth"><AuthButton client:only="react" /></li>
     </ul>
+
+    <!-- Always visible: auth icon + hamburger -->
+    <div class="nav-actions">
+      <AuthButton client:only="react" />
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
   </nav>
 </header>
 
@@ -60,6 +63,7 @@ const navLinks = [
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1.5rem;
   }
 
   .nav-logo {
@@ -67,6 +71,7 @@ const navLinks = [
     display: flex;
     align-items: center;
     gap: 0.625rem;
+    flex-shrink: 0;
   }
 
   .nav-logo-img {
@@ -105,6 +110,8 @@ const navLinks = [
     padding: 0;
     display: flex;
     gap: 2rem;
+    flex: 1;
+    justify-content: flex-end;
   }
 
   .nav-links a {
@@ -122,17 +129,12 @@ const navLinks = [
     color: var(--color-red);
   }
 
-  .nav-auth a {
-    color: var(--color-red) !important;
-    border: 1.5px solid var(--color-red);
-    border-radius: 999px;
-    padding: 0.35rem 1rem !important;
-    transition: background 0.2s, color 0.2s !important;
-  }
-
-  .nav-auth a:hover {
-    background: var(--color-red) !important;
-    color: #ffffff !important;
+  /* Always-visible right cluster: auth icon + hamburger */
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
   }
 
   .nav-toggle {
