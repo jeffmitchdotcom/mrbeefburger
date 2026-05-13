@@ -177,50 +177,60 @@ export default function PaymentTheater() {
               borderRadius: '8px',
               padding: '0.875rem 1.25rem',
               marginBottom: '1.25rem',
-              fontSize: '0.875rem',
-              color: '#1a1a1a',
-              lineHeight: 1.5,
               fontFamily: "'DM Sans', sans-serif",
             }}>
-              <span style={{ fontWeight: 700 }}>You're in the Accord.</span>{' '}
-              {summary && Math.floor(summary.total) > 0 ? (
-                <>
-                  This order earns you{' '}
-                  <span style={{ fontWeight: 800, color: '#b8920a' }}>{Math.floor(summary.total)} Sauce Units</span>.
-                  {' '}Gerald will credit them once he's reviewed the transaction.
-                </>
-              ) : (
-                <>Gerald will credit your Sauce Units once he's reviewed the transaction.</>
-              )}
+              <p style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#b8920a', margin: '0 0 0.4rem' }}>
+                Loyalty
+              </p>
+              <p style={{ fontSize: '0.875rem', color: '#1a1a1a', lineHeight: 1.5, margin: 0 }}>
+                <span style={{ fontWeight: 700 }}>You're in the Accord.</span>{' '}
+                {summary && Math.floor(summary.total) > 0 ? (
+                  <>
+                    This order earns you{' '}
+                    <span style={{ fontWeight: 800, color: '#b8920a' }}>{Math.floor(summary.total)} Sauce Units</span>.
+                    {' '}Gerald will credit them once he's reviewed the transaction.
+                  </>
+                ) : (
+                  <>Gerald will credit your Sauce Units once he's reviewed the transaction.</>
+                )}
+              </p>
             </div>
           )}
           {loyaltyStatus === 'non-member' && (
-            <label style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '0.75rem',
+            <div style={{
               background: '#f7f4f0',
               border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: '8px',
-              padding: '0.875rem 1.25rem',
+              padding: '1rem 1.25rem',
               marginBottom: '1.25rem',
-              fontSize: '0.875rem',
-              color: '#767676',
-              lineHeight: 1.5,
               fontFamily: "'DM Sans', sans-serif",
-              cursor: 'pointer',
             }}>
-              <input
-                type="checkbox"
-                checked={joinAccord}
-                onChange={(e) => setJoinAccord(e.target.checked)}
-                style={{ marginTop: '0.2rem', accentColor: '#DA291C', flexShrink: 0 }}
-              />
-              <span>
-                <span style={{ color: '#1a1a1a', fontWeight: 600 }}>Apply to the Accord after checkout</span>
-                {' '}— Gerald will hold your Sauce Units.
-              </span>
-            </label>
+              <p style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#DA291C', margin: '0 0 0.4rem' }}>
+                Loyalty
+              </p>
+              <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1a1a1a', margin: '0 0 0.3rem' }}>
+                You're not in the Accord.
+              </p>
+              {summary && Math.floor(summary.total) > 0 && (
+                <p style={{ fontSize: '0.875rem', color: '#767676', lineHeight: 1.5, margin: '0 0 0.875rem' }}>
+                  This order would earn you{' '}
+                  <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{Math.floor(summary.total)} Sauce Units</span>
+                  {' '}as a member.
+                </p>
+              )}
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={joinAccord}
+                  onChange={(e) => setJoinAccord(e.target.checked)}
+                  style={{ marginTop: '0.2rem', accentColor: '#DA291C', flexShrink: 0 }}
+                />
+                <span style={{ fontSize: '0.875rem', color: '#767676', lineHeight: 1.5 }}>
+                  <span style={{ color: '#1a1a1a', fontWeight: 600 }}>Apply to the Accord after checkout</span>
+                  {' '}— Gerald will hold your Sauce Units.
+                </span>
+              </label>
+            </div>
           )}
 
           {placeError && (
