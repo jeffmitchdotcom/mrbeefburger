@@ -1,4 +1,5 @@
 ---
+image: /images/menu/the-pineapple-situation.jpg
 title: "The Pineapple Situation"
 slug: "pineapple-situation"
 price: 16
