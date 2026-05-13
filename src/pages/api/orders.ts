@@ -3,7 +3,7 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { db } from '../../lib/db';
 import { orders, loyaltyMembers, loyaltyTransactions } from '../../lib/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sum } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { sendEmail } from '../../lib/email';
 
@@ -63,25 +63,35 @@ export const POST: APIRoute = async ({ request }) => {
       waitPhrase,
     });
 
-    // Credit Sauce Units if email matches a loyalty member — non-fatal
+    // Credit Sauce Units if email matches a loyalty member
     const suToCredit = Math.floor(total);
+    let suAwarded = 0;
+    let suNewBalance: number | null = null;
+
     if (suToCredit > 0) {
-      db.select({ id: loyaltyMembers.id })
-        .from(loyaltyMembers)
-        .where(eq(loyaltyMembers.email, normalizedEmail))
-        .limit(1)
-        .then(([member]) => {
-          if (member) {
-            return db.insert(loyaltyTransactions).values({
-              memberId: member.id,
-              action: 'order_purchase',
-              description: `Order ${orderNumber} — ${suToCredit} Sauce Units`,
-              sauceUnits: suToCredit,
-              referenceId: orderNumber,
-            });
-          }
-        })
-        .catch((err) => console.error('SU credit failed:', err));
+      try {
+        const [member] = await db.select({ id: loyaltyMembers.id })
+          .from(loyaltyMembers)
+          .where(eq(loyaltyMembers.email, normalizedEmail))
+          .limit(1);
+        if (member) {
+          await db.insert(loyaltyTransactions).values({
+            memberId: member.id,
+            action: 'order_purchase',
+            description: `Order ${orderNumber} — ${suToCredit} Sauce Units`,
+            sauceUnits: suToCredit,
+            referenceId: orderNumber,
+          });
+          suAwarded = suToCredit;
+          const [balRow] = await db
+            .select({ total: sum(loyaltyTransactions.sauceUnits) })
+            .from(loyaltyTransactions)
+            .where(eq(loyaltyTransactions.memberId, member.id));
+          suNewBalance = Number(balRow?.total ?? 0);
+        }
+      } catch (err) {
+        console.error('SU credit failed:', err);
+      }
     }
 
     // Send order confirmation email — non-fatal
@@ -134,6 +144,16 @@ export const POST: APIRoute = async ({ request }) => {
                 $${total.toFixed(2)}
               </td>
             </tr>
+            ${suAwarded > 0 && suNewBalance !== null ? `
+            <tr>
+              <td style="padding:8px 0 2px;color:#767676;font-size:0.85rem">Sauce Units earned</td>
+              <td style="padding:8px 0 2px;text-align:right;font-weight:700;color:#b8920a">+${suAwarded} SU</td>
+            </tr>
+            <tr>
+              <td style="padding:2px 0;color:#767676;font-size:0.85rem">Accord balance</td>
+              <td style="padding:2px 0;text-align:right;font-weight:700;color:#b8920a">${suNewBalance} SU total</td>
+            </tr>
+            ` : ''}
           </table>
 
           <p style="font-size:0.875rem;color:#767676;border-top:1px solid #f0ece6;padding-top:1.5rem;line-height:1.7;margin:0">
@@ -143,10 +163,10 @@ export const POST: APIRoute = async ({ request }) => {
           <p style="font-size:0.875rem;color:#767676;margin:1rem 0 0">— Mr. Beefburger</p>
         </div>
       `,
-      text: `Mr. Beefburger — Order Confirmation\n\nOrder No.: ${orderNumber}\nName: ${customerName}\nLocation: ${locationName}\nType: ${orderType}\nTime: ${pickupTime}\n\nItems:\n${(items as { title: string; quantity: number; price: number }[]).map((i) => `  ${i.title} × ${i.quantity}  $${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\nTotal: $${total.toFixed(2)}\n\nGerald does not send reminders. He does not send updates. This email is the update. Plan accordingly.\n\n— Mr. Beefburger`,
+      text: `Mr. Beefburger — Order Confirmation\n\nOrder No.: ${orderNumber}\nName: ${customerName}\nLocation: ${locationName}\nType: ${orderType}\nTime: ${pickupTime}\n\nItems:\n${(items as { title: string; quantity: number; price: number }[]).map((i) => `  ${i.title} × ${i.quantity}  $${(i.price * i.quantity).toFixed(2)}`).join('\n')}\n\nTotal: $${total.toFixed(2)}${suAwarded > 0 && suNewBalance !== null ? `\nSauce Units earned: +${suAwarded} SU\nAccord balance: ${suNewBalance} SU total` : ''}\n\nGerald does not send reminders. He does not send updates. This email is the update. Plan accordingly.\n\n— Mr. Beefburger`,
     }).catch((err) => console.error('Order confirmation email failed:', err));
 
-    return new Response(JSON.stringify({ orderNumber }), {
+    return new Response(JSON.stringify({ orderNumber, sauceUnitsAwarded: suAwarded }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

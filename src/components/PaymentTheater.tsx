@@ -169,7 +169,15 @@ export default function PaymentTheater() {
               fontFamily: "'DM Sans', sans-serif",
             }}>
               <span style={{ fontWeight: 700 }}>You're in the Accord.</span>{' '}
-              Gerald will credit your Sauce Units once he's reviewed the transaction.
+              {summary && Math.floor(summary.total) > 0 ? (
+                <>
+                  This order earns you{' '}
+                  <span style={{ fontWeight: 800, color: '#b8920a' }}>{Math.floor(summary.total)} Sauce Units</span>.
+                  {' '}Gerald will credit them once he's reviewed the transaction.
+                </>
+              ) : (
+                <>Gerald will credit your Sauce Units once he's reviewed the transaction.</>
+              )}
             </div>
           )}
           {loyaltyStatus === 'non-member' && (

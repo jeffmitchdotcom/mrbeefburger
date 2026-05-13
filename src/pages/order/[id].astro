@@ -3,8 +3,8 @@ export const prerender = false;
 
 import { getCollection } from 'astro:content';
 import { db } from '../../lib/db';
-import { orders } from '../../lib/schema';
-import { eq } from 'drizzle-orm';
+import { orders, loyaltyTransactions } from '../../lib/schema';
+import { eq, sum } from 'drizzle-orm';
 import Layout from '../../layouts/Layout.astro';
 import ProjectAttribution from '../../components/ProjectAttribution.astro';
 
@@ -32,9 +32,25 @@ const enrichedItems = (order.items as OrderItem[]).map(item => ({
 }));
 
 const orderTotal = (order.items as OrderItem[]).reduce(
-  (sum, item) => sum + item.price * item.quantity,
+  (acc, item) => acc + item.price * item.quantity,
   0
 );
+
+// Look up any Sauce Units credited for this order
+const suTxRows = await db
+  .select()
+  .from(loyaltyTransactions)
+  .where(eq(loyaltyTransactions.referenceId, order.orderNumber));
+const suTx = suTxRows[0] ?? null;
+
+let suBalance: number | null = null;
+if (suTx) {
+  const [balRow] = await db
+    .select({ total: sum(loyaltyTransactions.sauceUnits) })
+    .from(loyaltyTransactions)
+    .where(eq(loyaltyTransactions.memberId, suTx.memberId));
+  suBalance = Number(balRow?.total ?? 0);
+}
 ---
 
 <Layout title={`Order ${order.orderNumber} — Mr. Beefburger`}>
@@ -90,6 +106,19 @@ const orderTotal = (order.items as OrderItem[]).reduce(
         <span>Total</span>
         <span>${orderTotal.toFixed(2)}</span>
       </div>
+
+      {suTx && suBalance !== null && (
+        <div class="receipt-sauce-units">
+          <div class="su-row">
+            <span class="su-label">Sauce Units earned</span>
+            <span class="su-earned">+{suTx.sauceUnits} SU</span>
+          </div>
+          <div class="su-row">
+            <span class="su-label">Accord balance</span>
+            <span class="su-balance">{suBalance} SU</span>
+          </div>
+        </div>
+      )}
 
       {order.specialRequests && (
         <p class="special-requests">
@@ -308,6 +337,37 @@ const orderTotal = (order.items as OrderItem[]).reduce(
 
   .receipt-total span:last-child {
     color: var(--color-red);
+  }
+
+  .receipt-sauce-units {
+    padding: 0.75rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: #fffbea;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .su-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .su-label {
+    color: var(--color-muted);
+  }
+
+  .su-earned {
+    font-weight: 800;
+    color: #b8920a;
+    font-family: var(--font-display);
+  }
+
+  .su-balance {
+    font-weight: 700;
+    color: #b8920a;
   }
 
   .special-requests {
