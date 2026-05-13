@@ -87,22 +87,27 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
-      // Look up name from loyalty/orders if not already provided
-      let resolvedName = name.trim();
-      if (!resolvedName) {
-        const res = await fetch(`/api/account/name-lookup?email=${encodeURIComponent(email.trim())}`);
-        const data = await res.json();
-        if (data.name) {
-          resolvedName = data.name;
+      // Sign in with OTP — correct endpoint for the sign-in flow
+      const result = await authClient.signIn.emailOtp({ email: email.trim(), otp: otp.trim() });
+      if (result.error) throw new Error(result.error.message);
+
+      // If user has no meaningful name yet, try to set one from loyalty/orders
+      if (result.data?.user && (!result.data.user.name || result.data.user.name === result.data.user.email)) {
+        let resolvedName = name.trim();
+        if (!resolvedName) {
+          const res = await fetch(`/api/account/name-lookup?email=${encodeURIComponent(email.trim())}`);
+          const data = await res.json();
+          resolvedName = data.name ?? '';
+        }
+        if (resolvedName) {
+          await authClient.updateUser({ name: resolvedName }).catch(() => {});
         } else {
-          // Need to ask for name
           setNeedsName(true);
           setLoading(false);
           return;
         }
       }
-      const result = await authClient.emailOtp.verifyEmail({ email: email.trim(), otp: otp.trim(), name: resolvedName });
-      if (result.error) throw new Error(result.error.message);
+
       window.location.reload();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Invalid code. Try again.');
