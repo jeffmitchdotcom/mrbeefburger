@@ -108,7 +108,7 @@ function LoginForm() {
         }
       }
 
-      window.location.reload();
+      window.location.href = '/account';
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Invalid code. Try again.');
     } finally {
