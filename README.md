@@ -17,10 +17,12 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 | Layer | Tech |
 |---|---|
 | Framework | [Astro 6](https://astro.build) with Vercel SSR adapter |
-| UI components | React (islands via `client:load`) |
+| UI components | React (islands via `client:load` / `client:only`) |
 | State management | [Nanostores](https://github.com/nanostores/nanostores) + `@nanostores/persistent` |
 | Database | [Neon](https://neon.tech) serverless Postgres |
 | ORM | [Drizzle ORM](https://orm.drizzle.team) |
+| Auth | [Better Auth](https://better-auth.com) — passwordless OTP via email |
+| Email | [Amazon SES](https://aws.amazon.com/ses/) — order confirmations + OTP codes |
 | Hosting | [Vercel](https://vercel.com) |
 | Map | Leaflet.js (locations page) |
 | Fonts | Bricolage Grotesque + DM Sans (Google Fonts) |
@@ -30,11 +32,12 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 - **Menu** — content collection of items with food photography, toppings customization, and per-item `homepage` / `signature` flags
 - **Cart** — persistent cart drawer with quantity controls, stored in localStorage via nanostores
 - **Location selection** — interactive Leaflet map with geolocation sort; "Order Now" pre-selects a location across the order flow
-- **Order flow** — multi-step form (location → details → review), writes to Neon Postgres via Drizzle
-- **Payment theater** — personalized review screen; Pay Now reveals a gotcha modal
+- **Order flow** — multi-step form (location → details → review), writes to Neon Postgres via Drizzle; email required; confirmation email sent via SES
+- **Payment theater** — loyalty status banner (member vs. join prompt), personalized review screen; Pay Now reveals a gotcha modal
 - **Receipt page** — shareable `/order/[id]` page pulled from the database; includes estimated wait time and tech stack attribution
-- **Loyalty program** — "The Beefburger Loyalty Accord" at `/loyalty`: Sauce Units currency, four membership tiers, perks accordion, and an application form that writes to a real Neon Postgres table. Duplicate email detection returns a Gerald-flavored error. Points are tracked in a transaction ledger (`loyalty_transactions`) so full earning history is queryable — designed to connect to a future login system
-- **Contact form** — stubbed API endpoint ready for Resend/SMTP2GO wiring
+- **Loyalty program** — "The Beefburger Loyalty Accord" at `/loyalty`: Sauce Units currency, four membership tiers, perks accordion, and an application form that writes to Neon. Points tracked in a transaction ledger (`loyalty_transactions`). Sauce Units credited automatically on orders placed with a matching email
+- **Account dashboard** — `/account` with passwordless OTP sign-in (email → 6-digit code via SES → signed in, no password). Dashboard shows Sauce Units balance + tier, transaction history, and full order history linked by email. Name resolved from loyalty/order records on first sign-in
+- **Contact form** — stubbed API endpoint ready for email provider wiring
 - **About page** — outlandish origin story of Gerald Beaufort Beefburger III, with tech attribution section
 - **Locations page** — interactive map with all 11 locations and geolocation-based nearest sort
 - **Browser game** — "Mr. Beefburger's Great Escape" canvas sidescroller at `/game` (not in nav); Neon-backed leaderboard
@@ -52,13 +55,23 @@ Requires a `.env` file with:
 
 ```
 DATABASE_URL=your_neon_connection_string
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+SES_FROM_EMAIL=noreply@yourdomain.com
+BETTER_AUTH_SECRET=your_secret_32_chars_min
+BETTER_AUTH_URL=http://localhost:4321
 ```
+
+> `BETTER_AUTH_SECRET`: generate with `openssl rand -base64 32`. Set `BETTER_AUTH_URL` to the deployed URL in Vercel env vars.
 
 ## Project structure
 
 ```
 src/
 ├── components/       # React islands + Astro components
+│   ├── AccountIsland.tsx     # OTP login form + account dashboard
+│   ├── AuthButton.tsx        # Nav auth icon (sign in / account)
 │   ├── BeefburgerGame.tsx    # Canvas sidescroller game
 │   ├── CartDrawer.tsx
 │   ├── ContactForm.tsx
@@ -76,28 +89,38 @@ src/
 ├── layouts/
 │   └── Layout.astro  # Shared layout with Nav, Footer, global CSS tokens
 ├── lib/
+│   ├── auth.ts       # Better Auth server config (drizzle adapter, emailOTP plugin)
+│   ├── auth-client.ts  # Better Auth client helper (emailOTPClient plugin)
 │   ├── db.ts         # Drizzle + Neon client
-│   └── schema.ts     # orders, game_scores, loyalty_members, loyalty_transactions
+│   ├── email.ts      # Amazon SES sendEmail() wrapper
+│   └── schema.ts     # All 8 tables: orders, game_scores, loyalty_members, loyalty_transactions, + 4 Better Auth tables
 ├── pages/
 │   ├── api/
-│   │   ├── orders.ts       # POST — saves order to Neon
-│   │   ├── contact.ts      # POST — stub, ready for email provider
-│   │   ├── game-scores.ts  # GET top 10 / POST score / GET?clear=... to reset
-│   │   └── loyalty.ts      # POST — saves loyalty application, seeds 10 SU transaction
+│   │   ├── auth/
+│   │   │   └── [...all].ts  # Better Auth catch-all handler
+│   │   ├── account/
+│   │   │   └── name-lookup.ts  # GET — resolve name from loyalty/orders by email
+│   │   ├── loyalty/
+│   │   │   └── check.ts     # GET — returns { isMember: boolean } for an email
+│   │   ├── orders.ts        # POST — saves order, credits SU, sends confirmation email
+│   │   ├── contact.ts       # POST — stub, ready for email provider
+│   │   ├── game-scores.ts   # GET top 10 / POST score / GET?clear=... to reset
+│   │   └── loyalty.ts       # POST — saves loyalty application, seeds 10 SU transaction
 │   ├── order/
-│   │   └── [id].astro  # SSR receipt page (reads from DB by order number)
+│   │   └── [id].astro   # SSR receipt page (reads from DB by order number)
 │   ├── about.astro
+│   ├── account.astro    # SSR account page — OTP login or dashboard
 │   ├── contact.astro
-│   ├── game.astro      # Game page (noindex, not in nav)
+│   ├── game.astro       # Game page (noindex, not in nav)
 │   ├── index.astro
 │   ├── locations.astro
-│   ├── loyalty.astro   # The Beefburger Loyalty Accord
+│   ├── loyalty.astro    # The Beefburger Loyalty Accord
 │   ├── menu.astro
 │   ├── order.astro
 │   └── payment.astro
 └── stores/
-    ├── cart.ts         # Persistent cart state (localStorage)
-    └── location.ts     # Persistent pre-selected location state (localStorage)
+    ├── cart.ts          # Persistent cart state (localStorage)
+    └── location.ts      # Persistent pre-selected location state (localStorage)
 ```
 
 ---

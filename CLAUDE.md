@@ -29,28 +29,39 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 **Data flow:** All pages use `src/layouts/Layout.astro` which wraps content with `<Nav>` and `<Footer>`. Pages live in `src/pages/`. React components in `src/components/` are hydrated selectively.
 
-**Rendering modes:** Most pages are static. Pages that read from the database (`src/pages/order/[id].astro`) and all API routes use `export const prerender = false` for SSR.
+**Rendering modes:** Most pages are static. Pages that read from the database (`src/pages/order/[id].astro`, `src/pages/account.astro`) and all API routes use `export const prerender = false` for SSR.
 
-**Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. Four tables:
-- `orders` — full order as JSON blob + flat fields
+**Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. Eight tables:
+- `orders` — full order as JSON blob + flat fields; includes `customer_email` (nullable) for order history lookups
 - `game_scores` — playerName, score, durationSeconds
-- `loyalty_members` — one row per Accord member; email is unique and is the future account key
-- `loyalty_transactions` — point ledger; one row per earning/redemption event. Balance = `SUM(sauce_units)` for a given member. `sauce_units` is signed (negative for redemptions). `reference_id` is nullable text, reserved for future order number linkage.
+- `loyalty_members` — one row per Accord member; email is unique and is the account key
+- `loyalty_transactions` — point ledger; one row per earning/redemption event. Balance = `SUM(sauce_units)` for a given member. `sauce_units` is signed (negative for redemptions). `reference_id` is nullable text for order number linkage.
+- `user` — Better Auth core user table (id, name, email, emailVerified, createdAt, updatedAt)
+- `session` — Better Auth session table (token, userId FK, expiresAt)
+- `account` — Better Auth account table (accountId, providerId, userId FK)
+- `verification` — Better Auth OTP/verification token table (identifier, value, expiresAt)
 
 No migration runner is configured. To add tables, run raw SQL via the Neon MCP (`mcp__Neon__run_sql`, project ID `odd-cloud-33776174`) or the Neon console, then add the matching Drizzle table definition to `schema.ts`.
+
+**Auth system:** Passwordless OTP sign-in via [Better Auth](https://better-auth.com). No passwords, no social login. User enters email → receives 6-digit code via Amazon SES → enters code → signed in. Server config in `src/lib/auth.ts` uses the `drizzleAdapter` (not a Pool connection — Neon's WebSocket Pool is unsupported in Vercel SSR functions). Client helper in `src/lib/auth-client.ts`. All `/api/auth/*` traffic is handled by the catch-all route `src/pages/api/auth/[...all].ts`.
+
+**Install note:** `npm install better-auth` requires `--legacy-peer-deps` due to an optional peer dep conflict with `@lynx-js/react`. Same flag required for `react`, `react-dom`, and their types if reinstalling.
 
 **State management:** Nanostores with `@nanostores/persistent` for cross-page client state:
 - `src/stores/cart.ts` — cart items, persisted to localStorage key `mrb-cart`
 - `src/stores/location.ts` — pre-selected order location, persisted to `mrb-order-location`
 
 **API routes:**
-- `POST /api/orders` — validates and writes an order to Neon, returns `{ orderNumber }`
+- `POST /api/orders` — validates and writes an order to Neon, returns `{ orderNumber }`; also stores `customerEmail`, credits Sauce Units non-fatally if email matches a loyalty member (1 SU per $1, floor), and sends a Gerald-voiced order confirmation email via SES non-fatally
+- `ALL /api/auth/[...all]` — catch-all route; hands all Better Auth traffic to `auth.handler(request)`
+- `GET /api/loyalty/check` — takes `?email=x`, returns `{ isMember: boolean }` only (no balance, no PII)
+- `GET /api/account/name-lookup` — checks `loyalty_members.name` then most recent `orders.customer_name` for an email; returns `{ name: string | null }`; used by AccountIsland on first sign-in
 - `POST /api/contact` — stub endpoint, returns `{ ok: true }` (email provider not yet wired)
 - `GET /api/game-scores` — returns top 10 scores; accepts `?clear=GBB3-great-escape-reset` to wipe all scores
 - `POST /api/game-scores` — inserts a score row (playerName, score, durationSeconds)
 - `POST /api/loyalty` — validates loyalty application fields, checks for duplicate email (409 if found), inserts into `loyalty_members` + seeds a 10 SU `application_signup` transaction in `loyalty_transactions`
 
-**Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details) → `/payment` (PaymentTheater: review + fake Pay Now) → `/order/[id]` (receipt from DB). Order summary is passed to the payment page via `sessionStorage`.
+**Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details, **email required**) → `/payment` (PaymentTheater: loyalty status banner + review + fake Pay Now) → `/order/[id]` (receipt from DB). Order summary is passed to the payment page via `sessionStorage`. On order placement, SES sends a confirmation email and loyalty SU are credited if the email matches a member.
 
 **Design system:** All brand tokens live as CSS custom properties in the `<style is:global>` block in `src/layouts/Layout.astro`. Components consume them via `var(--color-*)` and `var(--font-*)`, never hardcoded values.
 
@@ -65,7 +76,7 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 --font-body       DM Sans (Google Fonts)
 ```
 
-**Nav mobile behavior:** Hamburger toggle is wired via a small inline `<script>` in `Nav.astro` that toggles an `.open` class on the `<ul>`. No JS framework involved.
+**Nav mobile behavior:** Hamburger toggle is wired via a small inline `<script>` in `Nav.astro` that toggles an `.open` class on the `<ul>`. No JS framework involved. Mobile breakpoint is `768px`. The `nav-actions` cluster (AuthButton + hamburger) is always visible at all widths — nav links collapse into the hamburger on mobile.
 
 ## Content collections
 
@@ -83,10 +94,11 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 | `/locations` | `locations.astro` | Interactive Leaflet map + geolocation sort; "Order Now" pre-selects location |
 | `/about` | `about.astro` | Gerald Beaufort Beefburger III origin story + ProjectAttribution section |
 | `/contact` | `contact.astro` | ContactForm island + sidebar with email addresses |
-| `/order` | `order.astro` | OrderForm island — location + order details, posts to `/api/orders` |
-| `/payment` | `payment.astro` | PaymentTheater island — review screen + gotcha modal |
+| `/order` | `order.astro` | OrderForm island — location + order details (email required), posts to `/api/orders` |
+| `/payment` | `payment.astro` | PaymentTheater island — loyalty status banner + review screen + gotcha modal |
 | `/order/[id]` | `order/[id].astro` | SSR receipt page; reads order from Neon by order number + ProjectAttribution |
 | `/loyalty` | `loyalty.astro` | The Beefburger Loyalty Accord — Sauce Units explainer, tier system, perks accordion, application form wired to `/api/loyalty` |
+| `/account` | `account.astro` | SSR; checks Better Auth session. Unauthenticated: OTP login form (AccountIsland). Authenticated: dashboard with loyalty card, SU balance, transaction ledger, order history, sign out |
 | `/game` | `game.astro` | "Mr. Beefburger's Great Escape" sidescroller; noindex, not in nav |
 
 ## Key component behaviors
@@ -95,9 +107,13 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 **OrderForm**: On mount, reads the location nanostore and skips to step 2 (details) if a location is already stored. Slug comparison normalizes `.md` suffix on both sides to avoid mismatch.
 
-**PaymentTheater**: Reads `orderNumber` and `orderSummary` from `sessionStorage` (set by OrderForm after successful POST). Heading personalizes with customer name: "Almost there, [Name]..."
+**PaymentTheater**: Reads `orderNumber` and `orderSummary` from `sessionStorage` (set by OrderForm after successful POST). Heading personalizes with customer name: "Almost there, [Name]..." On mount, also fetches `/api/loyalty/check?email=x` and shows a loyalty status banner above Pay Now — yellow-tinted for members ("Gerald will credit your Sauce Units…"), cream for non-members ("Not in the Accord? [Join →]").
 
 **ContactForm**: On successful POST, shows a success state with Gerald-flavored copy. The `/api/contact` endpoint is a stub — a `// TODO` comment marks where to add Resend or SMTP2GO.
+
+**AuthButton** (`src/components/AuthButton.tsx`): Minimal React island mounted with `client:only="react"` (not `client:load` — avoids SSR hook errors). Uses `useEffect` + `authClient.getSession()`. Shows a LogIn arrow SVG when signed out (links to `/account`), User silhouette SVG when signed in. Lives in the persistent `nav-actions` cluster alongside the hamburger — visible on both desktop and mobile at all breakpoints.
+
+**AccountIsland** (`src/components/AccountIsland.tsx`): Two states driven by the `user` prop passed from the server. Unauthenticated: email → "Send Code" → OTP → sign in. On first sign-in, name is resolved from `loyalty_members` then `orders` via `/api/account/name-lookup`; if not found, a name field appears on the form. Sign-in calls `authClient.signIn.emailOtp({ email, otp })` — NOT `emailOtp.verifyEmail` (that's for email verification flows, not sign-in). Authenticated: Sauce Units card + tier badge (if loyalty member), prompt to join (if not), transaction ledger, order history, sign out.
 
 **BeefburgerGame** (`game.astro` + `BeefburgerGame.tsx`): Canvas sidescroller. Sprite sheets in `public/sprites/` use magenta (#FF00FF) chroma key for transparency. Frame coordinates are marked `// TUNE` for easy adjustment if sprites change. Leaderboard reads/writes via `/api/game-scores`. Secret reset URL: `/api/game-scores?clear=GBB3-great-escape-reset`.
 
@@ -112,5 +128,4 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 - Wire up contact form email (Resend or SMTP2GO) — stub is at `src/pages/api/contact.ts`
 - Food photography for remaining menu items (drop in `public/images/menu/`, add `image:` to frontmatter)
 - Logo/mascot asset (replace text wordmark in Nav and Footer)
-- Login system — `loyalty_members.email` is the intended account key; `loyalty_transactions.reference_id` is reserved for linking order numbers so members can see their full point history
-- Additional point-earning actions wired into existing flows (e.g. crediting SU on order completion, Tuesday bonus detection)
+- Additional point-earning actions (Tuesday bonus, referrals, ordering the signature burger — each would be a new `loyalty_transactions` row)
