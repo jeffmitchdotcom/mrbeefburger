@@ -32,13 +32,15 @@ function UserIcon() {
 }
 
 export default function AuthButton() {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     authClient.getSession()
       .then((result) => setIsSignedIn(!!result?.data?.user))
-      .catch(() => {});
+      .catch(() => setIsSignedIn(false));
   }, []);
+
+  if (isSignedIn === null) return <div style={{ width: 30, height: 30 }} />;
 
   return (
     <a
