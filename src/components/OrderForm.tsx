@@ -16,6 +16,7 @@ type Location = {
 
 type Props = {
   locations: Location[];
+  user?: { name: string; email: string } | null;
 };
 
 const inputStyle: React.CSSProperties = {
@@ -54,12 +55,12 @@ function haversine(lat1: number, lng1: number, lat2: number, lng2: number): numb
 const defaultSort = (locs: Location[]) =>
   [...locs].sort((a, b) => a.state.localeCompare(b.state) || a.name.localeCompare(b.name));
 
-export default function OrderForm({ locations }: Props) {
+export default function OrderForm({ locations, user }: Props) {
   const [step, setStep] = useState(1);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [orderType, setOrderType] = useState<'pickup' | 'dine-in'>('pickup');
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerName, setCustomerName] = useState(user?.name ?? '');
+  const [customerEmail, setCustomerEmail] = useState(user?.email ?? '');
   const [pickupTime, setPickupTime] = useState('ASAP');
   const [specialRequests, setSpecialRequests] = useState('');
   const [loading, setLoading] = useState(false);
@@ -315,35 +316,69 @@ export default function OrderForm({ locations }: Props) {
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
-              <label style={labelStyle}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  Your name
-                  <span style={{ color: '#DA291C', fontWeight: 800 }}>*</span>
-                  <span style={{ fontSize: '0.65rem', color: '#767676', letterSpacing: '0.1em', fontWeight: 700 }}>REQUIRED</span>
-                </span>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="First name is fine"
-                  style={inputStyle}
-                />
-              </label>
+              {user ? (
+                <div style={{
+                  background: '#f7f4f0',
+                  border: '1px solid rgba(0,0,0,0.08)',
+                  borderRadius: '8px',
+                  padding: '1rem 1.25rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  flexWrap: 'wrap',
+                }}>
+                  <div>
+                    <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#767676', margin: '0 0 0.3rem', fontFamily: "'DM Sans', sans-serif" }}>
+                      Ordering as
+                    </p>
+                    <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a1a1a', margin: '0 0 0.15rem', fontFamily: "'DM Sans', sans-serif" }}>
+                      {user.name}
+                    </p>
+                    <p style={{ fontSize: '0.85rem', color: '#767676', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
+                      {user.email}
+                    </p>
+                  </div>
+                  <a
+                    href="/account"
+                    style={{ fontSize: '0.775rem', fontWeight: 700, color: '#DA291C', textDecoration: 'none', letterSpacing: '0.05em', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}
+                  >
+                    Not you? →
+                  </a>
+                </div>
+              ) : (
+                <>
+                  <label style={labelStyle}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      Your name
+                      <span style={{ color: '#DA291C', fontWeight: 800 }}>*</span>
+                      <span style={{ fontSize: '0.65rem', color: '#767676', letterSpacing: '0.1em', fontWeight: 700 }}>REQUIRED</span>
+                    </span>
+                    <input
+                      type="text"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      placeholder="First name is fine"
+                      style={inputStyle}
+                    />
+                  </label>
 
-              <label style={labelStyle}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  Email address
-                  <span style={{ color: '#DA291C', fontWeight: 800 }}>*</span>
-                  <span style={{ fontSize: '0.65rem', color: '#767676', letterSpacing: '0.1em', fontWeight: 700 }}>REQUIRED</span>
-                </span>
-                <input
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  placeholder="For your order confirmation"
-                  style={inputStyle}
-                />
-              </label>
+                  <label style={labelStyle}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      Email address
+                      <span style={{ color: '#DA291C', fontWeight: 800 }}>*</span>
+                      <span style={{ fontSize: '0.65rem', color: '#767676', letterSpacing: '0.1em', fontWeight: 700 }}>REQUIRED</span>
+                    </span>
+                    <input
+                      type="email"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      placeholder="For your order confirmation"
+                      style={inputStyle}
+                    />
+                  </label>
+                </>
+              )}
 
               <label style={labelStyle}>
                 {orderType === 'dine-in' ? 'Arrival time' : 'Pickup time'}

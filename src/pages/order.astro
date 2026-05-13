@@ -1,7 +1,13 @@
 ---
+export const prerender = false;
+
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import OrderForm from '../components/OrderForm.tsx';
+import { auth } from '../lib/auth';
+
+const session = await auth.api.getSession({ headers: Astro.request.headers });
+const user = session?.user ? { name: session.user.name, email: session.user.email } : null;
 
 const allLocations = await getCollection('locations');
 const locations = allLocations.map(l => ({
@@ -16,5 +22,5 @@ const locations = allLocations.map(l => ({
 ---
 
 <Layout title="Place Your Order — Mr. Beefburger">
-  <OrderForm locations={locations} client:load />
+  <OrderForm locations={locations} user={user} client:load />
 </Layout>
