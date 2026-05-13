@@ -1,6 +1,12 @@
 ---
+export const prerender = false;
+
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { auth } from '../lib/auth';
+import { db } from '../lib/db';
+import { loyaltyMembers } from '../lib/schema';
+import { eq } from 'drizzle-orm';
 
 const allItems = (await getCollection('menu')).filter(
   item => item.data.available !== false && item.data.category === 'burgers'
@@ -10,6 +16,18 @@ const burgers = allItems.sort((a, b) => {
   if (!a.data.signature && b.data.signature) return 1;
   return a.data.title.localeCompare(b.data.title);
 });
+
+const session = await auth.api.getSession({ headers: Astro.request.headers });
+const user = session?.user ?? null;
+let isAccordMember = false;
+if (user?.email) {
+  const [member] = await db
+    .select({ id: loyaltyMembers.id })
+    .from(loyaltyMembers)
+    .where(eq(loyaltyMembers.email, user.email.toLowerCase().trim()))
+    .limit(1);
+  isAccordMember = !!member;
+}
 ---
 
 <Layout title="Loyalty — Mr. Beefburger">
@@ -256,8 +274,36 @@ participation in the Accord.
     <section class="app-section" id="join-accord">
       <div class="app-inner">
         <p class="section-label">The Application</p>
-        <h2 class="section-heading">Join the Accord</h2>
-        <p class="app-intro">The Accord is not difficult to join. It is simply formal. Gerald believes formality is a sign of respect. Complete the following with accuracy and sincerity.</p>
+
+        {isAccordMember ? (
+          <>
+            <h2 class="section-heading">You're Already In</h2>
+            <p class="app-intro">Gerald is not accepting a second application. He does not need to.</p>
+            <div class="app-document">
+              <div class="app-doc-header">
+                <h3 class="app-doc-title">Application to the Beefburger Loyalty Accord</h3>
+                <p class="app-doc-sub">Status: Enrolled. This matter is closed.</p>
+              </div>
+              <div style="padding: 1rem 0 0.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                <p style="font-family: var(--font-body); font-size: 0.95rem; color: var(--color-text); line-height: 1.8; margin: 0;">
+                  Your enrollment is on record. Gerald is aware. He has been since you joined.
+                </p>
+                <p style="font-family: var(--font-body); font-size: 0.95rem; color: var(--color-text); line-height: 1.8; margin: 0;">
+                  You cannot apply a second time. This is not a limitation. It is a rule. Submitting a second application does not earn additional Sauce Units. It earns Gerald's awareness that you tried, which is a different thing entirely.
+                </p>
+                <p style="font-family: var(--font-body); font-size: 0.95rem; color: var(--color-muted); line-height: 1.8; margin: 0; font-style: italic;">
+                  Your Sauce Unit balance and order history are in your account.
+                </p>
+                <a href="/account" style="display: inline-block; align-self: flex-start; background: var(--color-red); color: #ffffff; text-decoration: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.5rem;">
+                  View My Account →
+                </a>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 class="section-heading">Join the Accord</h2>
+            <p class="app-intro">The Accord is not difficult to join. It is simply formal. Gerald believes formality is a sign of respect. Complete the following with accuracy and sincerity.</p>
 
         <div class="app-document">
 
@@ -329,6 +375,8 @@ participation in the Accord.
           </div>
 
         </div>
+          </>
+        )}
       </div>
     </section>
 
