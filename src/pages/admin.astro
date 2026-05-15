@@ -1,0 +1,325 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import { auth } from '../lib/auth';
+import { db } from '../lib/db';
+import { orders, loyaltyMembers, loyaltyTransactions } from '../lib/schema';
+import { desc, eq, sum } from 'drizzle-orm';
+
+const session = await auth.api.getSession({ headers: Astro.request.headers });
+if (!session?.user) return Astro.redirect('/account');
+if (!session.user.email.endsWith('@mrbeefburger.com')) return new Response('Forbidden', { status: 403 });
+
+const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
+
+const allMembers = await db
+  .select({
+    id: loyaltyMembers.id,
+    name: loyaltyMembers.name,
+    email: loyaltyMembers.email,
+    city: loyaltyMembers.city,
+    tier: loyaltyMembers.tier,
+    createdAt: loyaltyMembers.createdAt,
+    balance: sum(loyaltyTransactions.sauceUnits),
+  })
+  .from(loyaltyMembers)
+  .leftJoin(loyaltyTransactions, eq(loyaltyTransactions.memberId, loyaltyMembers.id))
+  .groupBy(loyaltyMembers.id)
+  .orderBy(desc(loyaltyMembers.createdAt));
+
+function orderTotal(items: { price: number; quantity: number }[]) {
+  return items.reduce((s, i) => s + i.price * i.quantity, 0);
+}
+
+function fmt(date: Date | null | undefined) {
+  if (!date) return '—';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { price: number; quantity: number }[]), 0);
+---
+
+<Layout title="Admin — Mr. Beefburger">
+  <main>
+    <div class="admin-wrap">
+
+      <div class="admin-header">
+        <h1 class="admin-title">Admin</h1>
+        <a href="https://vercel.com" target="_blank" rel="noopener" class="analytics-link">
+          View Vercel Analytics →
+        </a>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value">{allOrders.length}</div>
+          <div class="stat-label">Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${totalRevenue.toFixed(2)}</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{allMembers.length}</div>
+          <div class="stat-label">Accord Members</div>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <section class="table-section">
+        <h2 class="section-title">Orders</h2>
+        {allOrders.length === 0 ? (
+          <p class="empty">No orders yet.</p>
+        ) : (
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>Location</th>
+                  <th>Type</th>
+                  <th>Items</th>
+                  <th class="col-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allOrders.map(o => {
+                  const items = o.items as { title: string; price: number; quantity: number }[];
+                  const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+                  return (
+                    <tr>
+                      <td class="mono">
+                        <a href={`/order/${o.orderNumber}`} class="order-link">{o.orderNumber}</a>
+                      </td>
+                      <td class="nowrap">{fmt(o.createdAt)}</td>
+                      <td>{o.customerName}</td>
+                      <td class="muted">{o.customerEmail ?? '—'}</td>
+                      <td>{o.locationName}</td>
+                      <td class="nowrap">{o.orderType}</td>
+                      <td>{itemCount}</td>
+                      <td class="col-right mono">${orderTotal(items).toFixed(2)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <!-- Loyalty Members -->
+      <section class="table-section">
+        <h2 class="section-title">Accord Members</h2>
+        {allMembers.length === 0 ? (
+          <p class="empty">No members yet.</p>
+        ) : (
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>City</th>
+                  <th>Tier</th>
+                  <th class="col-right">SU Balance</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allMembers.map(m => (
+                  <tr>
+                    <td>{m.name}</td>
+                    <td class="muted">{m.email}</td>
+                    <td>{m.city}</td>
+                    <td><span class="tier-badge">{m.tier}</span></td>
+                    <td class="col-right mono">{Number(m.balance ?? 0)}</td>
+                    <td class="nowrap muted">{fmt(m.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .admin-wrap {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .admin-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .admin-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-red);
+    margin: 0;
+  }
+
+  .analytics-link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+
+  .analytics-link:hover {
+    color: var(--color-red);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--color-surface);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .table-section {
+    margin-bottom: 3.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  thead {
+    background: var(--color-surface);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--color-text);
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: rgba(0, 0, 0, 0.015);
+  }
+
+  .col-right {
+    text-align: right;
+  }
+
+  .mono {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  .muted {
+    color: var(--color-muted);
+  }
+
+  .order-link {
+    color: var(--color-red);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .order-link:hover {
+    text-decoration: underline;
+  }
+
+  .tier-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #fff8e0;
+    color: #7a5c00;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  .empty {
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .stats-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

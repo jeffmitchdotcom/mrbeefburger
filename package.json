@@ -20,6 +20,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vercel/analytics": "^2.0.1",
     "astro": "^6.1.2",
     "better-auth": "^1.6.11",
     "drizzle-orm": "^0.45.2",
