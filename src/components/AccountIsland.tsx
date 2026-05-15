@@ -229,6 +229,11 @@ function Dashboard({ user, orders, loyaltyMember, sauceUnits, transactions }: Pr
               {user.name}
             </h1>
             <p style={{ color: MUTED, fontSize: '0.875rem', margin: 0 }}>{user.email}</p>
+            {user.email.endsWith('@mrbeefburger.com') && (
+              <a href="/admin" style={{ fontSize: '0.75rem', fontWeight: 700, color: MUTED, textDecoration: 'none', letterSpacing: '0.04em' }}>
+                Admin Dashboard →
+              </a>
+            )}
           </div>
           <button
             onClick={signOut}
