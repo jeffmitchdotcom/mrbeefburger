@@ -36,6 +36,7 @@ function LoginForm() {
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
   const [needsName, setNeedsName] = useState(false);
+  const [sessionCreated, setSessionCreated] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,11 +88,19 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
-      // Sign in with OTP — correct endpoint for the sign-in flow
+      // Second click after name field appeared: session already exists, just update name
+      if (sessionCreated) {
+        if (name.trim()) {
+          await authClient.updateUser({ name: name.trim() }).catch(() => {});
+        }
+        window.location.href = '/account';
+        return;
+      }
+
       const result = await authClient.signIn.emailOtp({ email: email.trim(), otp: otp.trim() });
       if (result.error) throw new Error(result.error.message);
 
-      // If user has no meaningful name yet, try to set one from loyalty/orders
+      // If user has no meaningful name yet, try to resolve from loyalty/orders
       if (result.data?.user && (!result.data.user.name || result.data.user.name === result.data.user.email)) {
         let resolvedName = name.trim();
         if (!resolvedName) {
@@ -102,6 +111,8 @@ function LoginForm() {
         if (resolvedName) {
           await authClient.updateUser({ name: resolvedName }).catch(() => {});
         } else {
+          // OTP consumed, session created — just need a name before redirecting
+          setSessionCreated(true);
           setNeedsName(true);
           setLoading(false);
           return;
