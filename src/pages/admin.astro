@@ -72,42 +72,45 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
         {allOrders.length === 0 ? (
           <p class="empty">No orders yet.</p>
         ) : (
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Order #</th>
-                  <th>Date</th>
-                  <th>Customer</th>
-                  <th>Email</th>
-                  <th>Location</th>
-                  <th>Type</th>
-                  <th>Items</th>
-                  <th class="col-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allOrders.map(o => {
-                  const items = o.items as { title: string; price: number; quantity: number }[];
-                  const itemCount = items.reduce((s, i) => s + i.quantity, 0);
-                  return (
-                    <tr>
-                      <td class="mono">
-                        <a href={`/order/${o.orderNumber}`} class="order-link">{o.orderNumber}</a>
-                      </td>
-                      <td class="nowrap">{fmt(o.createdAt)}</td>
-                      <td>{o.customerName}</td>
-                      <td class="muted">{o.customerEmail ?? '—'}</td>
-                      <td>{o.locationName}</td>
-                      <td class="nowrap">{o.orderType}</td>
-                      <td>{itemCount}</td>
-                      <td class="col-right mono">${orderTotal(items).toFixed(2)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div class="table-scroll">
+              <table id="orders-table">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Items</th>
+                    <th class="col-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                  {allOrders.map(o => {
+                    const items = o.items as { title: string; price: number; quantity: number }[];
+                    const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+                    return (
+                      <tr>
+                        <td class="mono">
+                          <a href={`/order/${o.orderNumber}`} class="order-link">{o.orderNumber}</a>
+                        </td>
+                        <td class="nowrap">{fmt(o.createdAt)}</td>
+                        <td>{o.customerName}</td>
+                        <td class="muted">{o.customerEmail ?? '—'}</td>
+                        <td>{o.locationName}</td>
+                        <td class="nowrap">{o.orderType}</td>
+                        <td>{itemCount}</td>
+                        <td class="col-right mono">${orderTotal(items).toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div id="orders-pagination" class="pagination"></div>
+          </>
         )}
       </section>
 
@@ -317,9 +320,112 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
     margin: 0;
   }
 
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+  }
+
+  .pagination button {
+    background: none;
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .pagination button:hover:not(:disabled) {
+    border-color: var(--color-red);
+    color: var(--color-red);
+  }
+
+  .pagination button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .pagination button.active {
+    background: var(--color-red);
+    border-color: var(--color-red);
+    color: #ffffff;
+  }
+
+  .pagination-info {
+    color: var(--color-muted);
+    margin-left: auto;
+  }
+
   @media (max-width: 600px) {
     .stats-row {
       grid-template-columns: 1fr;
     }
   }
 </style>
+
+<script>
+  const PAGE_SIZE = 25;
+  const tbody = document.getElementById('orders-tbody') as HTMLTableSectionElement | null;
+  const container = document.getElementById('orders-pagination') as HTMLDivElement | null;
+
+  if (tbody && container) {
+    const rows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>('tr'));
+    const totalPages = Math.ceil(rows.length / PAGE_SIZE);
+    let currentPage = 1;
+
+    function showPage(page: number) {
+      currentPage = page;
+      rows.forEach((row, i) => {
+        row.style.display = (i >= (page - 1) * PAGE_SIZE && i < page * PAGE_SIZE) ? '' : 'none';
+      });
+      // Remove bottom border from the last visible row
+      rows.forEach(row => row.querySelectorAll('td').forEach(td => td.style.borderBottom = ''));
+      const visible = rows.filter(r => r.style.display !== 'none');
+      if (visible.length) {
+        visible[visible.length - 1].querySelectorAll('td').forEach(td => td.style.borderBottom = 'none');
+      }
+      renderControls();
+    }
+
+    function renderControls() {
+      if (totalPages <= 1) return;
+      container.innerHTML = '';
+
+      const prev = document.createElement('button');
+      prev.textContent = '← Prev';
+      prev.disabled = currentPage === 1;
+      prev.addEventListener('click', () => showPage(currentPage - 1));
+      container.appendChild(prev);
+
+      for (let p = 1; p <= totalPages; p++) {
+        const btn = document.createElement('button');
+        btn.textContent = String(p);
+        if (p === currentPage) btn.classList.add('active');
+        btn.addEventListener('click', () => showPage(p));
+        container.appendChild(btn);
+      }
+
+      const next = document.createElement('button');
+      next.textContent = 'Next →';
+      next.disabled = currentPage === totalPages;
+      next.addEventListener('click', () => showPage(currentPage + 1));
+      container.appendChild(next);
+
+      const info = document.createElement('span');
+      info.className = 'pagination-info';
+      const start = (currentPage - 1) * PAGE_SIZE + 1;
+      const end = Math.min(currentPage * PAGE_SIZE, rows.length);
+      info.textContent = `${start}–${end} of ${rows.length}`;
+      container.appendChild(info);
+    }
+
+    showPage(1);
+  }
+</script>
