@@ -46,6 +46,7 @@ if (user?.email) {
 ---
 
 <Layout title="My Account — Mr. Beefburger">
+  <meta slot="head" name="robots" content="noindex, nofollow" />
   <AccountIsland
     client:load
     user={user ? { name: user.name, email: user.email } : null}

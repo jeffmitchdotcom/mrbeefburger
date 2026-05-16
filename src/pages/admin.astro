@@ -41,6 +41,7 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
 ---
 
 <Layout title="Admin — Mr. Beefburger">
+  <meta slot="head" name="robots" content="noindex, nofollow" />
   <main>
     <div class="admin-wrap">
 
@@ -376,6 +377,7 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
   const container = document.getElementById('orders-pagination') as HTMLDivElement | null;
 
   if (tbody && container) {
+    const pager = container;
     const rows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>('tr'));
     const totalPages = Math.ceil(rows.length / PAGE_SIZE);
     let currentPage = 1;
@@ -396,34 +398,34 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
 
     function renderControls() {
       if (totalPages <= 1) return;
-      container.innerHTML = '';
+      pager.innerHTML = '';
 
       const prev = document.createElement('button');
       prev.textContent = '← Prev';
       prev.disabled = currentPage === 1;
       prev.addEventListener('click', () => showPage(currentPage - 1));
-      container.appendChild(prev);
+      pager.appendChild(prev);
 
       for (let p = 1; p <= totalPages; p++) {
         const btn = document.createElement('button');
         btn.textContent = String(p);
         if (p === currentPage) btn.classList.add('active');
         btn.addEventListener('click', () => showPage(p));
-        container.appendChild(btn);
+        pager.appendChild(btn);
       }
 
       const next = document.createElement('button');
       next.textContent = 'Next →';
       next.disabled = currentPage === totalPages;
       next.addEventListener('click', () => showPage(currentPage + 1));
-      container.appendChild(next);
+      pager.appendChild(next);
 
       const info = document.createElement('span');
       info.className = 'pagination-info';
       const start = (currentPage - 1) * PAGE_SIZE + 1;
       const end = Math.min(currentPage * PAGE_SIZE, rows.length);
       info.textContent = `${start}–${end} of ${rows.length}`;
-      container.appendChild(info);
+      pager.appendChild(info);
     }
 
     showPage(1);

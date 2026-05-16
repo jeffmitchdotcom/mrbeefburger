@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /order/
+Disallow: /admin
+Disallow: /account
+Disallow: /payment
+Disallow: /game
+
+Allow: /
