@@ -40,7 +40,14 @@ export default function AuthButton() {
       .catch(() => setIsSignedIn(false));
   }, []);
 
-  if (isSignedIn === null) return <div style={{ width: 30, height: 30 }} />;
+  if (isSignedIn === null) return (
+    <>
+      <style>{`@keyframes auth-pulse{0%,100%{opacity:.2}50%{opacity:.5}}`}</style>
+      <div style={{ ...iconStyle, color: '#b0b0b0', animation: 'auth-pulse 1.6s ease-in-out infinite', pointerEvents: 'none' }}>
+        <UserIcon />
+      </div>
+    </>
+  );
 
   return (
     <a
