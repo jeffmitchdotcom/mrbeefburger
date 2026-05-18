@@ -19,6 +19,9 @@ const allMembers = await db
     name: loyaltyMembers.name,
     email: loyaltyMembers.email,
     city: loyaltyMembers.city,
+    preferredBurger: loyaltyMembers.preferredBurger,
+    beefRelationship: loyaltyMembers.beefRelationship,
+    wellDone: loyaltyMembers.wellDone,
     tier: loyaltyMembers.tier,
     createdAt: loyaltyMembers.createdAt,
     balance: sum(loyaltyTransactions.sauceUnits),
@@ -135,7 +138,20 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
               </thead>
               <tbody>
                 {allMembers.map(m => (
-                  <tr>
+                  <tr
+                    class="member-row"
+                    data-member={JSON.stringify({
+                      name: m.name,
+                      email: m.email,
+                      city: m.city,
+                      preferredBurger: m.preferredBurger,
+                      beefRelationship: m.beefRelationship,
+                      wellDone: m.wellDone,
+                      tier: m.tier,
+                      balance: Number(m.balance ?? 0),
+                      joined: fmt(m.createdAt),
+                    })}
+                  >
                     <td>{m.name}</td>
                     <td class="muted">{m.email}</td>
                     <td>{m.city}</td>
@@ -152,6 +168,29 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
 
     </div>
   </main>
+
+  <!-- Member detail modal -->
+  <div id="member-overlay" class="member-overlay" aria-hidden="true">
+    <div class="member-modal" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+      <button id="modal-close" class="modal-close" aria-label="Close">✕</button>
+      <h2 id="modal-name" class="modal-name"></h2>
+      <p class="modal-meta"></p>
+      <dl class="modal-fields">
+        <div class="modal-field">
+          <dt>Preferred Burger</dt>
+          <dd id="modal-burger"></dd>
+        </div>
+        <div class="modal-field">
+          <dt>Relationship with Beef</dt>
+          <dd id="modal-beef"></dd>
+        </div>
+        <div class="modal-field">
+          <dt>Well Done?</dt>
+          <dd id="modal-welldone"></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
 </Layout>
 
 <style>
@@ -364,6 +403,98 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
     margin-left: auto;
   }
 
+  .member-row {
+    cursor: pointer;
+  }
+
+  .member-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .member-overlay.open {
+    display: flex;
+  }
+
+  .member-modal {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 520px;
+    width: 100%;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--color-muted);
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+
+  .modal-close:hover {
+    color: var(--color-red);
+  }
+
+  .modal-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-red);
+    margin: 0 0 0.25rem;
+    padding-right: 2rem;
+  }
+
+  .modal-meta {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0 0 1.5rem;
+  }
+
+  .modal-fields {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .modal-field dt {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .modal-field dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.55;
+  }
+
   @media (max-width: 600px) {
     .stats-row {
       grid-template-columns: 1fr;
@@ -430,4 +561,40 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
 
     showPage(1);
   }
+</script>
+
+<script>
+  const overlay = document.getElementById('member-overlay')!;
+  const closeBtn = document.getElementById('modal-close')!;
+
+  function openModal(data: {
+    name: string; email: string; city: string; tier: string;
+    preferredBurger: string; beefRelationship: string; wellDone: string;
+    balance: number; joined: string;
+  }) {
+    (document.getElementById('modal-name') as HTMLElement).textContent = data.name;
+    (document.querySelector('.modal-meta') as HTMLElement).textContent =
+      `${data.email} · ${data.city} · ${data.tier} · ${data.balance} SU · Joined ${data.joined}`;
+    (document.getElementById('modal-burger') as HTMLElement).textContent = data.preferredBurger;
+    (document.getElementById('modal-beef') as HTMLElement).textContent = data.beefRelationship;
+    (document.getElementById('modal-welldone') as HTMLElement).textContent = data.wellDone;
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+
+  document.querySelectorAll<HTMLTableRowElement>('.member-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const data = JSON.parse(row.dataset.member!);
+      openModal(data);
+    });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 </script>
