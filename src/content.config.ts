@@ -22,7 +22,7 @@ const menu = defineCollection({
     slug: z.string(),
     price: z.number(),
     description: z.string(),
-    category: z.enum(['burgers', 'sides', 'drinks']),
+    category: z.enum(['burgers', 'sides', 'drinks', 'extras']),
     toppings: z.array(z.string()).optional(),
     image: z.string().optional(),
     signature: z.boolean().optional(),
