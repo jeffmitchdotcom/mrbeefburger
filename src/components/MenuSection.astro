@@ -10,7 +10,7 @@ interface Props {
 const { title, items } = Astro.props;
 ---
 
-<section class="menu-section">
+<section class="menu-section" id={title.toLowerCase()}>
   <h2 class="section-title">{title}</h2>
   <div class="item-grid">
     {items.map((item) => (
