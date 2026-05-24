@@ -132,18 +132,30 @@ const categories = [
       </div>
     </section>
 
+    <!-- Locations Teaser -->
+    <section class="locations-teaser">
+      <div class="section-inner locations-inner">
+        <div class="locations-img-wrap">
+          <img
+            src="/images/mrbeefburger-exterior.jpg"
+            alt="Mr. Beefburger restaurant exterior"
+            class="locations-img"
+          />
+        </div>
+        <div class="locations-text">
+          <h2 class="locations-heading">Find Us</h2>
+          <p class="locations-copy">Now open in cities near you.</p>
+          <a href="/locations" class="btn btn-outline">Find a Location</a>
+        </div>
+      </div>
+    </section>
+
     <!-- Loyalty Accord Teaser -->
     <section class="accord-teaser">
       <div class="section-inner accord-inner">
 
         <div class="accord-visual">
           <div class="accord-receipt-stage">
-            <img
-              src="/images/mrbeefburger-icon-2026.png"
-              alt=""
-              class="accord-mascot"
-              aria-hidden="true"
-            />
             <div class="accord-receipt-wrap">
               <div class="accord-receipt-shadow" aria-hidden="true">
                 <div class="accord-receipt-shadow-shape"></div>
@@ -186,7 +198,15 @@ Gerald keeps records.
 
         <div class="accord-text">
           <p class="accord-eyebrow">Membership</p>
-          <h2 class="accord-heading">The Beefburger<br />Loyalty Accord</h2>
+          <div class="accord-heading-row">
+            <img
+              src="/images/mrbeefburger-icon-2026.png"
+              alt=""
+              class="accord-mascot"
+              aria-hidden="true"
+            />
+            <h2 class="accord-heading">The Beefburger<br />Loyalty Accord</h2>
+          </div>
           <p class="accord-sub">Not a program. Not a club. An Accord. Gerald drafted it himself. It took eleven months. You earn Sauce Units. Gerald tracks them personally.</p>
           <ul class="accord-perks">
             <li>Earn 1 Sauce Unit per dollar</li>
@@ -196,24 +216,6 @@ Gerald keeps records.
           <a href="/loyalty" class="btn accord-cta">Apply to the Accord</a>
         </div>
 
-      </div>
-    </section>
-
-    <!-- Locations Teaser -->
-    <section class="locations-teaser">
-      <div class="section-inner locations-inner">
-        <div class="locations-img-wrap">
-          <img
-            src="/images/mrbeefburger-exterior.jpg"
-            alt="Mr. Beefburger restaurant exterior"
-            class="locations-img"
-          />
-        </div>
-        <div class="locations-text">
-          <h2 class="locations-heading">Find Us</h2>
-          <p class="locations-copy">Now open in cities near you.</p>
-          <a href="/locations" class="btn btn-outline">Find a Location</a>
-        </div>
       </div>
     </section>
 
@@ -611,7 +613,7 @@ Gerald keeps records.
     align-items: center;
   }
 
-  /* Visual column: mascot + receipt */
+  /* Visual column: receipt */
   .accord-visual {
     display: flex;
     justify-content: center;
@@ -622,16 +624,6 @@ Gerald keeps records.
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  .accord-mascot {
-    width: 130px;
-    height: auto;
-    position: relative;
-    z-index: 20;
-    margin-bottom: -32px;
-    transform: rotate(9deg) translateX(12px);
-    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.7));
   }
 
   .accord-receipt-wrap {
@@ -717,12 +709,27 @@ Gerald keeps records.
     margin: 0 0 0.5rem;
   }
 
+  .accord-heading-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .accord-mascot {
+    width: 72px;
+    height: auto;
+    flex-shrink: 0;
+    transform: rotate(-9deg);
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+  }
+
   .accord-heading {
     font-family: var(--font-display);
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 800;
     color: #ffffff;
-    margin: 0 0 1.25rem;
+    margin: 0;
     line-height: 1.08;
   }
 
@@ -896,11 +903,6 @@ Gerald keeps records.
     .accord-inner {
       grid-template-columns: 1fr;
       gap: 3rem;
-    }
-
-    .accord-mascot {
-      width: 100px;
-      margin-bottom: -24px;
     }
 
     .accord-receipt {
