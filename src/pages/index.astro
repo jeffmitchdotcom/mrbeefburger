@@ -134,10 +134,19 @@ const categories = [
 
     <!-- Locations Teaser -->
     <section class="locations-teaser">
-      <div class="section-inner">
-        <h2 class="locations-heading">Find Us</h2>
-        <p class="locations-copy">Now open in cities near you.</p>
-        <a href="/locations" class="btn btn-outline">Find a Location</a>
+      <div class="section-inner locations-inner">
+        <div class="locations-img-wrap">
+          <img
+            src="/images/mrbeefburger-exterior.jpg"
+            alt="Mr. Beefburger restaurant exterior"
+            class="locations-img"
+          />
+        </div>
+        <div class="locations-text">
+          <h2 class="locations-heading">Find Us</h2>
+          <p class="locations-copy">Now open in cities near you.</p>
+          <a href="/locations" class="btn btn-outline">Find a Location</a>
+        </div>
       </div>
     </section>
 
@@ -524,9 +533,48 @@ const categories = [
 
   /* ── Locations Teaser ─────────────────────── */
   .locations-teaser {
-    background-color: var(--color-bg);
+    background-color: var(--color-surface);
     padding: 5rem 0;
-    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .locations-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .locations-img-wrap {
+    position: relative;
+    border: 3px solid var(--color-red);
+    border-radius: 6px;
+    padding: 10px;
+    background-color: var(--color-bg);
+  }
+
+  .locations-img-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border: 2px solid var(--color-yellow);
+    border-radius: 9px;
+    pointer-events: none;
+  }
+
+  .locations-img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 3px;
+    display: block;
+  }
+
+  .locations-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
 
   .locations-heading {
@@ -540,8 +588,8 @@ const categories = [
   .locations-copy {
     font-size: 1.0625rem;
     color: var(--color-muted);
-    margin: 0 auto 2rem;
-    max-width: 480px;
+    margin: 0 0 2rem;
+    max-width: 360px;
   }
 
   /* ── Shared utilities ─────────────────────── */
@@ -602,6 +650,20 @@ const categories = [
 
     .sig-grid {
       grid-template-columns: 1fr;
+    }
+
+    .locations-inner {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .locations-text {
+      align-items: center;
+      text-align: center;
+    }
+
+    .locations-copy {
+      max-width: 100%;
     }
   }
 </style>
