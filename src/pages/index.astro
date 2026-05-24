@@ -132,6 +132,73 @@ const categories = [
       </div>
     </section>
 
+    <!-- Loyalty Accord Teaser -->
+    <section class="accord-teaser">
+      <div class="section-inner accord-inner">
+
+        <div class="accord-visual">
+          <div class="accord-receipt-stage">
+            <img
+              src="/images/mrbeefburger-icon-2026.png"
+              alt=""
+              class="accord-mascot"
+              aria-hidden="true"
+            />
+            <div class="accord-receipt-wrap">
+              <div class="accord-receipt-shadow" aria-hidden="true">
+                <div class="accord-receipt-shadow-shape"></div>
+              </div>
+              <div class="accord-receipt" aria-hidden="true">
+                <div class="accord-receipt-body">
+                  <pre class="accord-receipt-text">================================
+  MR. BEEFBURGER
+================================
+  THE BEEFBURGER
+  LOYALTY ACCORD
+
+A formal arrangement between
+Gerald and the customer.
+Since 2019.
+
+--------------------------------
+SAUCE UNIT RATES
+--------------------------------
+Every $1 Spent          1 SU
+Visiting on Tuesday    +3 SU
+Meaty Faced Burger     +5 SU
+Joining the Accord    +10 SU
+--------------------------------
+
+Four tiers.
+Named with gravity.
+Gerald keeps records.
+
+================================
+** NOT A PUNCH CARD           **
+** NOT A PROGRAM              **
+** AN ACCORD                  **
+================================</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accord-text">
+          <p class="accord-eyebrow">Membership</p>
+          <h2 class="accord-heading">The Beefburger<br />Loyalty Accord</h2>
+          <p class="accord-sub">Not a program. Not a club. An Accord. Gerald drafted it himself. It took eleven months. You earn Sauce Units. Gerald tracks them personally.</p>
+          <ul class="accord-perks">
+            <li>Earn 1 Sauce Unit per dollar</li>
+            <li>Four tiers, named with escalating gravity</li>
+            <li>Gerald will eventually nod at you</li>
+          </ul>
+          <a href="/loyalty" class="btn accord-cta">Apply to the Accord</a>
+        </div>
+
+      </div>
+    </section>
+
     <!-- Locations Teaser -->
     <section class="locations-teaser">
       <div class="section-inner locations-inner">
@@ -531,6 +598,180 @@ const categories = [
     line-height: 1.6;
   }
 
+  /* ── Loyalty Accord Teaser ───────────────────── */
+  .accord-teaser {
+    background-color: #1a1a1a;
+    padding: 6rem 0;
+  }
+
+  .accord-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  /* Visual column: mascot + receipt */
+  .accord-visual {
+    display: flex;
+    justify-content: center;
+  }
+
+  .accord-receipt-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .accord-mascot {
+    width: 130px;
+    height: auto;
+    position: relative;
+    z-index: 20;
+    margin-bottom: -32px;
+    transform: rotate(9deg) translateX(12px);
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.7));
+  }
+
+  .accord-receipt-wrap {
+    position: relative;
+    transform: rotate(-3deg);
+    z-index: 10;
+  }
+
+  .accord-receipt-shadow {
+    position: absolute;
+    inset: 0;
+    filter: blur(8px);
+  }
+
+  .accord-receipt-shadow-shape {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    clip-path: polygon(
+      0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
+      22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
+      42.5% 0%, 45% 3%, 47.5% 0%, 50% 3%, 52.5% 0%, 55% 3%, 57.5% 0%, 60% 3%,
+      62.5% 0%, 65% 3%, 67.5% 0%, 70% 3%, 72.5% 0%, 75% 3%, 77.5% 0%, 80% 3%,
+      82.5% 0%, 85% 3%, 87.5% 0%, 90% 3%, 92.5% 0%, 95% 3%, 97.5% 0%, 100% 3%,
+      100% 97%,
+      97.5% 100%, 95% 97%, 92.5% 100%, 90% 97%, 87.5% 100%, 85% 97%, 82.5% 100%, 80% 97%,
+      77.5% 100%, 75% 97%, 72.5% 100%, 70% 97%, 67.5% 100%, 65% 97%, 62.5% 100%, 60% 97%,
+      57.5% 100%, 55% 97%, 52.5% 100%, 50% 97%, 47.5% 100%, 45% 97%, 42.5% 100%, 40% 97%,
+      37.5% 100%, 35% 97%, 32.5% 100%, 30% 97%, 27.5% 100%, 25% 97%, 22.5% 100%, 20% 97%,
+      17.5% 100%, 15% 97%, 12.5% 100%, 10% 97%, 7.5% 100%, 5% 97%, 2.5% 100%, 0% 97%
+    );
+  }
+
+  .accord-receipt {
+    position: relative;
+    width: 264px;
+    background: #f5f0e8;
+    clip-path: polygon(
+      0% 3%, 2.5% 0%, 5% 3%, 7.5% 0%, 10% 3%, 12.5% 0%, 15% 3%, 17.5% 0%, 20% 3%,
+      22.5% 0%, 25% 3%, 27.5% 0%, 30% 3%, 32.5% 0%, 35% 3%, 37.5% 0%, 40% 3%,
+      42.5% 0%, 45% 3%, 47.5% 0%, 50% 3%, 52.5% 0%, 55% 3%, 57.5% 0%, 60% 3%,
+      62.5% 0%, 65% 3%, 67.5% 0%, 70% 3%, 72.5% 0%, 75% 3%, 77.5% 0%, 80% 3%,
+      82.5% 0%, 85% 3%, 87.5% 0%, 90% 3%, 92.5% 0%, 95% 3%, 97.5% 0%, 100% 3%,
+      100% 97%,
+      97.5% 100%, 95% 97%, 92.5% 100%, 90% 97%, 87.5% 100%, 85% 97%, 82.5% 100%, 80% 97%,
+      77.5% 100%, 75% 97%, 72.5% 100%, 70% 97%, 67.5% 100%, 65% 97%, 62.5% 100%, 60% 97%,
+      57.5% 100%, 55% 97%, 52.5% 100%, 50% 97%, 47.5% 100%, 45% 97%, 42.5% 100%, 40% 97%,
+      37.5% 100%, 35% 97%, 32.5% 100%, 30% 97%, 27.5% 100%, 25% 97%, 22.5% 100%, 20% 97%,
+      17.5% 100%, 15% 97%, 12.5% 100%, 10% 97%, 7.5% 100%, 5% 97%, 2.5% 100%, 0% 97%
+    );
+  }
+
+  .accord-receipt-body {
+    padding: 48px 14px 56px;
+  }
+
+  .accord-receipt-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.67rem;
+    color: #2a2a2a;
+    line-height: 1.65;
+    white-space: pre;
+    margin: 0;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* Text column */
+  .accord-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .accord-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-yellow);
+    margin: 0 0 0.5rem;
+  }
+
+  .accord-heading {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 1.25rem;
+    line-height: 1.08;
+  }
+
+  .accord-sub {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.75;
+    margin: 0 0 2rem;
+    max-width: 400px;
+  }
+
+  .accord-perks {
+    list-style: none;
+    margin: 0 0 2.5rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .accord-perks li {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.85);
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .accord-perks li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--color-yellow);
+    font-weight: 700;
+  }
+
+  .accord-cta {
+    background-color: var(--color-red);
+    color: #ffffff;
+    border-color: var(--color-red);
+  }
+
+  .accord-cta:hover {
+    background-color: transparent;
+    color: #ffffff;
+    border-color: #ffffff;
+  }
+
   /* ── Locations Teaser ─────────────────────── */
   .locations-teaser {
     background-color: var(--color-surface);
@@ -650,6 +891,20 @@ const categories = [
 
     .sig-grid {
       grid-template-columns: 1fr;
+    }
+
+    .accord-inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .accord-mascot {
+      width: 100px;
+      margin-bottom: -24px;
+    }
+
+    .accord-receipt {
+      width: 240px;
     }
 
     .locations-inner {
