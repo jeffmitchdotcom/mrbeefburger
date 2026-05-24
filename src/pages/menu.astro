@@ -13,6 +13,7 @@ const sides = allItems
   .filter(i => i.data.category === 'sides' && i.data.available)
   .sort((a, b) => (a.data.signature ? -1 : 0) - (b.data.signature ? -1 : 0));
 const drinks = allItems.filter(i => i.data.category === 'drinks' && i.data.available);
+const extras = allItems.filter(i => i.data.category === 'extras' && i.data.available);
 ---
 
 <Layout title="Menu — Mr. Beefburger">
@@ -31,6 +32,7 @@ const drinks = allItems.filter(i => i.data.category === 'drinks' && i.data.avail
         <MenuSection title="Burgers" items={burgers} />
         <MenuSection title="Sides" items={sides} />
         <MenuSection title="Drinks" items={drinks} />
+        <MenuSection title="Extras" items={extras} />
       </div>
     </section>
   </main>
