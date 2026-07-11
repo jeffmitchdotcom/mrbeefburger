@@ -6,6 +6,13 @@ import { sendEmail } from '../../lib/email';
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json().catch(() => null);
 
+  if (body?.website) {
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   if (!body?.name || !body?.email || !body?.message) {
     return new Response(JSON.stringify({ error: 'Missing required fields' }), {
       status: 400,

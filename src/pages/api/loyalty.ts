@@ -16,7 +16,14 @@ function tierForBalance(balance: number): string {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, email, city, preferredBurger, beefRelationship, wellDone, orderNumber } = body;
+    const { name, email, city, preferredBurger, beefRelationship, wellDone, orderNumber, website } = body;
+
+    if (website) {
+      return new Response(JSON.stringify({ ok: true, sauceUnits: 10, memberId: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     if (!name || !email || !city || !preferredBurger || !beefRelationship || !wellDone) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {

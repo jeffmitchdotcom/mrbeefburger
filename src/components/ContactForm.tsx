@@ -40,6 +40,7 @@ export default function ContactForm() {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState(subjects[0]);
   const [message, setMessage] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +51,7 @@ export default function ContactForm() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), subject, message: message.trim() }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), subject, message: message.trim(), website: honeypot }),
       });
       if (!res.ok) throw new Error();
       setStatus('success');
@@ -140,6 +141,13 @@ export default function ContactForm() {
           style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
         />
       </label>
+
+      <div style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }} aria-hidden="true">
+        <label>
+          Website
+          <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
 
       {status === 'error' && (
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.875rem', color: '#DA291C', margin: 0 }}>
