@@ -29,7 +29,7 @@ Multi-page Astro 6 site with Vercel SSR adapter. Interactive UI is built as Reac
 
 **Data flow:** All pages use `src/layouts/Layout.astro` which wraps content with `<Nav>` and `<Footer>`. Pages live in `src/pages/`. React components in `src/components/` are hydrated selectively.
 
-**Rendering modes:** Most pages are static. Pages that read from the database (`src/pages/order/[id].astro`, `src/pages/account.astro`) and all API routes use `export const prerender = false` for SSR.
+**Rendering modes:** Most pages are static. Pages that read from the database (`src/pages/order/[id].astro`, `src/pages/account.astro`, `src/pages/loyalty.astro`, `src/pages/admin.astro`) and all API routes use `export const prerender = false` for SSR.
 
 **Database:** Neon serverless Postgres, accessed via Drizzle ORM. Schema is in `src/lib/schema.ts`, client in `src/lib/db.ts`. Eight tables:
 - `orders` — full order as JSON blob + flat fields; includes `customer_email` (nullable) for order history lookups
@@ -56,10 +56,15 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 - `ALL /api/auth/[...all]` — catch-all route; hands all Better Auth traffic to `auth.handler(request)`
 - `GET /api/loyalty/check` — takes `?email=x`, returns `{ isMember: boolean }` only (no balance, no PII)
 - `GET /api/account/name-lookup` — checks `loyalty_members.name` then most recent `orders.customer_name` for an email; returns `{ name: string | null }`; used by AccountIsland on first sign-in
-- `POST /api/contact` — stub endpoint, returns `{ ok: true }` (email provider not yet wired)
+- `POST /api/contact` — verifies Cloudflare Turnstile token, checks honeypot, sends contact email via SES (notification to inbox + Gerald-voiced auto-reply to sender)
 - `GET /api/game-scores` — returns top 10 scores; accepts `?clear=GBB3-great-escape-reset` to wipe all scores
 - `POST /api/game-scores` — inserts a score row (playerName, score, durationSeconds)
-- `POST /api/loyalty` — validates loyalty application fields, checks for duplicate email (409 if found), inserts into `loyalty_members` + seeds a 10 SU `application_signup` transaction in `loyalty_transactions`
+- `POST /api/loyalty` — verifies Cloudflare Turnstile token, checks honeypot, validates fields (email regex, length caps), checks for duplicate email (409 if found), inserts into `loyalty_members` + seeds a 10 SU `application_signup` transaction in `loyalty_transactions`
+- `DELETE /api/admin/loyalty/[id]` — auth-guarded (requires `@mrbeefburger.com` session); deletes a loyalty member and all their `loyalty_transactions` rows (manual cascade, no FK constraint); used by the admin dashboard delete button
+
+**Spam protection:** Both the Contact form and Loyalty Accord form use two layers of bot protection:
+1. **Honeypot field** — a hidden `website` input (positioned off-screen, `tabIndex={-1}`, `autoComplete="off"`). If populated, the API silently returns 200 without processing.
+2. **Cloudflare Turnstile** — Managed mode widget (invisible to real users, challenge for bots). Site key `0x4AAAAAAD36HqBUZW4Ax1Wo` is embedded in the page; secret key is `TURNSTILE_SECRET_KEY` env var. Verification is handled by the shared utility `src/lib/turnstile.ts`, which calls the Cloudflare siteverify API and returns `true` in dev when the env var is not set. Both API routes reject with 400 if the token fails verification.
 
 **Order flow:** Menu → Cart drawer → `/order` (OrderForm: location + details, **email required**; saves full order payload to `sessionStorage`, no API call) → `/payment` (PaymentTheater: reads summary from `sessionStorage`, shows loyalty banner; **Pay Now** POSTs to `/api/orders`, credits SU, sends confirmation email, then shows gotcha modal) → `/order/[id]` (receipt from DB). The order is not created in the database until Pay Now is clicked.
 
@@ -109,7 +114,7 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 **PaymentTheater**: On mount, reads `orderSummary` from `sessionStorage` and fetches `/api/loyalty/check?email=x`. Shows a loyalty status banner — yellow-tinted for members (with SU preview: "This order earns you X Sauce Units"), cream for non-members. Heading personalizes with customer name. **Pay Now** makes the `POST /api/orders` call; on success, stores the returned `orderNumber` in `sessionStorage` and shows the gotcha modal. The modal's "See My Order Anyway →" link uses the live order number. Shows a loading state ("One moment...") and error message on the button if the API call fails.
 
-**ContactForm**: On successful POST, shows a success state with Gerald-flavored copy. The `/api/contact` endpoint is a stub — a `// TODO` comment marks where to add Resend or SMTP2GO.
+**ContactForm**: Includes a Cloudflare Turnstile widget (rendered via `useEffect` + `window.turnstile.render()` into a ref'd div, since it's a React island) and a hidden honeypot input. On successful POST, shows a success state with Gerald-flavored copy. The Turnstile script is loaded in `contact.astro`'s head via `<script slot="head" is:inline src="...turnstile...">`. The API now sends a real email — notification to the inbox and a Gerald-voiced auto-reply to the sender via SES.
 
 **AuthButton** (`src/components/AuthButton.tsx`): Minimal React island mounted with `client:only="react"` (not `client:load` — avoids SSR hook errors). Uses `useEffect` + `authClient.getSession()`. Shows a LogIn arrow SVG when signed out (links to `/account`), User silhouette SVG when signed in. Lives in the persistent `nav-actions` cluster alongside the hamburger — visible on both desktop and mobile at all breakpoints.
 
@@ -121,7 +126,9 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 **OrderForm** (step 1): The pickup/dine-in toggle and "Continue" button are `position: fixed` to the viewport bottom so they stay visible while the user scrolls the location list.
 
-**Loyalty application** (`loyalty.astro` + `/api/loyalty`): All fields are required (HTML native validation). The burger dropdown is filtered to `category === 'burgers'` only, sorted so `signature: true` items (Meaty Faced Sauce Burger) appear first. On submit, the form POSTs JSON to `/api/loyalty`. Duplicate emails return a 409 — the client surfaces a distinct snarky error message for duplicates vs. a generic server failure. On success, `loyalty_members` gets the member row and `loyalty_transactions` gets a `+10 SU` signup event. The transaction ledger pattern means future point-earning actions (Tuesday bonus, ordering the signature burger, referrals) are each their own row — balance is always `SUM(sauce_units)`, never a stored running total.
+**Loyalty application** (`loyalty.astro` + `/api/loyalty`): All fields are required (HTML native validation). The burger dropdown is filtered to `category === 'burgers'` only, sorted so `signature: true` items (Meaty Faced Sauce Burger) appear first. The form includes a Cloudflare Turnstile widget (`<div class="cf-turnstile" data-sitekey="...">`) and a hidden honeypot field. On submit, the JS handler includes both `website` (honeypot) and `cf-turnstile-response` in the POST body. The API verifies the Turnstile token before any DB work; duplicate emails return a 409 — the client surfaces a distinct snarky error message for duplicates vs. a generic server failure. On success, `loyalty_members` gets the member row and `loyalty_transactions` gets a `+10 SU` signup event. The transaction ledger pattern means future point-earning actions (Tuesday bonus, ordering the signature burger, referrals) are each their own row — balance is always `SUM(sauce_units)`, never a stored running total.
+
+**Admin dashboard** (`/admin`): Lists all loyalty members in a table; clicking a row opens a detail modal. Modal includes a red "Delete Member" button — click triggers a browser `confirm()` then `DELETE /api/admin/loyalty/[id]`; on success the row is removed from the DOM. The page and DELETE endpoint are both auth-guarded to `@mrbeefburger.com` email addresses.
 
 ## What's coming
 

@@ -33,6 +33,7 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 | Email | [Amazon SES](https://aws.amazon.com/ses/) — order confirmations + OTP codes |
 | Hosting | [Vercel](https://vercel.com) |
 | Map | Leaflet.js (locations page) |
+| Bot protection | [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) — Managed mode on Contact and Loyalty forms |
 | Fonts | Bricolage Grotesque + DM Sans (Google Fonts) |
 
 ## Features
@@ -43,9 +44,9 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 - **Order flow** — multi-step form (location → details → review), writes to Neon Postgres via Drizzle; email required; confirmation email sent via SES
 - **Payment theater** — loyalty status banner (member vs. join prompt), personalized review screen; Pay Now reveals a gotcha modal
 - **Receipt page** — shareable `/order/[id]` page pulled from the database; includes estimated wait time and tech stack attribution
-- **Loyalty program** — "The Beefburger Loyalty Accord" at `/loyalty`: Sauce Units currency, four membership tiers, perks accordion, and an application form that writes to Neon. Points tracked in a transaction ledger (`loyalty_transactions`). Sauce Units credited automatically on orders placed with a matching email
+- **Loyalty program** — "The Beefburger Loyalty Accord" at `/loyalty`: Sauce Units currency, four membership tiers, perks accordion, and an application form protected by Cloudflare Turnstile and a honeypot field. Points tracked in a transaction ledger (`loyalty_transactions`). Sauce Units credited automatically on orders placed with a matching email
 - **Account dashboard** — `/account` with passwordless OTP sign-in (email → 6-digit code via SES → signed in, no password). Dashboard shows Sauce Units balance + tier, transaction history, and full order history linked by email. Name resolved from loyalty/order records on first sign-in
-- **Contact form** — stubbed API endpoint ready for email provider wiring
+- **Contact form** — sends a notification email to the inbox and a Gerald-voiced auto-reply to the sender via SES; protected by Cloudflare Turnstile and a honeypot field
 - **About page** — outlandish origin story of Gerald Beaufort Beefburger III, with tech attribution section
 - **Locations page** — interactive map with all 11 locations and geolocation-based nearest sort
 - **Browser game** — "Mr. Beefburger's Great Escape" canvas sidescroller at `/game` (not in nav); Neon-backed leaderboard
@@ -69,9 +70,10 @@ AWS_SECRET_ACCESS_KEY=your_secret
 SES_FROM_EMAIL=noreply@yourdomain.com
 BETTER_AUTH_SECRET=your_secret_32_chars_min
 BETTER_AUTH_URL=http://localhost:4321
+TURNSTILE_SECRET_KEY=your_cloudflare_turnstile_secret_key
 ```
 
-> `BETTER_AUTH_SECRET`: generate with `openssl rand -base64 32`. Set `BETTER_AUTH_URL` to the deployed URL in Vercel env vars.
+> `BETTER_AUTH_SECRET`: generate with `openssl rand -base64 32`. Set `BETTER_AUTH_URL` to the deployed URL in Vercel env vars. `TURNSTILE_SECRET_KEY` can be omitted locally — Turnstile verification is skipped when the key is not set. In production, set it alongside the site key in Cloudflare Dashboard → Turnstile.
 
 ## Project structure
 
@@ -101,7 +103,8 @@ src/
 │   ├── auth-client.ts  # Better Auth client helper (emailOTPClient plugin)
 │   ├── db.ts         # Drizzle + Neon client
 │   ├── email.ts      # Amazon SES sendEmail() wrapper
-│   └── schema.ts     # All 8 tables: orders, game_scores, loyalty_members, loyalty_transactions, + 4 Better Auth tables
+│   ├── schema.ts     # All 8 tables: orders, game_scores, loyalty_members, loyalty_transactions, + 4 Better Auth tables
+│   └── turnstile.ts  # Cloudflare Turnstile server-side verification utility
 ├── pages/
 │   ├── api/
 │   │   ├── auth/
@@ -110,10 +113,13 @@ src/
 │   │   │   └── name-lookup.ts  # GET — resolve name from loyalty/orders by email
 │   │   ├── loyalty/
 │   │   │   └── check.ts     # GET — returns { isMember: boolean } for an email
+│   │   ├── admin/
+│   │   │   └── loyalty/
+│   │   │       └── [id].ts  # DELETE — auth-guarded; removes member + all SU transactions
 │   │   ├── orders.ts        # POST — saves order, credits SU, sends confirmation email
-│   │   ├── contact.ts       # POST — stub, ready for email provider
+│   │   ├── contact.ts       # POST — Turnstile verify, honeypot check, sends email via SES
 │   │   ├── game-scores.ts   # GET top 10 / POST score / GET?clear=... to reset
-│   │   └── loyalty.ts       # POST — saves loyalty application, seeds 10 SU transaction
+│   │   └── loyalty.ts       # POST — Turnstile verify, honeypot check, saves application, seeds 10 SU
 │   ├── order/
 │   │   └── [id].astro   # SSR receipt page (reads from DB by order number)
 │   ├── about.astro
