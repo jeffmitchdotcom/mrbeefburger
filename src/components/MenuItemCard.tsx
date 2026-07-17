@@ -12,16 +12,21 @@ type Props = {
 
 export default function MenuItemCard({ slug, title, price, description, toppings, image }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(toppings ?? []);
   const [added, setAdded] = useState(false);
 
   const toggleTopping = (t: string) =>
     setSelected((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
 
+  const removalCount = (toppings ?? []).filter(t => !selected.includes(t)).length;
+
   const handleAdd = () => {
-    addToCart({ slug, title, price, quantity: 1, customizations: selected });
+    const removals = (toppings ?? [])
+      .filter(t => !selected.includes(t))
+      .map(t => `NO ${t}`);
+    addToCart({ slug, title, price, quantity: 1, customizations: removals });
     setAdded(true);
-    setSelected([]);
+    setSelected(toppings ?? []);
     setExpanded(false);
     setTimeout(() => setAdded(false), 1500);
   };
@@ -105,11 +110,12 @@ export default function MenuItemCard({ slug, title, price, description, toppings
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {expanded ? 'Done' : 'Customize'}
+            {expanded ? 'Done' : removalCount > 0 ? `Customize (${removalCount} removed)` : 'Customize'}
           </button>
 
           {expanded && (
             <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <p style={{ fontSize: '0.75rem', color: '#767676', margin: '0 0 0.25rem' }}>Uncheck to remove an ingredient.</p>
               {toppings.map((t) => (
                 <label key={t} style={{
                   display: 'flex',

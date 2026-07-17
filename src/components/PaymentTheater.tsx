@@ -142,8 +142,12 @@ export default function PaymentTheater() {
                       <span style={{ fontWeight: 600, color: '#1a1a1a' }}>{item.title}</span>
                       {item.quantity > 1 && <span style={{ color: '#767676', fontSize: '0.8rem' }}> × {item.quantity}</span>}
                       {item.customizations.length > 0 && (
-                        <div style={{ fontSize: '0.75rem', color: '#767676', marginTop: '0.15rem' }}>
-                          {item.customizations.join(', ')}
+                        <div style={{ fontSize: '0.75rem', marginTop: '0.15rem' }}>
+                          {item.customizations.map((c, j) => (
+                            <span key={j} style={c.startsWith('NO ') ? { color: '#DA291C', fontWeight: 600 } : { color: '#767676' }}>
+                              {j > 0 ? ', ' : ''}{c}
+                            </span>
+                          ))}
                         </div>
                       )}
                     </div>

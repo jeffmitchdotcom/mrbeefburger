@@ -96,7 +96,9 @@ if (suTx) {
             </div>
             {item.customizations?.length > 0 && (
               <ul class="item-customizations">
-                {item.customizations.map((c: string) => <li>{c}</li>)}
+                {item.customizations.map((c: string) => (
+                  <li class={c.startsWith('NO ') ? 'removal' : 'addition'}>{c}</li>
+                ))}
               </ul>
             )}
           </li>
@@ -319,10 +321,15 @@ if (suTx) {
     color: var(--color-muted);
   }
 
-  .item-customizations li::before {
+  .item-customizations li.addition::before {
     content: '+ ';
     color: var(--color-red);
     font-weight: 700;
+  }
+
+  .item-customizations li.removal {
+    color: var(--color-red);
+    font-weight: 600;
   }
 
   .receipt-total {

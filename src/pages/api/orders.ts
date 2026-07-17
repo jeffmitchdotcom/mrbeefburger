@@ -110,7 +110,7 @@ export const POST: APIRoute = async ({ request }) => {
     const itemRows = (items as { title: string; quantity: number; price: number; customizations?: string[] }[])
       .map((item) => {
         const customLine = item.customizations?.length
-          ? `<div style="font-size:0.8rem;color:#767676;margin-top:2px">${item.customizations.join(', ')}</div>`
+          ? `<div style="font-size:0.8rem;color:#DA291C;font-weight:600;margin-top:2px">${item.customizations.join(', ')}</div>`
           : '';
         return `<tr>
           <td style="padding:6px 0;border-bottom:1px solid #f0ece6">
