@@ -1,6 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { verifyTurnstile } from '../../lib/turnstile';
 import { sendEmail } from '../../lib/email';
 
 export const POST: APIRoute = async ({ request }) => {
@@ -9,6 +10,14 @@ export const POST: APIRoute = async ({ request }) => {
   if (body?.website) {
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const turnstileOk = await verifyTurnstile(body?.['cf-turnstile-response']);
+  if (!turnstileOk) {
+    return new Response(JSON.stringify({ error: 'Verification failed' }), {
+      status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }

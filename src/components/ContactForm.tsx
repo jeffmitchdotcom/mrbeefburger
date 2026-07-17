@@ -1,4 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (el: HTMLElement, options: { sitekey: string; callback: (token: string) => void; 'expired-callback': () => void }) => void;
+    };
+  }
+}
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -41,7 +49,27 @@ export default function ContactForm() {
   const [subject, setSubject] = useState(subjects[0]);
   const [message, setMessage] = useState('');
   const [honeypot, setHoneypot] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  useEffect(() => {
+    const render = () => {
+      if (turnstileRef.current && window.turnstile) {
+        window.turnstile.render(turnstileRef.current, {
+          sitekey: '0x4AAAAAAD36HqBUZW4Ax1Wo',
+          callback: (token) => setTurnstileToken(token),
+          'expired-callback': () => setTurnstileToken(''),
+        });
+      }
+    };
+    if (window.turnstile) {
+      render();
+    } else {
+      const script = document.querySelector('script[src*="turnstile"]');
+      script?.addEventListener('load', render);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +79,7 @@ export default function ContactForm() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), subject, message: message.trim(), website: honeypot }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), subject, message: message.trim(), website: honeypot, 'cf-turnstile-response': turnstileToken }),
       });
       if (!res.ok) throw new Error();
       setStatus('success');
@@ -148,6 +176,8 @@ export default function ContactForm() {
           <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+
+      <div ref={turnstileRef} />
 
       {status === 'error' && (
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.875rem', color: '#DA291C', margin: 0 }}>

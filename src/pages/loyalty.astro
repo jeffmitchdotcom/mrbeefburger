@@ -32,6 +32,7 @@ if (user?.email) {
 
 <Layout title="Loyalty — Mr. Beefburger">
   <link slot="head" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <script slot="head" is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <div id="accord-context-bar" style="display:none;position:fixed;top:90px;left:0;right:0;z-index:90;background:#1a1a1a;color:#ffffff;padding:0.625rem 1.5rem;font-family:var(--font-body);font-size:0.8rem;text-align:center;border-bottom:2px solid #F5C200;">
     <span id="accord-context-text"></span>
@@ -363,6 +364,7 @@ participation in the Accord.
             <div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
               <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
             </div>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAD36HqBUZW4Ax1Wo"></div>
             <button type="submit" class="app-submit">Submit Application to the Accord</button>
             <p class="app-error" id="app-error">The Accord encountered a difficulty. Gerald is looking into it.</p>
             <p class="app-error" id="app-error-duplicate">You are already enrolled in the Accord. Gerald has your record. Attempting to join twice does not earn additional Sauce Units. Gerald checked.</p>
