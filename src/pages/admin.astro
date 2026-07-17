@@ -141,6 +141,7 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
                   <tr
                     class="member-row"
                     data-member={JSON.stringify({
+                      id: m.id,
                       name: m.name,
                       email: m.email,
                       city: m.city,
@@ -189,6 +190,10 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
           <dd id="modal-welldone"></dd>
         </div>
       </dl>
+      <div class="modal-footer">
+        <button id="modal-delete" class="modal-delete-btn">Delete Member</button>
+        <span id="modal-delete-msg" class="modal-delete-msg"></span>
+      </div>
     </div>
   </div>
 </Layout>
@@ -495,6 +500,45 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
     line-height: 1.55;
   }
 
+  .modal-footer {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .modal-delete-btn {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--color-red);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.25rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+
+  .modal-delete-btn:hover {
+    background: #b82018;
+  }
+
+  .modal-delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .modal-delete-msg {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    font-style: italic;
+  }
+
   @media (max-width: 600px) {
     .stats-row {
       grid-template-columns: 1fr;
@@ -566,12 +610,21 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
 <script>
   const overlay = document.getElementById('member-overlay')!;
   const closeBtn = document.getElementById('modal-close')!;
+  const deleteBtn = document.getElementById('modal-delete') as HTMLButtonElement;
+  const deleteMsg = document.getElementById('modal-delete-msg')!;
+
+  let activeMemberId: number | null = null;
+  let activeRow: HTMLTableRowElement | null = null;
 
   function openModal(data: {
-    name: string; email: string; city: string; tier: string;
+    id: number; name: string; email: string; city: string; tier: string;
     preferredBurger: string; beefRelationship: string; wellDone: string;
     balance: number; joined: string;
-  }) {
+  }, row: HTMLTableRowElement) {
+    activeMemberId = data.id;
+    activeRow = row;
+    deleteBtn.disabled = false;
+    deleteMsg.textContent = '';
     (document.getElementById('modal-name') as HTMLElement).textContent = data.name;
     (document.querySelector('.modal-meta') as HTMLElement).textContent =
       `${data.email} · ${data.city} · ${data.tier} · ${data.balance} SU · Joined ${data.joined}`;
@@ -585,12 +638,31 @@ const totalRevenue = allOrders.reduce((s, o) => s + orderTotal(o.items as { pric
   function closeModal() {
     overlay.classList.remove('open');
     overlay.setAttribute('aria-hidden', 'true');
+    activeMemberId = null;
+    activeRow = null;
   }
+
+  deleteBtn.addEventListener('click', async () => {
+    if (!activeMemberId) return;
+    const confirmed = confirm('Delete this member and all their Sauce Unit history? This cannot be undone.');
+    if (!confirmed) return;
+    deleteBtn.disabled = true;
+    deleteMsg.textContent = 'Deleting…';
+    try {
+      const res = await fetch(`/api/admin/loyalty/${activeMemberId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      activeRow?.remove();
+      closeModal();
+    } catch {
+      deleteBtn.disabled = false;
+      deleteMsg.textContent = 'Something went wrong. Try again.';
+    }
+  });
 
   document.querySelectorAll<HTMLTableRowElement>('.member-row').forEach(row => {
     row.addEventListener('click', () => {
       const data = JSON.parse(row.dataset.member!);
-      openModal(data);
+      openModal(data, row);
     });
   });
 

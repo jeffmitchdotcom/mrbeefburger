@@ -1,6 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { verifyTurnstile } from '../../lib/turnstile';
 import { db } from '../../lib/db';
 import { loyaltyMembers, loyaltyTransactions, orders } from '../../lib/schema';
 import { eq, and, sum } from 'drizzle-orm';
@@ -16,8 +17,9 @@ function tierForBalance(balance: number): string {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, email, city, preferredBurger, beefRelationship, wellDone, orderNumber, website } = body;
+    const { name, email, city, preferredBurger, beefRelationship, wellDone, orderNumber, website, 'cf-turnstile-response': turnstileToken } = body;
 
+    // Honeypot: silently succeed without writing anything
     if (website) {
       return new Response(JSON.stringify({ ok: true, sauceUnits: 10, memberId: 0 }), {
         status: 200,
@@ -25,8 +27,32 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Turnstile verification
+    const turnstileOk = await verifyTurnstile(turnstileToken);
+    if (!turnstileOk) {
+      return new Response(JSON.stringify({ error: 'Verification failed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     if (!name || !email || !city || !preferredBurger || !beefRelationship || !wellDone) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Field length and email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.length > 254) {
+      return new Response(JSON.stringify({ error: 'Invalid email address' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    if (name.length > 100 || city.length > 100 || beefRelationship.length > 1000) {
+      return new Response(JSON.stringify({ error: 'Field too long' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
