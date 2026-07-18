@@ -125,8 +125,9 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: '720px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', background: '#ffffff', border: '2px solid #DA291C', borderRadius: '8px', padding: '2rem' }}>
+      <style>{`.contact-name-email{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}@media(max-width:600px){.contact-name-email{grid-template-columns:1fr}}`}</style>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+      <div className="contact-name-email">
         <label style={labelStyle}>
           <span>Your name <span style={{ color: '#DA291C' }}>*</span></span>
           <input
