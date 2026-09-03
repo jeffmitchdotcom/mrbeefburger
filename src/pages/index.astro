@@ -840,6 +840,21 @@ Gerald keeps records.
   /* ── Locations Teaser ─────────────────────── */
   .locations-teaser {
     background-color: var(--color-surface);
+    /* Subtle zigzag watermark echoing the chevron pattern on the cups,
+       fry boats, and sauce label — big bold bands, low-opacity so it
+       reads as texture rather than decoration. Drawn as a filled
+       polygon with vertical edges at the tile boundaries (rather than
+       a stroked path cut mid-line) so it tiles with no seam artifacts —
+       a stroke's end-cap is perpendicular to the line, not vertical,
+       and gets visibly clipped by the tile edge otherwise. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath d='M0,12.5 L12.5,0 L37.5,25 L50,12.5 L50,37.5 L37.5,50 L12.5,25 L0,37.5 Z' fill='%231a1a1a' fill-opacity='0.027'/%3E%3C/svg%3E");
+    background-size: 140px 140px;
+    /* Quarter-tile offset — keeps the section's top edge clear of the
+       sharp peak tip (at 0) without landing on the band's midline (at
+       half-tile, where the shape happens to be solid full-width with
+       no visible valleys). This is independent of the section's
+       (responsive) height, so it holds at every viewport. */
+    background-position: 0 -35px;
     padding: 5rem 0;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
