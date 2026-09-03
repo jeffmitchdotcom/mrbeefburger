@@ -30,6 +30,11 @@ const { title, items } = Astro.props;
 <style>
   .menu-section {
     margin-bottom: 3rem;
+    /* Keeps the heading clear of the sticky nav (92px) plus the sticky
+       "Ordering from" location banner (40px) when one is present, with
+       a little breathing room. Sized for the worst case (banner shown)
+       since scroll-margin-top can't vary based on whether it's rendered. */
+    scroll-margin-top: 9.5rem;
   }
 
   .section-title {
