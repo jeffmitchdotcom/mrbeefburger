@@ -20,24 +20,24 @@ const categories = [
     </svg>`,
   },
   {
-    label: 'Fries',
+    label: 'Sides',
     href: '/menu#sides',
     icon: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M18 44 L22 24 H42 L46 44 Z" fill="#DA291C"/>
-      <rect x="24" y="14" width="4" height="14" rx="2" fill="#DA291C"/>
-      <rect x="30" y="11" width="4" height="17" rx="2" fill="#DA291C"/>
-      <rect x="36" y="14" width="4" height="14" rx="2" fill="#DA291C"/>
+      <path d="M18 24 L22 44 H42 L46 24 Z" fill="#DA291C"/>
+      <rect x="21" y="17" width="4" height="11" rx="2" fill="#DA291C"/>
+      <rect x="27" y="10" width="4" height="18" rx="2" fill="#DA291C"/>
+      <rect x="33" y="15" width="4" height="13" rx="2" fill="#DA291C"/>
+      <rect x="39" y="8" width="4" height="20" rx="2" fill="#DA291C"/>
       <path d="M20 34 L44 34" stroke="#F5C200" stroke-width="1.5"/>
     </svg>`,
   },
   {
-    label: 'Shakes & Drinks',
+    label: 'Drinks',
     href: '/menu#drinks',
     icon: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M20 24 L26 50 H38 L44 24 Z" fill="#DA291C"/>
       <rect x="18" y="19" width="28" height="6" rx="3" fill="#DA291C"/>
-      <path d="M24 19 Q24 9 32 9 Q40 9 40 19 Z" fill="#F5C200"/>
-      <line x1="33" y1="13" x2="45" y2="3" stroke="#DA291C" stroke-width="3" stroke-linecap="round"/>
+      <line x1="34" y1="19" x2="38" y2="3" stroke="#DA291C" stroke-width="3" stroke-linecap="round"/>
     </svg>`,
   },
   {
@@ -464,8 +464,11 @@ Gerald keeps records.
     color: var(--color-text);
     text-align: center;
     /* Negative margin compensates for .category-grid's translateY overlap
-       below, so the heading still sits close to the badges visually. */
-    margin: 0 0 -1.25rem;
+       below, so the heading still sits close to the badges visually.
+       This only pulls the grid up in normal flow before the transform
+       pushes it back down — it doesn't change the transform itself, so
+       the badges' overlap into the section below is unaffected. */
+    margin: 0 0 -3rem;
   }
 
   .category-grid {
