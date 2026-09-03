@@ -61,7 +61,7 @@ const categories = [
         <div class="hero-slide" style="background-image: url('/images/mrbeefburger-hero-2.jpg')"></div>
         <div class="hero-slide" style="background-image: url('/images/mrbeefburger-hero-3.jpg')"></div>
       </div>
-      <div class="hero-inner">
+      <div class="hero-inner reveal">
         <h1 class="hero-title">
           <span class="hero-overline">Home of the</span>
           <span class="hero-headline">Meaty Faced Sauce Burger</span>
@@ -80,10 +80,10 @@ const categories = [
     <!-- Menu Category Icons -->
     <section class="categories">
       <div class="section-inner">
-        <p class="categories-label">Explore the Menu</p>
+        <p class="categories-label reveal">Explore the Menu</p>
         <div class="category-grid">
-          {categories.map(cat => (
-            <a href={cat.href} class="category-tile">
+          {categories.map((cat, i) => (
+            <a href={cat.href} class="category-tile reveal" style={`--reveal-delay: ${i * 80}ms`}>
               <div class="category-icon" set:html={cat.icon} />
               <span class="category-label">{cat.label}</span>
             </a>
@@ -98,9 +98,9 @@ const categories = [
         <img
           src="/images/menu/the-meaty-faced-sauce-burger.jpg"
           alt="The Meaty Faced Sauce Burger"
-          class="featured-img"
+          class="featured-img reveal-left"
         />
-        <div class="featured-text">
+        <div class="featured-text reveal-right">
           <p class="featured-eyebrow">Our Signature</p>
           <h2 class="featured-title">The Meaty Faced Sauce Burger</h2>
           <p class="featured-desc">
@@ -115,10 +115,10 @@ const categories = [
     <!-- More from the Menu -->
     <section class="signatures">
       <div class="section-inner">
-        <h2 class="section-heading">More from the Menu</h2>
+        <h2 class="section-heading reveal">More from the Menu</h2>
         <div class="sig-grid">
-          {homepageItems.map((item) => (
-            <a href="/menu" class="sig-card">
+          {homepageItems.map((item, i) => (
+            <a href="/menu" class="sig-card reveal" style={`--reveal-delay: ${i * 100}ms`}>
               {item.data.image && (
                 <img src={item.data.image} alt={item.data.title} class="sig-img" />
               )}
@@ -135,14 +135,14 @@ const categories = [
     <!-- Locations Teaser -->
     <section class="locations-teaser">
       <div class="section-inner locations-inner">
-        <div class="locations-img-wrap">
+        <div class="locations-img-wrap reveal-left">
           <img
             src="/images/mrbeefburger-exterior.jpg"
             alt="Mr. Beefburger restaurant exterior"
             class="locations-img"
           />
         </div>
-        <div class="locations-text">
+        <div class="locations-text reveal-right">
           <h2 class="locations-heading">Find Us</h2>
           <p class="locations-copy">Now open in cities near you.</p>
           <a href="/locations" class="btn btn-outline">Find a Location</a>
@@ -154,7 +154,7 @@ const categories = [
     <section class="accord-teaser">
       <div class="section-inner accord-inner">
 
-        <div class="accord-visual">
+        <div class="accord-visual reveal-left">
           <div class="accord-receipt-stage">
             <div class="accord-receipt-wrap">
               <div class="accord-receipt-shadow" aria-hidden="true">
@@ -196,7 +196,7 @@ Gerald keeps records.
           </div>
         </div>
 
-        <div class="accord-text">
+        <div class="accord-text reveal-right">
           <p class="accord-eyebrow">Membership</p>
           <div class="accord-heading-row">
             <img
@@ -220,6 +220,15 @@ Gerald keeps records.
     </section>
 
   </main>
+
+  <noscript>
+    <style>
+      .reveal, .reveal-left, .reveal-right {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    </style>
+  </noscript>
 </Layout>
 
 <script>
@@ -249,6 +258,27 @@ Gerald keeps records.
   });
 
   startTimer();
+
+  // Scroll / entrance animations — plain IntersectionObserver, no library.
+  const revealEls = document.querySelectorAll<HTMLElement>('.reveal, .reveal-left, .reveal-right');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    revealEls.forEach(el => el.classList.add('is-visible'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }
+    );
+    revealEls.forEach(el => io.observe(el));
+  }
 </script>
 
 <style>
@@ -925,6 +955,45 @@ Gerald keeps records.
 
     .locations-copy {
       max-width: 100%;
+    }
+  }
+
+  /* ── Scroll / Entrance Animations ─────────── */
+  .reveal,
+  .reveal-left,
+  .reveal-right {
+    opacity: 0;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal {
+    transform: translateY(24px);
+  }
+
+  .reveal-left {
+    transform: translateX(-32px);
+  }
+
+  .reveal-right {
+    transform: translateX(32px);
+  }
+
+  .reveal.is-visible,
+  .reveal-left.is-visible,
+  .reveal-right.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal,
+    .reveal-left,
+    .reveal-right {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
   }
 </style>
