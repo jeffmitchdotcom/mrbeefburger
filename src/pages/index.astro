@@ -1016,21 +1016,21 @@ Gerald keeps records.
   .reveal-left,
   .reveal-right {
     opacity: 0;
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition: opacity 0.75s ease-out, transform 0.75s ease-out;
     transition-delay: var(--reveal-delay, 0ms);
     will-change: opacity, transform;
   }
 
   .reveal {
-    transform: translateY(24px);
+    transform: translateY(60px);
   }
 
   .reveal-left {
-    transform: translateX(-32px);
+    transform: translateX(-75px);
   }
 
   .reveal-right {
-    transform: translateX(32px);
+    transform: translateX(75px);
   }
 
   .reveal.is-visible,
@@ -1038,6 +1038,19 @@ Gerald keeps records.
   .reveal-right.is-visible {
     opacity: 1;
     transform: none;
+  }
+
+  @media (max-width: 768px) {
+    /* Side-reveal elements are nearly full-width once sections stack
+       on mobile, so the larger desktop travel distance would push them
+       past the viewport edge and cause horizontal overflow. */
+    .reveal-left {
+      transform: translateX(-20px);
+    }
+
+    .reveal-right {
+      transform: translateX(20px);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
