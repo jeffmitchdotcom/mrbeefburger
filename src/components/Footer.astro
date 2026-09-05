@@ -12,7 +12,6 @@ const companyLinks = [
 ];
 ---
 
-<div class="footer-spacer" aria-hidden="true"></div>
 <footer class="footer">
   <div class="footer-watermark" aria-hidden="true"></div>
 
@@ -55,65 +54,82 @@ const companyLinks = [
 </footer>
 
 <script>
-  // Parallax "curtain" reveal: the footer is pinned to the viewport
-  // bottom and never moves. The spacer above it reserves the footer's
-  // own height in normal document flow, so the page's own content is
-  // what scrolls up and over it — the footer only becomes visible as
-  // that content clears the bottom of the viewport. Layout.astro's
-  // <main> is given position+z-index+an opaque background so it
-  // actually occludes the fixed footer while scrolling over it.
+  // Parallax "curtain" reveal, driven by a scroll-linked transform
+  // rather than position: fixed or sticky. Both of those were tried
+  // first and both broke on iOS Safari in different ways: `fixed`
+  // makes Safari detect a bottom-pinned element and permanently tint
+  // its own browser chrome (address bar / home indicator) to match
+  // its background, regardless of what's stacked on top of it in the
+  // page's own rendering; `sticky` on the last element of a
+  // full-height container turns out to render "stuck" for the entire
+  // page (not just near the end), since there's no later sibling to
+  // bound its stuck range. A manual transform sidesteps both: the
+  // footer is a completely normal, non-positioned, last-in-flow
+  // element the rest of the time, and only gets translated upward
+  // while its natural position is passing through the last
+  // footer-height pixels of scroll — clamped to translateY(0) outside
+  // that window, so it's provably inert everywhere else.
   const footer = document.querySelector<HTMLElement>('.footer');
-  const spacer = document.querySelector<HTMLElement>('.footer-spacer');
 
-  if (footer && spacer) {
-    const sync = () => {
-      spacer.style.height = `${footer.offsetHeight}px`;
+  if (footer) {
+    let ticking = false;
+
+    const update = () => {
+      const viewportH = window.innerHeight;
+      const footerHeight = footer.offsetHeight;
+      const naturalTop = footer.offsetTop - window.scrollY;
+      const pinnedTop = viewportH - footerHeight;
+
+      if (naturalTop >= viewportH || naturalTop <= pinnedTop) {
+        // Fully below the fold (nothing to do) or already scrolled to
+        // its resting position (let it be normal) — no transform.
+        footer.style.transform = '';
+      } else {
+        // Natural position is passing through the reveal window —
+        // hold it at the bottom of the viewport instead.
+        footer.style.transform = `translateY(${pinnedTop - naturalTop}px)`;
+      }
+
+      ticking = false;
     };
 
-    if (typeof ResizeObserver !== 'undefined') {
-      new ResizeObserver(sync).observe(footer);
-    } else {
-      sync();
-      window.addEventListener('resize', sync);
-    }
+    const onScrollOrResize = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    update();
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize);
   }
 
-  // Keep iOS/Android chrome tinting in sync with the reveal: the
-  // spacer (not the fixed footer, which always geometrically overlaps
-  // the viewport bottom) is what actually scrolls into view exactly
-  // when the red footer becomes visible on screen, so it's the right
-  // thing to watch.
+  // Keep iOS/Android chrome tinting in sync with the reveal — the
+  // transform above is a plain paint-only translate, so an
+  // IntersectionObserver on the footer still correctly reports
+  // whether it's actually visible on screen.
   const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
 
-  if (themeColorMeta && spacer && 'IntersectionObserver' in window) {
+  if (themeColorMeta && footer && 'IntersectionObserver' in window) {
     const themeIO = new IntersectionObserver(
       ([entry]) => {
         themeColorMeta.setAttribute('content', entry.isIntersecting ? '#DA291C' : '#ffffff');
       },
       { threshold: 0 }
     );
-    themeIO.observe(spacer);
+    themeIO.observe(footer);
   }
 </script>
 
 <style>
-  .footer-spacer {
-    /* Reserves the fixed footer's real height in normal flow so the
-       page has somewhere to scroll — see the sync script above. This
-       value is only ever visible for an instant before JS measures
-       the real height. */
-    height: 340px;
-  }
-
   .footer {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
     z-index: 0;
     overflow: hidden;
     background-color: var(--color-red);
     border-top: 4px solid var(--color-yellow);
+    will-change: transform;
   }
 
   /* Oversized, near-invisible mascot silhouette bleeding off the edge —

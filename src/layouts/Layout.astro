@@ -14,10 +14,8 @@ const { title = 'Mr. Beefburger' } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Explicit, so iOS Safari's edge-color chrome tinting doesn't
-         auto-sample whatever's rendered at the viewport bottom (i.e.
-         the fixed red footer) all the time. Footer.astro flips this
-         to brand red only while that footer is actually on screen. -->
+    <!-- Explicit default for iOS/Android chrome tinting. Footer.astro
+         flips this to brand red only while the footer is on screen. -->
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -31,8 +29,10 @@ const { title = 'Mr. Beefburger' } = Astro.props;
     <slot name="head" />
   </head>
   <body>
-    <Nav />
-    <slot />
+    <div class="page-shell">
+      <Nav />
+      <slot />
+    </div>
     <Footer />
     <Analytics />
   </body>
@@ -64,18 +64,24 @@ const { title = 'Mr. Beefburger' } = Astro.props;
     font-family: var(--font-body);
   }
 
-  body {
+  /* Wraps Nav + page content (but not Footer). Stacked above and
+     opaque so it covers the footer while Footer.astro's script holds
+     it pinned at the viewport bottom during the reveal — see that
+     file for the full mechanic. min-height keeps short pages (admin,
+     account) filling the viewport so the footer still ends up flush
+     with the bottom instead of floating mid-page. */
+  .page-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
+    background-color: var(--color-bg);
   }
 
   main {
     flex: 1;
-    /* Stacked and opaque so it fully occludes the fixed footer while
-       scrolling over it — see Footer.astro for the reveal mechanic. */
-    position: relative;
-    z-index: 1;
-    background-color: var(--color-bg);
   }
 
   h1, h2, h3, h4, h5, h6 {
