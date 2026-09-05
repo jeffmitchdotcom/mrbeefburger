@@ -17,7 +17,7 @@ const companyLinks = [
 
   <div class="footer-top">
     <div class="footer-inner footer-grid">
-      <div class="footer-brand">
+      <div class="footer-brand reveal">
         <a href="/" class="footer-logo">
           <span class="footer-logo-badge">
             <img src="/images/mrbeefburger-icon-2026.png" alt="" class="footer-logo-img" />
@@ -28,7 +28,7 @@ const companyLinks = [
         <p class="footer-blurb">Serving up legacy, sauce, and unreasonable enthusiasm at every location.</p>
       </div>
 
-      <nav class="footer-col" aria-label="Order">
+      <nav class="footer-col reveal" style="--reveal-delay: 100ms" aria-label="Order">
         <h3 class="footer-col-heading">Order</h3>
         <ul>
           {orderLinks.map(link => (
@@ -37,7 +37,7 @@ const companyLinks = [
         </ul>
       </nav>
 
-      <nav class="footer-col" aria-label="Company">
+      <nav class="footer-col reveal" style="--reveal-delay: 200ms" aria-label="Company">
         <h3 class="footer-col-heading">Company</h3>
         <ul>
           {companyLinks.map(link => (
@@ -54,24 +54,23 @@ const companyLinks = [
 </footer>
 
 <script>
-  // Parallax "curtain" reveal, driven by a scroll-linked transform
-  // rather than position: fixed or sticky. Both of those were tried
-  // first and both broke on iOS Safari in different ways: `fixed`
-  // makes Safari detect a bottom-pinned element and permanently tint
-  // its own browser chrome (address bar / home indicator) to match
-  // its background, regardless of what's stacked on top of it in the
-  // page's own rendering; `sticky` on the last element of a
-  // full-height container turns out to render "stuck" for the entire
-  // page (not just near the end), since there's no later sibling to
-  // bound its stuck range. A manual transform sidesteps both: the
-  // footer is a completely normal, non-positioned, last-in-flow
-  // element the rest of the time, and only gets translated upward
-  // while its natural position is passing through the last
-  // footer-height pixels of scroll — clamped to translateY(0) outside
-  // that window, so it's provably inert everywhere else.
+  // Parallax "curtain" reveal via a scroll-linked transform — desktop
+  // only. This is the third approach tried here: position:fixed made
+  // Safari permanently tint its own browser chrome to match the
+  // footer's background (regardless of what's stacked on top of it in
+  // the page's own rendering), and position:sticky on the last child
+  // of a full-height container rendered "stuck" for the whole page
+  // instead of just near the end. A manual transform sidesteps both
+  // of those — but a scroll-driven JS transform runs on the main
+  // thread and can't keep up with iOS's compositor-driven momentum
+  // scrolling, which showed up as visible jitter on mobile. Desktop
+  // scrolling (wheel/trackpad, not touch momentum) doesn't have that
+  // problem, so the effect is restricted to desktop; mobile gets the
+  // plain one-time fade-in below instead.
   const footer = document.querySelector<HTMLElement>('.footer');
+  const isDesktop = window.matchMedia('(min-width: 769px)').matches;
 
-  if (footer) {
+  if (footer && isDesktop) {
     let ticking = false;
 
     const update = () => {
@@ -105,10 +104,37 @@ const companyLinks = [
     window.addEventListener('resize', onScrollOrResize);
   }
 
-  // Keep iOS/Android chrome tinting in sync with the reveal — the
-  // transform above is a plain paint-only translate, so an
-  // IntersectionObserver on the footer still correctly reports
-  // whether it's actually visible on screen.
+  // Plain one-time fade-up, same IntersectionObserver pattern as the
+  // homepage's .reveal elements — the CSS only gives these elements a
+  // hidden starting state below the desktop breakpoint (see the
+  // stylesheet), so this is a no-op on desktop and the mobile-only
+  // reveal everywhere else.
+  const revealEls = document.querySelectorAll<HTMLElement>('.footer .reveal');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (revealEls.length) {
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+      revealEls.forEach(el => el.classList.add('is-visible'));
+    } else {
+      const revealIO = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }
+      );
+      revealEls.forEach(el => revealIO.observe(el));
+    }
+  }
+
+  // Keep iOS/Android chrome tinting in sync with the reveal — works
+  // the same regardless of which reveal mechanic is in play, since
+  // both are plain paint-only effects an IntersectionObserver still
+  // reads correctly.
   const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
 
   if (themeColorMeta && footer && 'IntersectionObserver' in window) {
@@ -307,6 +333,32 @@ const companyLinks = [
   @media (max-width: 480px) {
     .footer-grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  /* Mobile-only entrance: below the desktop breakpoint, .reveal starts
+     hidden and fades/slides up once via JS — desktop ignores this
+     entirely (no rule outside this query) and keeps the scroll-linked
+     parallax pin instead. */
+  @media (max-width: 768px) {
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
   }
 </style>
