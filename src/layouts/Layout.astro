@@ -14,6 +14,11 @@ const { title = 'Mr. Beefburger' } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Explicit, so iOS Safari's edge-color chrome tinting doesn't
+         auto-sample whatever's rendered at the viewport bottom (i.e.
+         the fixed red footer) all the time. Footer.astro flips this
+         to brand red only while that footer is actually on screen. -->
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" href="/favicon.ico" />

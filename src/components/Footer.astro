@@ -77,6 +77,23 @@ const companyLinks = [
       window.addEventListener('resize', sync);
     }
   }
+
+  // Keep iOS/Android chrome tinting in sync with the reveal: the
+  // spacer (not the fixed footer, which always geometrically overlaps
+  // the viewport bottom) is what actually scrolls into view exactly
+  // when the red footer becomes visible on screen, so it's the right
+  // thing to watch.
+  const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+
+  if (themeColorMeta && spacer && 'IntersectionObserver' in window) {
+    const themeIO = new IntersectionObserver(
+      ([entry]) => {
+        themeColorMeta.setAttribute('content', entry.isIntersecting ? '#DA291C' : '#ffffff');
+      },
+      { threshold: 0 }
+    );
+    themeIO.observe(spacer);
+  }
 </script>
 
 <style>
