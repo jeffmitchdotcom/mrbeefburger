@@ -1,119 +1,279 @@
 ---
 const year = new Date().getFullYear();
-const navLinks = [
+const orderLinks = [
   { label: 'Menu', href: '/menu' },
-  { label: 'About', href: '/about' },
   { label: 'Locations', href: '/locations' },
-  { label: 'Loyalty', href: '/loyalty' },
+  { label: 'My Account', href: '/account' },
+];
+const companyLinks = [
+  { label: 'About', href: '/about' },
+  { label: 'Loyalty Accord', href: '/loyalty' },
   { label: 'Contact', href: '/contact' },
 ];
 ---
 
+<div class="footer-spacer" aria-hidden="true"></div>
 <footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <a href="/" class="footer-logo">Mr. Beefburger</a>
-      <p class="footer-tagline">Home of the Meaty Faced Sauce Burger.</p>
-    </div>
+  <div class="footer-watermark" aria-hidden="true"></div>
 
-    <nav class="footer-nav" aria-label="Footer navigation">
-      <ul>
-        {navLinks.map(link => (
-          <li><a href={link.href}>{link.label}</a></li>
-        ))}
-      </ul>
-    </nav>
+  <div class="footer-top">
+    <div class="footer-inner footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <span class="footer-logo-badge">
+            <img src="/images/mrbeefburger-icon-2026.png" alt="" class="footer-logo-img" />
+          </span>
+          <span class="footer-logo-text">Mr. Beefburger</span>
+        </a>
+        <p class="footer-tagline">Home of the Meaty Faced Sauce Burger.</p>
+        <p class="footer-blurb">Serving up legacy, sauce, and unreasonable enthusiasm at every location.</p>
+      </div>
+
+      <nav class="footer-col" aria-label="Order">
+        <h3 class="footer-col-heading">Order</h3>
+        <ul>
+          {orderLinks.map(link => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="Company">
+        <h3 class="footer-col-heading">Company</h3>
+        <ul>
+          {companyLinks.map(link => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; {year} Mr. Beefburger. All rights reserved.</p>
+    <p class="footer-inner">&copy; {year} Mr. Beefburger. All rights reserved.</p>
   </div>
 </footer>
 
+<script>
+  // Parallax "curtain" reveal: the footer is pinned to the viewport
+  // bottom and never moves. The spacer above it reserves the footer's
+  // own height in normal document flow, so the page's own content is
+  // what scrolls up and over it — the footer only becomes visible as
+  // that content clears the bottom of the viewport. Layout.astro's
+  // <main> is given position+z-index+an opaque background so it
+  // actually occludes the fixed footer while scrolling over it.
+  const footer = document.querySelector<HTMLElement>('.footer');
+  const spacer = document.querySelector<HTMLElement>('.footer-spacer');
+
+  if (footer && spacer) {
+    const sync = () => {
+      spacer.style.height = `${footer.offsetHeight}px`;
+    };
+
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(sync).observe(footer);
+    } else {
+      sync();
+      window.addEventListener('resize', sync);
+    }
+  }
+</script>
+
 <style>
+  .footer-spacer {
+    /* Reserves the fixed footer's real height in normal flow so the
+       page has somewhere to scroll — see the sync script above. This
+       value is only ever visible for an instant before JS measures
+       the real height. */
+    height: 340px;
+  }
+
   .footer {
-    background-color: var(--color-surface);
-    border-top: 2px solid var(--color-red);
-    margin-top: auto;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: var(--color-red);
+    border-top: 4px solid var(--color-yellow);
+  }
+
+  /* Oversized, near-invisible mascot silhouette bleeding off the edge —
+     the same "texture, not decoration" watermark idiom used on the
+     homepage Locations Teaser, but as a single large brand mark rather
+     than a tiled pattern. Reads as expansive corporate polish rather
+     than a sticker, because it's monochrome and barely-there instead
+     of the mascot's full clip-art coloring. */
+  .footer-watermark {
+    position: absolute;
+    top: -10%;
+    right: -4%;
+    width: 320px;
+    height: 448px;
+    background-image: url('/images/mrbeefburger-icon-2026.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: brightness(0) invert(1);
+    opacity: 0.06;
+    pointer-events: none;
   }
 
   .footer-inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem 1.5rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-top .footer-inner {
+    padding: 3.5rem 1.5rem 3rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 3rem;
   }
 
   .footer-logo {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--color-red);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-logo-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    flex-shrink: 0;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+
+  .footer-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     display: block;
-    margin-bottom: 0.5rem;
+  }
+
+  .footer-logo-text {
+    position: relative;
+    isolation: isolate;
+    font-family: var(--font-display);
+    font-size: 1.44rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  .footer-logo-text::after {
+    content: '';
+    position: absolute;
+    left: -2%;
+    right: -3%;
+    bottom: -4px;
+    height: 9px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 12' preserveAspectRatio='none'%3E%3Cpath d='M 2,10 C 30,1 65,2 98,8' stroke='%23F5C200' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    z-index: -1;
   }
 
   .footer-tagline {
     font-family: var(--font-body);
     font-size: 0.875rem;
-    color: var(--color-muted);
-    margin: 0;
+    color: #ffffff;
+    margin: 0 0 0.75rem;
     font-style: italic;
   }
 
-  .footer-nav ul {
+  .footer-blurb {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    max-width: 32ch;
+  }
+
+  .footer-col-heading {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-yellow);
+    margin: 0 0 1.1rem;
+  }
+
+  .footer-col ul {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    text-align: right;
   }
 
-  .footer-nav a {
+  .footer-col a {
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-text);
+    color: #ffffff;
     text-decoration: none;
     transition: color 0.2s;
   }
 
-  .footer-nav a:hover {
-    color: var(--color-red);
+  .footer-col a:hover {
+    color: var(--color-yellow);
   }
 
   .footer-bottom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
   }
 
   .footer-bottom p {
     font-family: var(--font-body);
     font-size: 0.8rem;
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.7);
     margin: 0;
+    padding: 1.25rem 1.5rem;
   }
 
-  @media (max-width: 640px) {
-    .footer-inner {
-      flex-direction: column;
+  @media (max-width: 768px) {
+    .footer-watermark {
+      width: 150px;
+      height: 210px;
+      top: -2%;
+      right: -14%;
+      opacity: 0.05;
     }
 
-    .footer-nav ul {
-      text-align: left;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 0.75rem 1.5rem;
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem 1.5rem;
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
