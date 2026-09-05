@@ -318,10 +318,14 @@ const companyLinks = [
          however tall the footer actually renders — width then follows
          from the source image's own ratio via aspect-ratio, which is
          why this can end up close to half the screen width; .footer's
-         overflow: hidden crops whatever spills past the edge. */
+         overflow: hidden crops whatever spills past the edge.
+         right:0 + translateX(50%) puts the image's own horizontal
+         midpoint exactly on the footer's right edge — half of it
+         bleeds off, rather than being centered or hugging the corner. */
       top: 0;
       bottom: 0;
-      right: -8%;
+      right: 0;
+      transform: translateX(50%);
       width: auto;
       height: auto;
       aspect-ratio: 500 / 700;
