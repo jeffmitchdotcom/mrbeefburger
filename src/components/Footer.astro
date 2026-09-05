@@ -313,10 +313,18 @@ const companyLinks = [
 
   @media (max-width: 768px) {
     .footer-watermark {
-      width: 150px;
-      height: 210px;
-      top: -2%;
-      right: -14%;
+      /* Stretched to the footer's full (auto) height via top+bottom
+         insets rather than a fixed height, so it always matches
+         however tall the footer actually renders — width then follows
+         from the source image's own ratio via aspect-ratio, which is
+         why this can end up close to half the screen width; .footer's
+         overflow: hidden crops whatever spills past the edge. */
+      top: 0;
+      bottom: 0;
+      right: -8%;
+      width: auto;
+      height: auto;
+      aspect-ratio: 500 / 700;
       opacity: 0.05;
     }
 
