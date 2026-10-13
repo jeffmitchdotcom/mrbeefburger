@@ -1,5 +1,5 @@
 ---
-image: /images/menu/the-fungal-aristocrat.jpg
+image: /images/menu/the-fungal-aristocrat/image.jpg
 homepage: true
 title: "The Fungal Aristocrat"
 slug: "fungal-aristocrat"

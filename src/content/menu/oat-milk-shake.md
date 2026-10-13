@@ -1,5 +1,5 @@
 ---
-image: /images/menu/oat-milk-shake.jpg
+image: /images/menu/oat-milk-shake/image.jpg
 title: "Oat Milk Shake"
 slug: "oat-milk-shake"
 price: 11

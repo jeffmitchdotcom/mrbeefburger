@@ -1,5 +1,5 @@
 ---
-image: /images/menu/the-ranchero-chicken-sandwich.jpg
+image: /images/menu/the-ranchero-chicken-sandwich/image.jpg
 title: "The Ranchero Chicken Sandwich"
 slug: "ranchero-chicken-sandwich"
 price: 17
