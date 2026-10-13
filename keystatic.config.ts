@@ -5,8 +5,10 @@ import { config, collection, fields } from '@keystatic/core';
 // with those Zod schemas — Keystatic writes, Astro validates at build time.
 export default config({
   // Local mode writes straight to disk while running `npm run dev`.
-  // In production, Keystatic commits through GitHub (needs a GitHub App — see README).
-  storage: import.meta.env.PROD
+  // In production, Keystatic commits through GitHub (needs a GitHub App — see CLAUDE.md).
+  // `PUBLIC_KEYSTATIC_STORAGE=github npm run dev` forces GitHub mode locally,
+  // which is how the GitHub App gets created in the first place.
+  storage: import.meta.env.PROD || import.meta.env.PUBLIC_KEYSTATIC_STORAGE === 'github'
     ? { kind: 'github', repo: 'jeffmitchdotcom/mrbeefburger' }
     : { kind: 'local' },
 
