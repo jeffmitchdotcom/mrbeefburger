@@ -1,5 +1,5 @@
 ---
-image: /images/menu/the-apex-predator.jpg
+image: /images/menu/the-apex-predator/image.jpg
 homepage: true
 title: "The Apex Predator"
 slug: "apex-predator"

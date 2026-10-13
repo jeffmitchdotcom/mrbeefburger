@@ -1,5 +1,5 @@
 ---
-image: /images/menu/the-swiss-account.jpg
+image: /images/menu/the-swiss-account/image.jpg
 title: "The Swiss Account"
 slug: "swiss-account"
 price: 19

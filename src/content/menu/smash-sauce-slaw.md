@@ -1,5 +1,5 @@
 ---
-image: /images/menu/smash-sauce-slaw.jpg
+image: /images/menu/smash-sauce-slaw/image.jpg
 title: "Smash Sauce Slaw"
 slug: "smash-sauce-slaw"
 price: 7

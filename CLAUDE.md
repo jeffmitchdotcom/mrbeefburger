@@ -14,6 +14,7 @@ The owner has brand assets (burger names, mascot, images) that will be layered i
 npm run dev       # start local dev server at localhost:4321
 npm run build     # production build to ./dist/
 npm run preview   # preview the production build locally
+# Keystatic CMS admin: http://localhost:4321/keystatic (while `npm run dev` is running)
 ```
 
 No test runner or linter is configured yet.
@@ -85,10 +86,21 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 ## Content collections
 
-- `src/content/menu/` — one Markdown file per menu item; fields: `title`, `slug`, `price`, `description`, `category` (burgers/sides/drinks), `toppings` (optional string array — the customize checklist), `image` (optional, absolute path from `/public/`), `signature` (optional bool — sorts item first in its category on the menu page), `homepage` (optional bool — surfaces item in the "More from the Menu" section on the homepage, max 3 shown), `available` (bool, default true)
-- `src/content/locations/` — one Markdown file per location (11 total); fields: `name`, `address`, `city`, `state`, `lat`, `lng`, `hours`, `phone`; location names do NOT include the brand prefix ("South Congress", not "Mr. Beefburger — South Congress")
+- `src/content/menu/` — one Markdown file per menu item; fields: `title`, `slug`, `price`, `description`, `category` (burgers/sides/drinks/extras), `toppings` (optional string array — the customize checklist), `image` (optional, absolute path from `/public/`), `signature` (optional bool — sorts item first in its category on the menu page), `homepage` (optional bool — surfaces item in the "More from the Menu" section on the homepage, max 3 shown), `available` (bool, default true)
+- `src/content/locations/` — one Markdown file per location (14 total); fields: `name`, `address`, `city`, `state`, `lat`, `lng`, `hours`, `phone`; location names do NOT include the brand prefix ("South Congress", not "Mr. Beefburger — South Congress")
 
-**Menu images** live in `public/images/menu/`. Add `image: /images/menu/filename.png` to a menu item's frontmatter to display it on the menu page (16:9 yellow-bordered box) and homepage grid.
+**Menu images** live in `public/images/menu/<entry-filename>/image.<ext>` (e.g. `public/images/menu/the-apex-predator/image.jpg`) and are referenced in frontmatter as `image: /images/menu/the-apex-predator/image.jpg`. They show on the menu page (16:9 yellow-bordered box) and homepage grid. This per-entry folder layout is what Keystatic's image field expects — a flat `/images/menu/foo.jpg` path won't be recognized, and Keystatic will **drop the image** from frontmatter the next time that entry is saved.
+
+## Keystatic CMS
+
+[Keystatic](https://keystatic.com) is a git-based CMS that edits the two content collections above in place. Config is `keystatic.config.ts`; it's wired in via the `keystatic()` integration in `astro.config.mjs`, which adds on-demand (non-prerendered) routes at `/keystatic` (admin UI) and `/api/keystatic/*`. The rest of the site stays static.
+
+- **Schemas live in two places.** `src/content.config.ts` (Zod) is what Astro validates at build; `keystatic.config.ts` is what the editor UI writes. Adding/renaming a field means updating both.
+- **Filename = Keystatic slug.** Menu filenames come from `title`, location filenames from `name` (via `fields.slug`). Location filenames are the location's URL/order slug, so don't rename live ones. The menu `slug` frontmatter field is separate and is the cart/order identity — also don't change it on live items.
+- **Frontmatter-only files.** Both collections use `fields.emptyContent({ extension: 'md' })` so files stay `.md` with no body.
+- **Formatting churn.** Keystatic re-serializes YAML on save (drops quotes, folds long descriptions, writes `signature: false` etc.). That's cosmetic; the Zod schema accepts it.
+- **Storage.** `local` in dev (writes straight to disk, so commit the changes yourself). In production it's `github` mode against `jeffmitchdotcom/mrbeefburger`, which needs a GitHub App and the env vars `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, and `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`. Without them `/keystatic` won't work in production; the rest of the site is unaffected. Each save in GitHub mode is a commit, which triggers a Vercel redeploy. To create the GitHub App: run `PUBLIC_KEYSTATIC_STORAGE=github npm run dev` locally, open `/keystatic`, and follow the prompt. Keystatic creates the app on GitHub and writes the four env vars to `.env`; copy them to Vercel and install the app on the repo.
+- **Install:** `npm install @keystatic/core @keystatic/astro --legacy-peer-deps`.
 
 ## Pages
 
@@ -139,6 +151,6 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 ## What's coming
 
 - Wire up contact form email (Resend or SMTP2GO) — stub is at `src/pages/api/contact.ts`
-- Food photography for remaining menu items (drop in `public/images/menu/`, add `image:` to frontmatter)
+- Food photography for remaining menu items (upload via Keystatic at `/keystatic`, or drop in `public/images/menu/<entry>/image.jpg` and add `image:` to frontmatter)
 - Logo/mascot asset (replace text wordmark in Nav and Footer)
 - Additional point-earning actions (Tuesday bonus, referrals, ordering the signature burger — each would be a new `loyalty_transactions` row)
