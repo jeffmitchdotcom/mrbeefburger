@@ -1,0 +1,55 @@
+{
+  "author": "Jeff Mitchell",
+  "url": "https://jeffmitch.com",
+  "description": "Built as a full-stack showcase — a fictional ordering system with a real database, real deploys, and zero actual burgers.",
+  "technologies": [
+    {
+      "name": "Astro",
+      "color": "#FF5D01"
+    },
+    {
+      "name": "React",
+      "color": "#61DAFB"
+    },
+    {
+      "name": "TypeScript",
+      "color": "#3178C6"
+    },
+    {
+      "name": "Neon Postgres",
+      "color": "#00E599"
+    },
+    {
+      "name": "Drizzle ORM",
+      "color": "#C5F74F"
+    },
+    {
+      "name": "Vercel",
+      "color": "#000000"
+    },
+    {
+      "name": "Amazon SES",
+      "color": "#FF9900"
+    },
+    {
+      "name": "Cloudflare Turnstile",
+      "color": "#F38020"
+    },
+    {
+      "name": "Better Auth",
+      "color": "#7C3AED"
+    },
+    {
+      "name": "Keystatic",
+      "color": "#3E63DD"
+    },
+    {
+      "name": "GitHub",
+      "color": "#181717"
+    },
+    {
+      "name": "Claude Code",
+      "color": "#D97757"
+    }
+  ]
+}
