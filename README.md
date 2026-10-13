@@ -12,7 +12,7 @@ Most portfolio projects stop at the interesting part. They demo a UI, mock the b
 
 The fictional brand was a deliberate choice. "Mr. Beefburger" gave me room to build a complete, production-like system (multi-step ordering, a loyalty program with a transaction ledger, passwordless sign-in, automated emails) without the constraints of a real business. It also made it more fun to use. Gerald's personality runs through the copy, the error messages, the verification emails — it's a reminder that the technical choices and the product experience are the same decision.
 
-Every tool in the stack was chosen because it's what I'd reach for on a real project: Neon for serverless Postgres, Drizzle for type-safe queries, Better Auth for passwordless OTP, Amazon SES for transactional email, Vercel for deployment. No mocks, no stubs where it counted.
+Every tool in the stack was chosen because it's what I'd reach for on a real project: Neon for serverless Postgres, Drizzle for type-safe queries, Better Auth for passwordless OTP, Amazon SES for transactional email, Keystatic for git-based content editing, Vercel for deployment. No mocks, no stubs where it counted.
 
 ## What it is
 
@@ -31,6 +31,7 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 | ORM | [Drizzle ORM](https://orm.drizzle.team) |
 | Auth | [Better Auth](https://better-auth.com) — passwordless OTP via email |
 | Email | [Amazon SES](https://aws.amazon.com/ses/) — order confirmations + OTP codes |
+| CMS | [Keystatic](https://keystatic.com) — git-based editor for the menu and locations content collections |
 | Hosting | [Vercel](https://vercel.com) |
 | Map | Leaflet.js (locations page) |
 | Bot protection | [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) — Managed mode on Contact and Loyalty forms |
@@ -48,7 +49,8 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 - **Account dashboard** — `/account` with passwordless OTP sign-in (email → 6-digit code via SES → signed in, no password). Dashboard shows Sauce Units balance + tier, transaction history, and full order history linked by email. Name resolved from loyalty/order records on first sign-in
 - **Contact form** — sends a notification email to the inbox and a Gerald-voiced auto-reply to the sender via SES; protected by Cloudflare Turnstile and a honeypot field
 - **About page** — outlandish origin story of Gerald Beaufort Beefburger III, with tech attribution section
-- **Locations page** — interactive map with all 11 locations and geolocation-based nearest sort
+- **Locations page** — interactive map with all 15 locations and geolocation-based nearest sort
+- **Content editing** — menu items and locations are editable in a [Keystatic](https://keystatic.com) admin at `/keystatic`. It writes the same Markdown files Astro reads, so every save is a git commit (and a redeploy in production) rather than a database write
 - **Browser game** — "Mr. Beefburger's Great Escape" canvas sidescroller at `/game` (not in nav); Neon-backed leaderboard
 
 ## Running locally
@@ -59,6 +61,8 @@ npm run dev       # localhost:4321
 npm run build     # production build to ./dist/
 npm run preview   # preview production build
 ```
+
+While `npm run dev` is running, the Keystatic content admin is at [localhost:4321/keystatic](http://localhost:4321/keystatic). Locally it writes straight to the files in `src/content/` — commit the changes yourself.
 
 Requires a `.env` file with:
 
@@ -75,9 +79,12 @@ TURNSTILE_SECRET_KEY=your_cloudflare_turnstile_secret_key
 
 > `BETTER_AUTH_SECRET`: generate with `openssl rand -base64 32`. Set `BETTER_AUTH_URL` to the deployed URL in Vercel env vars. `TURNSTILE_SECRET_KEY` can be omitted locally — Turnstile verification is skipped when the key is not set. In production, set it alongside the site key in Cloudflare Dashboard → Turnstile.
 
+In production, Keystatic saves through GitHub and needs four more env vars in Vercel: `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, and `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`. They come from a GitHub App that Keystatic creates for you: run `PUBLIC_KEYSTATIC_STORAGE=github npm run dev`, open `/keystatic`, follow the prompt, then copy the generated values from `.env` to Vercel and install the app on the repo. Without them only `/keystatic` breaks; the rest of the site is unaffected.
+
 ## Project structure
 
 ```
+keystatic.config.ts   # Keystatic CMS collections + storage mode (local in dev, GitHub in prod)
 src/
 ├── components/       # React islands + Astro components
 │   ├── AccountIsland.tsx     # OTP login form + account dashboard
@@ -94,8 +101,9 @@ src/
 │   ├── PaymentTheater.tsx
 │   └── ProjectAttribution.astro  # Shared byline + tech stack (receipt + about)
 ├── content/
-│   ├── menu/         # Menu items as Markdown content collection
-│   └── locations/    # Location data as Markdown content collection
+│   ├── menu/         # Menu items as Markdown content collection (editable in Keystatic)
+│   └── locations/    # Location data as Markdown content collection (editable in Keystatic)
+├── content.config.ts # Zod schemas Astro validates content against (keep in sync with keystatic.config.ts)
 ├── layouts/
 │   └── Layout.astro  # Shared layout with Nav, Footer, global CSS tokens
 ├── lib/

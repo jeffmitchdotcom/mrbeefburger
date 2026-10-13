@@ -87,7 +87,7 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 ## Content collections
 
 - `src/content/menu/` — one Markdown file per menu item; fields: `title`, `slug`, `price`, `description`, `category` (burgers/sides/drinks/extras), `toppings` (optional string array — the customize checklist), `image` (optional, absolute path from `/public/`), `signature` (optional bool — sorts item first in its category on the menu page), `homepage` (optional bool — surfaces item in the "More from the Menu" section on the homepage, max 3 shown), `available` (bool, default true)
-- `src/content/locations/` — one Markdown file per location (14 total); fields: `name`, `address`, `city`, `state`, `lat`, `lng`, `hours`, `phone`; location names do NOT include the brand prefix ("South Congress", not "Mr. Beefburger — South Congress")
+- `src/content/locations/` — one Markdown file per location (15 total); fields: `name`, `address`, `city`, `state`, `lat`, `lng`, `hours`, `phone`; location names do NOT include the brand prefix ("South Congress", not "Mr. Beefburger — South Congress")
 
 **Menu images** live in `public/images/menu/<entry-filename>/image.<ext>` (e.g. `public/images/menu/the-apex-predator/image.jpg`) and are referenced in frontmatter as `image: /images/menu/the-apex-predator/image.jpg`. They show on the menu page (16:9 yellow-bordered box) and homepage grid. This per-entry folder layout is what Keystatic's image field expects — a flat `/images/menu/foo.jpg` path won't be recognized, and Keystatic will **drop the image** from frontmatter the next time that entry is saved.
 
@@ -134,7 +134,7 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 **BeefburgerGame** (`game.astro` + `BeefburgerGame.tsx`): Canvas sidescroller. Sprite sheets in `public/sprites/` use magenta (#FF00FF) chroma key for transparency. Frame coordinates are marked `// TUNE` for easy adjustment if sprites change. Leaderboard reads/writes via `/api/game-scores`. Secret reset URL: `/api/game-scores?clear=GBB3-great-escape-reset`.
 
-**ProjectAttribution** (`src/components/ProjectAttribution.astro`): Single source of truth for the byline, description, and tech stack badges shown on the receipt page and about page. Edit this one file to update either location.
+**ProjectAttribution** (`src/components/ProjectAttribution.astro`): Single source of truth for the byline, description, and tech stack badges shown on the receipt page and about page. Edit this one file to update either location. Each badge's dot color is that technology's brand color (Keystatic uses `#3E63DD`, the indigo accent of its admin UI).
 
 **OrderForm** (step 1): The pickup/dine-in toggle and "Continue" button are `position: fixed` to the viewport bottom so they stay visible while the user scrolls the location list.
 
@@ -150,7 +150,6 @@ No migration runner is configured. To add tables, run raw SQL via the Neon MCP (
 
 ## What's coming
 
-- Wire up contact form email (Resend or SMTP2GO) — stub is at `src/pages/api/contact.ts`
 - Food photography for remaining menu items (upload via Keystatic at `/keystatic`, or drop in `public/images/menu/<entry>/image.jpg` and add `image:` to frontmatter)
 - Logo/mascot asset (replace text wordmark in Nav and Footer)
 - Additional point-earning actions (Tuesday bonus, referrals, ordering the signature burger — each would be a new `loyalty_transactions` row)
