@@ -31,7 +31,7 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 | ORM | [Drizzle ORM](https://orm.drizzle.team) |
 | Auth | [Better Auth](https://better-auth.com) — passwordless OTP via email |
 | Email | [Amazon SES](https://aws.amazon.com/ses/) — order confirmations + OTP codes |
-| CMS | [Keystatic](https://keystatic.com) — git-based editor for the menu and locations content collections |
+| CMS | [Keystatic](https://keystatic.com) — git-based editor for menu items, locations, and the tech stack badges |
 | Hosting | [Vercel](https://vercel.com) |
 | Map | Leaflet.js (locations page) |
 | Bot protection | [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) — Managed mode on Contact and Loyalty forms |
@@ -50,7 +50,7 @@ Built to showcase a modern Astro stack with server-side rendering, persistent cl
 - **Contact form** — sends a notification email to the inbox and a Gerald-voiced auto-reply to the sender via SES; protected by Cloudflare Turnstile and a honeypot field
 - **About page** — outlandish origin story of Gerald Beaufort Beefburger III, with tech attribution section
 - **Locations page** — interactive map with all 15 locations and geolocation-based nearest sort
-- **Content editing** — menu items and locations are editable in a [Keystatic](https://keystatic.com) admin at `/keystatic`. It writes the same Markdown files Astro reads, so every save is a git commit (and a redeploy in production) rather than a database write
+- **Content editing** — menu items, locations, and the project attribution/tech stack badges are editable in a [Keystatic](https://keystatic.com) admin at `/keystatic`. It writes the same files Astro reads, so every save is a git commit (and a redeploy in production) rather than a database write
 - **Browser game** — "Mr. Beefburger's Great Escape" canvas sidescroller at `/game` (not in nav); Neon-backed leaderboard
 
 ## Running locally
@@ -99,10 +99,12 @@ src/
 │   ├── Nav.astro
 │   ├── OrderForm.tsx
 │   ├── PaymentTheater.tsx
-│   └── ProjectAttribution.astro  # Shared byline + tech stack (receipt + about)
+│   └── ProjectAttribution.astro  # Renders byline + tech stack badges (receipt + about)
 ├── content/
 │   ├── menu/         # Menu items as Markdown content collection (editable in Keystatic)
-│   └── locations/    # Location data as Markdown content collection (editable in Keystatic)
+│   ├── locations/    # Location data as Markdown content collection (editable in Keystatic)
+│   └── site/
+│       └── attribution.json  # Byline + tech stack badges (Keystatic singleton)
 ├── content.config.ts # Zod schemas Astro validates content against (keep in sync with keystatic.config.ts)
 ├── layouts/
 │   └── Layout.astro  # Shared layout with Nav, Footer, global CSS tokens

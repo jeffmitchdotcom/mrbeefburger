@@ -1,31 +1,26 @@
 ---
-// Central store for project attribution content.
-// Used on: /order/[id] (receipt) and /about.
-// To add a library or update details, edit this file only.
+// Byline + tech stack shown on /order/[id] (receipt) and /about.
+// Content lives in src/content/site/attribution.json — edit it in Keystatic
+// (Singletons → Project Attribution) or by hand.
+import { getEntry } from 'astro:content';
+
+const attribution = await getEntry('site', 'attribution');
+if (!attribution) throw new Error('Missing src/content/site/attribution.json');
+const { author, url, description, technologies } = attribution.data;
+const urlLabel = new URL(url).hostname.replace(/^www\./, '');
 ---
 
 <div class="attribution">
   <p class="attr-byline">
-    A demo project by <a href="https://jeffmitch.com" target="_blank" rel="noopener noreferrer" class="attr-link">Jeff Mitchell</a>
+    A demo project by <a href={url} target="_blank" rel="noopener noreferrer" class="attr-link">{author}</a>
     &nbsp;·&nbsp;
-    <a href="https://jeffmitch.com" target="_blank" rel="noopener noreferrer" class="attr-link">jeffmitch.com</a>
+    <a href={url} target="_blank" rel="noopener noreferrer" class="attr-link">{urlLabel}</a>
   </p>
-  <p class="attr-desc">
-    Built as a full-stack showcase — a fictional ordering system with a real database, real deploys, and zero actual burgers.
-  </p>
+  <p class="attr-desc">{description}</p>
   <div class="tech-stack">
-    <span class="tech-badge"><span class="tech-dot" style="background:#FF5D01"></span>Astro</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#61DAFB"></span>React</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#3178C6"></span>TypeScript</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#00E599"></span>Neon Postgres</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#C5F74F"></span>Drizzle ORM</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#000000"></span>Vercel</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#FF9900"></span>Amazon SES</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#F38020"></span>Cloudflare Turnstile</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#7C3AED"></span>Better Auth</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#3E63DD"></span>Keystatic</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#181717"></span>GitHub</span>
-    <span class="tech-badge"><span class="tech-dot" style="background:#D97757"></span>Claude Code</span>
+    {technologies.map((tech) => (
+      <span class="tech-badge"><span class="tech-dot" style={`background:${tech.color}`}></span>{tech.name}</span>
+    ))}
   </div>
 </div>
 

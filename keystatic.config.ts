@@ -1,4 +1,4 @@
-import { config, collection, fields } from '@keystatic/core';
+import { config, collection, fields, singleton } from '@keystatic/core';
 
 // Keystatic edits the same Markdown files Astro's content collections read
 // (see src/content.config.ts). Field names and types here must stay in sync
@@ -105,6 +105,44 @@ export default config({
         hours: fields.text({ label: 'Hours', validation: { isRequired: true } }),
         phone: fields.text({ label: 'Phone', validation: { isRequired: true } }),
         content: fields.emptyContent({ extension: 'md' }),
+      },
+    }),
+  },
+
+  singletons: {
+    // Byline + tech stack badges shown by src/components/ProjectAttribution.astro
+    // (about page and order receipt). Read by the `site` collection in content.config.ts.
+    attribution: singleton({
+      label: 'Project Attribution',
+      path: 'src/content/site/attribution',
+      format: { data: 'json' },
+      entryLayout: 'form',
+      schema: {
+        author: fields.text({ label: 'Author', validation: { isRequired: true } }),
+        url: fields.url({ label: 'Author URL', validation: { isRequired: true } }),
+        description: fields.text({
+          label: 'Description',
+          multiline: true,
+          validation: { isRequired: true },
+        }),
+        technologies: fields.array(
+          fields.object({
+            name: fields.text({ label: 'Name', validation: { isRequired: true } }),
+            color: fields.text({
+              label: 'Dot color',
+              description: 'Brand color as a 6-digit hex, e.g. #FF5D01.',
+              validation: {
+                isRequired: true,
+                pattern: { regex: /^#[0-9a-fA-F]{6}$/, message: 'Use a 6-digit hex color like #FF5D01' },
+              },
+            }),
+          }),
+          {
+            label: 'Tech stack badges',
+            description: 'Shown in this order. Drag to reorder.',
+            itemLabel: (props) => props.fields.name.value || 'New technology',
+          },
+        ),
       },
     }),
   },

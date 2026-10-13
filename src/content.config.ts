@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 
 const locations = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/locations' }),
@@ -31,4 +31,23 @@ const menu = defineCollection({
   }),
 });
 
-export const collections = { locations, menu };
+// Single-entry collection backing the Keystatic "Project Attribution" singleton.
+// The file is one object, so the parser wraps it as an entry with id 'attribution'.
+const site = defineCollection({
+  loader: file('src/content/site/attribution.json', {
+    parser: (text) => [{ id: 'attribution', ...JSON.parse(text) }],
+  }),
+  schema: z.object({
+    author: z.string(),
+    url: z.string().url(),
+    description: z.string(),
+    technologies: z.array(
+      z.object({
+        name: z.string(),
+        color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      }),
+    ),
+  }),
+});
+
+export const collections = { locations, menu, site };
